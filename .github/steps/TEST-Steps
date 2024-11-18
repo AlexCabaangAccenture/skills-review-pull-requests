@@ -1,16 +1,1 @@
-"IsEncrypted": false,
-"Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "TenantId": "",
-    "OAuthClientId": "",
-    "OAuthClientSecret": "",
-    "OAuthScopeUrl": "",
-    "Authority": "",
-    "ContainerName": "",
-    "StorageAccountName": "",
-    "StorageAccountKey": "",
-    "BlobConnectionString": "",
-    "FinOpsApiBaseUrl": "", 
-    "ASBConnectionString": "",
-    "CreateJournalEntryApiPath": ""
+
