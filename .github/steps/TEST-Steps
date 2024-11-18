@@ -1,9 +1,16 @@
-namespace CAT.App.D365.Service.Application.Service
-{
-    public interface IVendorApplication
-    {
-        Task<string> CreateVendorPOAsync(string vendorPOInfo);
-        Task<string> GetVendorPOAsync(string vendorId, string purchaseOrderNumber);
-        Task<string> UpdateVendorPOAsync(string vendorPOInfo, string vendorId, string purchaseOrderNumber);
-    }
-}
+"IsEncrypted": false,
+"Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "TenantId": "",
+    "OAuthClientId": "",
+    "OAuthClientSecret": "",
+    "OAuthScopeUrl": "",
+    "Authority": "",
+    "ContainerName": "",
+    "StorageAccountName": "",
+    "StorageAccountKey": "",
+    "BlobConnectionString": "",
+    "FinOpsApiBaseUrl": "", 
+    "ASBConnectionString": "",
+    "CreateJournalEntryApiPath": ""
