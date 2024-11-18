@@ -1,42 +1,89 @@
-
-using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System.IO;
-using VendorPOManagement.Application.Service;
-using VendorPOManagement.Application.Service.Interface;
-using VendorPOManagement.Core.Utilities;
 using VendorPOManagement.Core.Utilities.Interface;
-using VendorPOManagement.Infra.Service;
 using VendorPOManagement.Infra.Service.Interface;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System;
+using System.Threading.Tasks;
 
-[assembly: FunctionsStartup(typeof(VendorPOManagement.StartUp))]
-
-namespace VendorPOManagement
+namespace VendorPOManagement.Application.Service
 {
-    public class StartUp : FunctionsStartup
+    public class VendorApplication : IVendorApplication
     {
-        public override void Configure(IFunctionsHostBuilder builder)
+        private readonly IVendorService _service;
+        private readonly ILiquidTemplateService _liquidTemplateService;
+
+        public VendorApplication(IVendorService service, ILiquidTemplateService liquidTemplateService)
         {
-            // Configure application settings
-            var configuration = new ConfigurationBuilder()
-                 .SetBasePath(Directory.GetCurrentDirectory())
-                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true) // For local testing
-                 .AddEnvironmentVariables() // For CI/CD to use Azure DevOps variables
-                 .Build();
+            _liquidTemplateService = liquidTemplateService;
+            _service = service;
+        }
 
-            // Register configuration
-            builder.Services.AddSingleton<IConfiguration>(configuration);
+        public async Task<string> CreateVendorPOAsync(string vendorPOInfo)
+        {
+            try
+            {
+                // Generate payload using liquid templates
+                var payloadVendorPO = await _liquidTemplateService.GetLiquidTemplateAsync(vendorPOInfo, LiquidTemplateConstants.CREATE_VENDOR_PO_TEMPLATE);
+                var responseVendorPO = await _service.CreateVendorPOAsync(payloadVendorPO);
 
-            // Register application services (specific to Vendor PO Management)
-            builder.Services.AddSingleton<IVendorApplication, VendorApplication>();
-            builder.Services.AddSingleton<IVendorService, VendorService>();
+                dynamic vendorPO = JsonConvert.DeserializeObject<dynamic>(responseVendorPO);
+                if (string.IsNullOrEmpty(vendorPO.PurchaseOrderNumber?.ToString()))
+                {
+                    throw new Exception("Could not retrieve Purchase Order Number");
+                }
 
-            // Register utility services
-            builder.Services.AddSingleton<ILiquidTemplateService, LiquidTemplateService>();
-            builder.Services.AddSingleton<IStorageAccountService, StorageAccountService>();
-            builder.Services.AddSingleton<IAPICaller, APICaller>();
-            builder.Services.AddSingleton<IAzureServiceBusService, AzureServiceBusService>();
+                string purchaseOrderNumber = vendorPO.PurchaseOrderNumber?.ToString();
+
+                // Generate response using liquid templates
+                var responsePayload = await _liquidTemplateService.GetLiquidTemplateAsync(responseVendorPO, LiquidTemplateConstants.VENDOR_PO_CREATE_RESPONSE_TEMPLATE);
+
+                return responsePayload;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error while creating Vendor PO: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<string> GetVendorPOAsync(string vendorId, string purchaseOrderNumber)
+        {
+            try
+            {
+                var response = await _service.GetVendorPOAsync(vendorId, purchaseOrderNumber);
+                var responsePayload = await _liquidTemplateService.GetLiquidTemplateAsync(response, LiquidTemplateConstants.RESPONSE_GET_VENDOR_PO_TEMPLATE);
+                return responsePayload.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error while retrieving Vendor PO: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<string> UpdateVendorPOAsync(string vendorPOInfo, string vendorId, string purchaseOrderNumber)
+        {
+            try
+            {
+                // Generate payload for update
+                var payloadVendorPO = await _liquidTemplateService.GetLiquidTemplateAsync(vendorPOInfo, LiquidTemplateConstants.UPDATE_VENDOR_PO_TEMPLATE);
+                var responseVendorPO = await _service.UpdateVendorPOAsync(payloadVendorPO, vendorId, purchaseOrderNumber);
+
+                // Retrieve updated Vendor PO
+                var responseGetVendorPO = await _service.GetVendorPOAsync(vendorId, purchaseOrderNumber);
+                var responseRetrieveVendorPO = await _liquidTemplateService.GetLiquidTemplateAsync(responseGetVendorPO, LiquidTemplateConstants.RESPONSE_GET_VENDOR_PO_TEMPLATE);
+
+                return responseRetrieveVendorPO.ToString();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error while updating Vendor PO: {ex.Message}", ex);
+            }
         }
     }
 }
+
+public const string CREATE_VENDOR_PO_TEMPLATE = "VendorPOCreateTemplate.liquid";
+public const string UPDATE_VENDOR_PO_TEMPLATE = "VendorPOUpdateTemplate.liquid";
+public const string RESPONSE_GET_VENDOR_PO_TEMPLATE = "VendorPOGetResponseTemplate.liquid";
+public const string VENDOR_PO_CREATE_RESPONSE_TEMPLATE = "VendorPOCreateResponseTemplate.liquid";
+
+
