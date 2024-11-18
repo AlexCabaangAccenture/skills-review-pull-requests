@@ -1,70 +1,9 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace VendorManagement.Functions
+namespace CAT.App.D365.Service.Application.Service
 {
-    public class VendorTriggers
+    public interface IVendorApplication
     {
-        private readonly IVendorApplication _service;
-
-        public VendorTriggers(IVendorApplication service)
-        {
-            _service = service;
-        }
-
-        [FunctionName("CreateVendorPO")]
-        public async Task<IActionResult> CreateVendorPOAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            dynamic responseMessage = new JObject();
-            try
-            {
-                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(requestBody);
-
-                log.LogInformation($"HTTP trigger to create Vendor PO received the following request: {data}");
-
-                // Validate required fields
-                if (string.IsNullOrEmpty(data.VendorId?.ToString()))
-                {
-                    log.LogInformation("VendorId is a required field.");
-                    responseMessage.Add(new JProperty("ReturnMessage", "Vendor PO creation failed: VendorId is required."));
-                    responseMessage.Add(new JProperty("ReturnValue", false));
-                    return new BadRequestObjectResult(responseMessage);
-                }
-                if (string.IsNullOrEmpty(data.PurchaseOrderNumber?.ToString()))
-                {
-                    log.LogInformation("PurchaseOrderNumber is a required field.");
-                    responseMessage.Add(new JProperty("ReturnMessage", "Vendor PO creation failed: PurchaseOrderNumber is required."));
-                    responseMessage.Add(new JProperty("ReturnValue", false));
-                    return new BadRequestObjectResult(responseMessage);
-                }
-
-                // Call the application service to create the Vendor PO
-                var response = await _service.CreateVendorPOAsync(requestBody);
-                responseMessage = JsonConvert.DeserializeObject(response);
-                responseMessage.Add(new JProperty("ReturnMessage", "Vendor PO Successfully Created."));
-                responseMessage.Add(new JProperty("ReturnValue", true));
-
-                log.LogInformation($"Vendor PO creation completed with response: {responseMessage}");
-                return new OkObjectResult(responseMessage);
-            }
-            catch (Exception ex)
-            {
-                responseMessage.Add(new JProperty("ReturnMessage", $"Vendor PO creation failed with error: {ex.Message}"));
-                responseMessage.Add(new JProperty("ReturnValue", false));
-                log.LogError($"An error occurred while creating Vendor PO. Error: {ex.Message}. Inner Exception: {ex.InnerException}");
-                return new BadRequestObjectResult(responseMessage);
-            }
-        }
+        Task<string> CreateVendorPOAsync(string vendorPOInfo);
+        Task<string> GetVendorPOAsync(string vendorId, string purchaseOrderNumber);
+        Task<string> UpdateVendorPOAsync(string vendorPOInfo, string vendorId, string purchaseOrderNumber);
     }
 }
