@@ -1,1 +1,22 @@
 
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CAT.App.D365.Service.Core\CAT.App.D365.Service.Core.csproj" />
+    <ProjectReference Include="..\CAT.App.D365.Service.Infra\CAT.App.D365.Service.Infra.csproj" />
+  </ItemGroup>
+
+</Project>
