@@ -1,1 +1,88 @@
 
+using CAT.App.D365.Service.Core.Models;
+using CAT.App.D365.Service.Core.Utilities;
+using CAT.App.D365.Service.Core.Utilities.Interface;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CAT.App.D365.Service.Infra.Service
+{
+    public class JournalService : IJournalService
+    {
+        private readonly IAPICaller _apiCaller;
+        private readonly IConfiguration _config;
+        private readonly IAzureServiceBusService _serviceBus;
+
+        public JournalService(IAPICaller apiCaller, IConfiguration config, IAzureServiceBusService asbCaller)
+        {
+            _apiCaller = apiCaller;
+            _config = config;
+            _serviceBus = asbCaller;
+        }
+
+        public async Task<string> GetJournalNameAsync(string companyId, string journalName)
+        {
+            string odataQuery = $"data/JournalNames?$filter=dataAreaId eq '{companyId}' and Name eq '{journalName}'&cross-company=true";
+            try
+            {
+                var response = await _apiCaller.FinOpsApiCallAsync(HttpMethod.Get, odataQuery);
+
+                return response.Content.ReadAsStringAsync().Result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task<string> CreateJournalEntryAsync(string journalEntry)
+        {
+            try
+            {
+                string resourceUrl = "api/services/AVALedgerJournalDBS/AVALedgerJournalDBSService/create";
+                StringContent contents = new StringContent(journalEntry, Encoding.UTF8, "application/json");
+                //var response = await _apiCaller.APICallAsync(HttpMethod.Post, contents);
+                var response = await _apiCaller.FinOpsApiCallAsync(HttpMethod.Post, resourceUrl, contents);
+                if (response.IsSuccessStatusCode)
+                    return response.Content.ReadAsStringAsync().Result;
+                else
+                    throw new Exception();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task<string> GetPostedJournalAsync(string transactionType, IRequestCriteria? criteria)
+        {
+            try
+            {
+                var response = await _serviceBus.ASBGetMessageApiCallAsync(transactionType, criteria);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task<string> SendJournalEntryAsync(string journalEntry, string transactionType)
+        {
+            try
+            {
+                var response = await _serviceBus.ASBSendBatchMessageApiCallAsync(journalEntry, transactionType);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+    }
+}
