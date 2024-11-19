@@ -1,1 +1,22 @@
 
+using CAT.App.D365.Service.Core.Models;
+using CAT.App.D365.Service.Core.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CAT.App.D365.Service.Infra.Service
+{
+    public interface IJournalService
+    {
+        Task<string> GetJournalNameAsync(string companyId, string journalName);
+
+        Task<string> GetPostedJournalAsync(string transactionType, IRequestCriteria? criteria);
+
+        Task<string> CreateJournalEntryAsync(string journalEntry);
+
+        Task<string> SendJournalEntryAsync(string journalEntry, string transactionType);
+    }
+}
