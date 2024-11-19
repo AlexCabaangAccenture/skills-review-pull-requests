@@ -1,7 +1,44 @@
+Based on the TEST mapping of fields.
 
-public const string CREATE_VENDOR_PO_TEMPLATE = "VendorPOCreateTemplate.liquid";
-public const string UPDATE_VENDOR_PO_TEMPLATE = "VendorPOUpdateTemplate.liquid";
-public const string RESPONSE_GET_VENDOR_PO_TEMPLATE = "VendorPOGetResponseTemplate.liquid";
-public const string VENDOR_PO_CREATE_RESPONSE_TEMPLATE = "VendorPOCreateResponseTemplate.liquid";
+BDS Field Name
+
+1.  ACCT 
+2.  NAME 
+3.  CURR 
+4.  PAGDTA 
+5.  ENTITY 
+6.  TITLE 
+7.  ADDR1 
+8.  ADDR6 
+9.  PSTCDE 
+10. CNTRY 
+11. TELNO 
+12. FAXNO 
 
 
+D365 F&O Matching field Name
+
+1. VENDORACCOUNTNUMBER (required)
+2. DORORGANIZATIONNAME (required)
+3. CURRENCYCODE        (required)
+4. DEFAULTPAYMENTTERMSNAME (required)
+5. VENDORSEARCHNAME 
+6  VENDORORGANIZATIONNAME  (required)
+7. STREET (LogisticsPostalAddress_Street) (required)
+8. CITY (LogisticsPostalAddress_City) (required)
+9. ZIP/POSTALCODE (LogisticsPostalAddress_ZipCode) (required)
+10. COUNTRY/REGION (LogisticsPostalAddress_CountryRegiodId)  (required)
+11. LOCATOR (LogisticsElectronicAddress_Locator) (not required)
+12. LOCATOR (LogisticsElectronicAddress_Locator) (not required)
+
+
+Additional Details: 
+Vendor creation in D365 F&O will be transmitted to DBS, and it needs to update the vendor master file 
+	Prod > FDCSPOLIBP/POPCOVN0 
+	Test > FDCSPOLIBT/ POPCOVN0 
+
+API will be exposed by DBS to add the vendor in the files above. D365 will consume this API whenever a vendor is created or updated. 
+
+For Phone, check the Type (LogisticsElectronicAddress_Type) if ‘Phone’. Get the first entry with type ‘Phone” 
+
+For Fax, check the Type (LogisticsElectronicAddress_Type) if ‘Fax’. Get the first entry with type ‘Phone” 
