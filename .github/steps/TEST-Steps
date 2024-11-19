@@ -1,1 +1,186 @@
-test file
+
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using CAT.App.D365.Service.Application.Service;
+using Azure;
+using Newtonsoft.Json.Linq;
+using CAT.App.D365.Service.Core.Models;
+using CAT.App.D365.Service.Core.Utilities;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using CAT.App.D365.Service.Core;
+using DocumentFormat.OpenXml.Wordprocessing;
+
+namespace CAT.App.D365.Service.FA.Triggers
+{
+    public class JournalTriggers
+    {
+        private readonly IJournalApplication _service;
+
+        public JournalTriggers(IJournalApplication service)
+        {
+            _service = service;
+        }
+
+        [FunctionName("CheckValidDocumentType")]
+        public async Task<IActionResult> CheckValidDocumentType(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "CheckValidDocumentType")] HttpRequest req,
+            ILogger log)
+        {
+            string responseMessage = "Document type is valid.";
+            bool responseValue = true;
+            JObject responseJson;
+            var apiResponse = new ApiResponse();
+
+            try
+            {
+                string documentType = req.Query["DocumentType"];
+                string companyId = req.Query["CompanyCode"];
+
+                log.LogInformation($"C# HTTP get Journal Name information trigger function processed a get journal({documentType}) record request.");
+
+                string response = await _service.GetJournalNameAsync(companyId, documentType);
+
+                if (string.IsNullOrEmpty(response))
+                {
+                    apiResponse.ResponseMessage = $"Document type is not valid.";
+                    apiResponse.ResponseValue = false;
+
+                    //Return Status 500 - Internal Server Error
+                    return new ObjectResult(apiResponse.ToJsonString())
+                    {
+                        StatusCode = StatusCodes.Status500InternalServerError
+                    };
+                }
+                else
+                {
+                    Dictionary<string, object> responseDict = new Dictionary<string, object>(JsonConversionExtensions.ToDictionary(JObject.Parse(response)));
+                    apiResponse.ResponseMessage = "Current Period retrieved successfully.";
+                    apiResponse.ResponseValue = true;
+                    apiResponse.AdditionalProperties = responseDict;
+                }
+
+                return new OkObjectResult(apiResponse.ToJsonString());
+            }
+            catch (Exception ex)
+            {
+                log.LogError($"An error occurred. Error Message: {ex.Message}. Inner Exception: {ex.InnerException}");
+                return new ObjectResult(ex.Message)
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
+        }
+
+        [FunctionName("GetPostedJournal")]
+        public async Task<IActionResult> GetPostedJournalAsync([HttpTrigger(AuthorizationLevel.Function, "post", Route = "GetPostedJournal/{TransactionType}")] HttpRequest req, ILogger log, string transactionType)
+        {
+            ApiResponse responseMessage = new ApiResponse();
+
+            try
+            {
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                var reqCriteria = GetRequestCriteria(transactionType, requestBody);
+
+                log.LogInformation($"C# HTTP GetPostedJournal initiated. Transaction Type: {transactionType}; Request Body: {requestBody}");
+
+                string response = await _service.GetPostedJournalAsync(transactionType, reqCriteria);
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    responseMessage.ResponseData = JsonConvert.DeserializeObject<object>(response);
+                    responseMessage.ResponseMessage = "Posted Journal retrieved";
+                    responseMessage.ResponseValue = true;
+                }
+                else
+                {
+                    responseMessage.ResponseMessage = "No Posted Journal message to process.";
+                    responseMessage.ResponseValue = false;
+                }
+
+                return new OkObjectResult(responseMessage);
+            }
+            catch (Exception ex)
+            {
+                responseMessage.ResponseMessage = ex.Message;
+                responseMessage.ResponseValue = false;
+                log.LogError($"An error occured. Message: {ex.Message} Inner Exception: {ex.InnerException}");
+                return new BadRequestObjectResult(responseMessage);
+            }
+        }
+
+        [FunctionName("CreateJournalEntry")]
+        public async Task<IActionResult> CreateJournalEntryAsync([HttpTrigger(AuthorizationLevel.Function, "post", Route = "CreateJournalEntry")] HttpRequest req, ILogger log)
+        {
+            ApiResponse responseMessage = new ApiResponse();
+            try
+            {
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                log.LogInformation($"HTTP create journal entry trigger function processed a request with request message {requestBody}");
+                string response = await _service.CreateJournalEntryAsync(requestBody);
+                log.LogInformation($"HTTP journal entry trigger function processed complete with response body {response}");
+                responseMessage.ResponseMessage = response; //"Journal Entry Successfully created";
+                responseMessage.ResponseValue = true;
+
+                return new OkObjectResult(responseMessage);
+            }
+            catch (Exception ex)
+            {
+                responseMessage.ResponseMessage = ex.Message;
+                responseMessage.ResponseValue = false;
+                log.LogError($"An error occured. Message: {ex.Message} Inner Exception: {ex.InnerException}");
+                return new BadRequestObjectResult(responseMessage);
+            }
+        }
+
+        [FunctionName("PostJournalEntryMessages")]
+        public async Task<IActionResult> PostJournalEntryMessagesAsync([HttpTrigger(AuthorizationLevel.Function, "post", Route = "SendJournalEntryMessages/{TransactionType}")] HttpRequest req, ILogger log, string transactionType)
+        {
+            ApiResponse responseMessage = new ApiResponse();
+            try
+            {
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                log.LogInformation($"HTTP create journal entry trigger function processed a request with request message {requestBody}");
+                string response = await _service.SendJournalEntryAsync(requestBody, transactionType);
+                log.LogInformation($"HTTP journal entry trigger function processed complete with response body {response}");
+                responseMessage.ResponseMessage = response; //"Journal Entry Successfully created";
+                responseMessage.ResponseValue = true;
+
+                return new OkObjectResult(responseMessage);
+            }
+            catch (Exception ex)
+            {
+                responseMessage.ResponseMessage = ex.Message;
+                responseMessage.ResponseValue = false;
+                log.LogError($"An error occured. Message: {ex.Message} Inner Exception: {ex.InnerException}");
+                return new BadRequestObjectResult(responseMessage);
+            }
+        }
+
+
+        private IRequestCriteria? GetRequestCriteria(string transactionType, string request)
+        {
+            var criteria = new Dictionary<string, Func<string, IRequestCriteria>>
+            {
+                { TransactionTypes.EMSFI, req => JsonConvert.DeserializeObject<EMSFICriteriaRequest>(req) },
+                { TransactionTypes.NOTES, req => JsonConvert.DeserializeObject<NotesCriteriaRequest>(req) },
+                { TransactionTypes.GENERAL, req => null },
+
+            };
+
+            if (criteria.TryGetValue(transactionType, out var deserializer))
+            {
+                return deserializer(request);
+            }
+
+            throw new ArgumentException($"Unsupported transaction type: {transactionType}", nameof(transactionType));
+        }
+    }
+}
