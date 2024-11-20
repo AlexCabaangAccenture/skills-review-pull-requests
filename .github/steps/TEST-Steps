@@ -1,5 +1,13 @@
-{
-  "ReturnMessage": "Vendor Account Successfully Created",
-  "ReturnValue": true,
-  "VendorAccountNumber": "VND12345"
-}
+DBS Field Name	D365 F&O Matching Field Name	Required
+ACCT	VENDORACCOUNTNUMBER	Yes
+NAME	DORORGANIZATIONNAME	Yes
+CURR	CURRENCYCODE	Yes
+PAGDTA	DEFAULTPAYMENTTERMSNAME	Yes
+ENTITY	VENDORSEARCHNAME	No
+TITLE	VENDORORGANIZATIONNAME	Yes
+ADDR1	STREET (LogisticsPostalAddress_Street)	Yes
+ADDR6	CITY (LogisticsPostalAddress_City)	Yes
+PSTCDE	ZIP/POSTALCODE (LogisticsPostalAddress_ZipCode)	Yes
+CNTRY	COUNTRY/REGION (LogisticsPostalAddress_CountryRegionId)	Yes
+TELNO	LOCATOR (LogisticsElectronicAddress_Locator - Phone)	No
+FAXNO	LOCATOR (LogisticsElectronicAddress_Locator - Fax)	No
