@@ -1,24 +1,24 @@
+
 {
     "VendorAccountNumber": "12345",
-    "VendorOrganizationName": "ABC Supplies",
+    "OrganizationName": "ABC Supplies",
     "CurrencyCode": "USD",
-    "DefaultPaymentTermsName": "Net 30",
-    "VendorSearchName": "ABC",
-    "VendorOrganizationName": "ABC Corporation",
+    "PaymentTermsName": "Net 30",
+    "SearchName": "ABC",
     "Address": {
         "Street": "123 Main St",
         "City": "New York",
-        "PostalCode": "10001",
+        "ZipCode": "10001",
         "CountryRegionId": "US"
     },
-    "ContactInfo": {
-        "Phone": {
+    "ContactInfo": [
+        {
             "Type": "Phone",
             "Locator": "+1-555-123-4567"
         },
-        "Fax": {
+        {
             "Type": "Fax",
             "Locator": "+1-555-987-6543"
         }
-    }
+    ]
 }
