@@ -1,16 +1,6 @@
-"IsEncrypted": false,
-"Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "TenantId": "",
-    "OAuthClientId": "",
-    "OAuthClientSecret": "",
-    "OAuthScopeUrl": "",
-    "Authority": "",
-    "ContainerName": "",
-    "StorageAccountName": "",
-    "StorageAccountKey": "",
-    "BlobConnectionString": "",
-    "FinOpsApiBaseUrl": "", 
-    "ASBConnectionString": "",
-    "CreateJournalEntryApiPath": ""
+Facilitate seamless integration between the DBS system and the D365 application to ensure accurate and timely synchronization of vendor-related data.
+Automate Vendor PO creation updates in D365 whenever a new Vendor PO is created in the DBS system.
+Ensure synchronization of vendor information updates so that any modifications to vendor records in the DBS system are reflected in D365 in real-time.
+Establish a one-way data flow from the DBS system to D365, ensuring that all vendor creation and update processes originate exclusively from the DBS system.
+Maintain data consistency and accuracy by implementing a robust integration mechanism that aligns with the mapped fields between DBS and D365.
+Simplify and streamline the vendor management process by reducing manual interventions and leveraging automation for record synchronization.
