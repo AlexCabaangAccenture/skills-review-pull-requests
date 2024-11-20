@@ -1,39 +1,16 @@
-
-Triggers and Entry Points
-Trigger Overview:
-The integration leverages Azure Function triggers to listen for incoming requests from the DBS system. The trigger acts as the entry point for the integration flow, initiating the process of capturing, validating, and processing vendor data for updates or creation in the D365 application.
-
-HTTP Trigger Details:
-The integration uses an HTTP trigger with the following configuration:
-
-csharp
-Copy code
-[HttpTrigger(AuthorizationLevel.Function, "post", Route = "CreateVendor")] HttpRequest req, ILogger log
-Authorization Level: Function ensures that only authenticated and authorized clients can invoke this endpoint.
-HTTP Method: The "post" method is used to receive payloads for creating or updating vendor information.
-Route: The route CreateVendor defines the specific endpoint through which DBS will send vendor-related data.
-Trigger Workflow:
-
-Incoming Request:
-The DBS system sends a POST request to the Azure Function endpoint (CreateVendor) with a JSON payload containing the vendor data.
-Data Capture:
-The trigger captures the incoming HTTP request and logs the initial details for auditing and debugging purposes using the ILogger instance.
-Example:
-csharp
-Copy code
-log.LogInformation($"Received vendor creation request: {data}");
-Validation:
-The payload is deserialized and validated to ensure all required fields (e.g., VendorAccountNumber, CurrencyCode) are present and meet predefined criteria.
-Service Layer Invocation:
-Once validated, the trigger passes the data to the service layer (e.g., IVendorApplication) for further processing. The service layer is responsible for transforming the payload and invoking the D365 API for vendor creation or update.
-Example:
-csharp
-Copy code
-var response = await _vendorApplication.CreateVendorAsync(requestBody);
-Response Handling:
-The service layer processes the data and returns a response indicating success or failure, which is then relayed back to the DBS system.
-Key Benefits of Using Triggers:
-
-Scalability: The Azure Function can handle multiple concurrent requests efficiently, ensuring robust processing even during peak loads.
-Security: The Function authorization level ensures only authenticated clients can interact with the trigger.
-Modularity: The trigger is designed to remain lightweight, delegating complex logic to the service layer, promoting separation of concerns.
+"IsEncrypted": false,
+"Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "TenantId": "",
+    "OAuthClientId": "",
+    "OAuthClientSecret": "",
+    "OAuthScopeUrl": "",
+    "Authority": "",
+    "ContainerName": "",
+    "StorageAccountName": "",
+    "StorageAccountKey": "",
+    "BlobConnectionString": "",
+    "FinOpsApiBaseUrl": "", 
+    "ASBConnectionString": "",
+    "CreateJournalEntryApiPath": ""
