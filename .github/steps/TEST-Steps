@@ -1,14 +1,5 @@
 {
-  "ACCT": "VND12345",
-  "NAME": "ABC Supplies",
-  "CURR": "USD",
-  "PAGDTA": "Net 30",
-  "ENTITY": "ABC Corp",
-  "TITLE": "Primary Vendor",
-  "ADDR1": "123 Main St",
-  "ADDR6": "Suite 400",
-  "PSTCDE": "90210",
-  "CNTRY": "US",
-  "TELNO": "123-456-7890",
-  "FAXNO": "123-456-7891"
+  "ReturnMessage": "Vendor Account Successfully Created",
+  "ReturnValue": true,
+  "VendorAccountNumber": "VND12345"
 }
