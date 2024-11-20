@@ -1,16 +1,24 @@
-"IsEncrypted": false,
-"Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "TenantId": "",
-    "OAuthClientId": "",
-    "OAuthClientSecret": "",
-    "OAuthScopeUrl": "",
-    "Authority": "",
-    "ContainerName": "",
-    "StorageAccountName": "",
-    "StorageAccountKey": "",
-    "BlobConnectionString": "",
-    "FinOpsApiBaseUrl": "", 
-    "ASBConnectionString": "",
-    "CreateJournalEntryApiPath": ""
+{
+    "VendorAccountNumber": "12345",
+    "VendorOrganizationName": "ABC Supplies",
+    "CurrencyCode": "USD",
+    "DefaultPaymentTermsName": "Net 30",
+    "VendorSearchName": "ABC",
+    "VendorOrganizationName": "ABC Corporation",
+    "Address": {
+        "Street": "123 Main St",
+        "City": "New York",
+        "PostalCode": "10001",
+        "CountryRegionId": "US"
+    },
+    "ContactInfo": {
+        "Phone": {
+            "Type": "Phone",
+            "Locator": "+1-555-123-4567"
+        },
+        "Fax": {
+            "Type": "Fax",
+            "Locator": "+1-555-987-6543"
+        }
+    }
+}
