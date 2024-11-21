@@ -1,24 +1,53 @@
-
-{
-    "VendorAccountNumber": "12345",
-    "OrganizationName": "ABC Supplies",
-    "CurrencyCode": "USD",
-    "PaymentTermsName": "Net 30",
-    "SearchName": "ABC",
-    "Address": {
-        "Street": "123 Main St",
-        "City": "New York",
-        "ZipCode": "10001",
-        "CountryRegionId": "US"
-    },
-    "ContactInfo": [
-        {
-            "Type": "Phone",
-            "Locator": "+1-555-123-4567"
-        },
-        {
-            "Type": "Fax",
-            "Locator": "+1-555-987-6543"
-        }
-    ]
-}
+PurchaseOrderID
+RevisionNumber
+POType
+Status
+EmployeeName
+VendorNme
+VendorID
+ShipMethodID
+OrderDate
+ShipDate
+WorkOrder
+DeliveryRequiredBy
+AboutPO
+SubTotal
+TaxAmt
+Freight
+TotalDue
+PaidAmt
+PaidDate
+PaidTransactions
+ModifiedDate
+ShiptoName
+ShiptoAttn
+ShiptoAddress
+ShiptoCity
+ShiptoState
+ShiptoZip
+VendAddress
+VendCity
+VendZip
+VendSt
+SentTo
+SentDate
+RoutingNotes
+Comments
+TaxPct
+ApproveDate
+VoidBy
+ClosedBy
+ReopenedBy
+Approver
+OrderQty
+RecvQty
+OrderType
+SOS
+SOSD
+Store
+ERPOrdNo
+ERPSeg
+ERPwo
+VendorPO
+EMConfig
+OwnerID
