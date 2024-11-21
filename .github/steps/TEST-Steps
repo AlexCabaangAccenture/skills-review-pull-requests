@@ -1,1 +1,365 @@
-Test file
+JSON Payload/Schema
+Complete Example
+{
+    "OrderHeader": {
+        "PurchaseOrderID": "PO12345",
+        "RevisionNumber": 1,
+        "POType": "Standard",
+        "Status": "Open",
+        "EmployeeName": "John Doe",
+        "VendorName": "Supplier ABC",
+        "VendorID": "V123",
+        "ShipMethodID": "SM001",
+        "OrderDate": "2024-11-18T10:00:00Z",
+        "ShipDate": "2024-11-25T10:00:00Z",
+        "WorkOrder": "WO98765",
+        "DeliveryRequiredBy": "2024-11-30T00:00:00Z",
+        "AboutPO": "Urgent delivery needed",
+        "SubTotal": 1000.00,
+        "TaxAmt": 80.00,
+        "Freight": 50.00,
+        "TotalDue": 1130.00,
+        "PaidAmt": 500.00,
+        "PaidDate": "2024-11-20T00:00:00Z",
+        "PaidTransactions": "PT12345",
+        "ModifiedDate": "2024-11-19T12:00:00Z",
+        "ShipTo": {
+            "Name": "Warehouse A",
+            "Attention": "Receiving Department",
+            "Address": "123 Main St",
+            "City": "New York",
+            "State": "NY",
+            "Zip": "10001"
+        },
+        "VendorAddress": {
+            "Address": "456 Supplier Rd",
+            "City": "Los Angeles",
+            "Zip": "90001",
+            "State": "CA"
+        },
+        "SentTo": "ApproverName",
+        "SentDate": "2024-11-18T10:00:00Z",
+        "RoutingNotes": "Use Route X",
+        "Comments": "Check shipment carefully",
+        "TaxPct": 8.0,
+        "ApproveDate": "2024-11-19T10:00:00Z",
+        "VoidBy": null,
+        "ClosedBy": null,
+        "ReopenedBy": null,
+        "Approver": "Manager Name",
+        "OrderQty": 100,
+        "RecvQty": 90,
+        "OrderType": "Standard",
+        "SOS": "SOS123",
+        "SOSD": "Details of SOS",
+        "Store": "001",
+        "ERPOrdNo": "ERP12345",
+        "ERPSeg": "Seg01",
+        "ERPwo": "WO123",
+        "VendorPO": "VPO98765",
+        "EMConfig": "Config Details",
+        "OwnerID": "Owner123"
+    },
+    "OrderDetails": [
+        {
+            "ProductID": "P123",
+            "ProductDesc": "Product Description 1",
+            "UnitPrice": 50.00,
+            "LineTotal": 500.00,
+            "OrderQty": 10,
+            "LineTax": 40.00,
+            "ReceivedQty": 9,
+            "GLAccount": "GL12345",
+            "CostCenter": "CC67890",
+            "DueDate": "2024-11-25T00:00:00Z",
+            "POdetailKey": "Key001",
+            "POHeaderKey": "PO12345",
+            "IsSplit": false,
+            "IsTaxed": true,
+            "SOS": "SOS123",
+            "SOSD": "Detail",
+            "Store": "001",
+            "ERPOrdNo": "ERP123",
+            "ERPSeg": "Seg01",
+            "WONo": "WO12345",
+            "Division": "Division1",
+            "NewUsed": "New",
+            "UnitType": "TypeA",
+            "UnitID": "UID123",
+            "InventoryCustomer": "CustomerABC",
+            "ProductMake": "BrandX"
+        },
+        {
+            "ProductID": "P456",
+            "ProductDesc": "Product Description 2",
+            "UnitPrice": 30.00,
+            "LineTotal": 300.00,
+            "OrderQty": 10,
+            "LineTax": 30.00,
+            "ReceivedQty": 8,
+            "GLAccount": "GL67890",
+            "CostCenter": "CC12345",
+            "DueDate": "2024-11-26T00:00:00Z",
+            "POdetailKey": "Key002",
+            "POHeaderKey": "PO12345",
+            "IsSplit": true,
+            "IsTaxed": false,
+            "SOS": "SOS456",
+            "SOSD": "Detail",
+            "Store": "002",
+            "ERPOrdNo": "ERP456",
+            "ERPSeg": "Seg02",
+            "WONo": "WO67890",
+            "Division": "Division2",
+            "NewUsed": "Used",
+            "UnitType": "TypeB",
+            "UnitID": "UID456",
+            "InventoryCustomer": "CustomerXYZ",
+            "ProductMake": "BrandY"
+        }
+    ]
+}
+
+-----------------------------
+
+1. Endpoint for PO Creation
+Purpose: Receive PO data from DBS for creation in D365 F&O.
+HTTP Method: POST
+Endpoint URL: /api/VendorPO/CreatePurchaseOrder
+
+[FunctionName("CreatePurchaseOrder")]
+public async Task<IActionResult> CreatePurchaseOrderAsync(
+    [HttpTrigger(AuthorizationLevel.Function, "post", Route = "VendorPO/CreatePurchaseOrder")] HttpRequest req,
+    ILogger log)
+{
+    try
+    {
+        // Parse the request body
+        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+        dynamic purchaseOrderData = JsonConvert.DeserializeObject(requestBody);
+
+        log.LogInformation($"Received PO creation request: {purchaseOrderData}");
+
+        // Call the service layer to handle the PO creation
+        var response = await _vendorPOService.CreatePurchaseOrderAsync(purchaseOrderData);
+
+        log.LogInformation($"PO created successfully with response: {response}");
+        return new OkObjectResult(response);
+    }
+    catch (Exception ex)
+    {
+        log.LogError($"Error while creating PO: {ex.Message}");
+        return new BadRequestObjectResult($"Failed to create PO: {ex.Message}");
+    }
+}
+-----------------------------------------------
+
+2. Endpoint for PO Update
+Purpose: Handle PO updates from DBS and sync with D365 F&O.
+HTTP Method: PUT
+Endpoint URL: /api/VendorPO/UpdatePurchaseOrder
+
+[FunctionName("UpdatePurchaseOrder")]
+public async Task<IActionResult> UpdatePurchaseOrderAsync(
+    [HttpTrigger(AuthorizationLevel.Function, "put", Route = "VendorPO/UpdatePurchaseOrder")] HttpRequest req,
+    ILogger log)
+{
+    try
+    {
+        // Parse the request body
+        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+        dynamic purchaseOrderUpdateData = JsonConvert.DeserializeObject(requestBody);
+
+        log.LogInformation($"Received PO update request: {purchaseOrderUpdateData}");
+
+        // Call the service layer to handle the PO update
+        var response = await _vendorPOService.UpdatePurchaseOrderAsync(purchaseOrderUpdateData);
+
+        log.LogInformation($"PO updated successfully with response: {response}");
+        return new OkObjectResult(response);
+    }
+    catch (Exception ex)
+    {
+        log.LogError($"Error while updating PO: {ex.Message}");
+        return new BadRequestObjectResult($"Failed to update PO: {ex.Message}");
+    }
+}
+
+
+----------------------------------------------------------
+3. Endpoint for Fetching Existing PO
+Purpose: Fetch the existing PO details from D365 F&O for validation or reporting.
+HTTP Method: GET
+Endpoint URL: /api/VendorPO/GetPurchaseOrder/{PurchaseOrderID}
+
+
+[FunctionName("GetPurchaseOrder")]
+public async Task<IActionResult> GetPurchaseOrderAsync(
+    [HttpTrigger(AuthorizationLevel.Function, "get", Route = "VendorPO/GetPurchaseOrder/{PurchaseOrderID}")] HttpRequest req,
+    string PurchaseOrderID,
+    ILogger log)
+{
+    try
+    {
+        log.LogInformation($"Fetching details for PO ID: {PurchaseOrderID}");
+
+        // Call the service layer to fetch the PO details
+        var response = await _vendorPOService.GetPurchaseOrderAsync(PurchaseOrderID);
+
+        log.LogInformation($"Retrieved PO details: {response}");
+        return new OkObjectResult(response);
+    }
+    catch (Exception ex)
+    {
+        log.LogError($"Error while fetching PO: {ex.Message}");
+        return new BadRequestObjectResult($"Failed to fetch PO: {ex.Message}");
+    }
+}
+
+------------------------------------------
+
+Example Testing Scenario
+Scenario: PO Creation
+
+Input: POST /api/VendorPO/CreatePurchaseOrder with a valid payload:
+{
+    "PurchaseOrderID": "PO12345",
+    "VendorID": "V123",
+    "OrderDate": "2024-11-18",
+    "OrderDetails": [
+        {
+            "ProductID": "P001",
+            "OrderQty": 10,
+            "UnitPrice": 50
+        }
+    ]
+}
+
+------------------------------------------
+
+Sample JSON Payload for Purchase Order
+{
+    "PurchaseOrder": {
+        "Header": {
+            "PurchaseOrderID": "PO12345",
+            "RevisionNumber": 1,
+            "POType": "Standard",
+            "Status": "Pending",
+            "EmployeeName": "John Doe",
+            "VendorName": "ABC Supplies",
+            "VendorID": "V123",
+            "ShipMethodID": "Ground",
+            "OrderDate": "2024-11-18",
+            "ShipDate": "2024-11-20",
+            "WorkOrder": "WO45678",
+            "DeliveryRequiredBy": "2024-11-30",
+            "AboutPO": "Urgent delivery required.",
+            "SubTotal": 1000.00,
+            "TaxAmt": 50.00,
+            "Freight": 25.00,
+            "TotalDue": 1075.00,
+            "PaidAmt": 500.00,
+            "PaidDate": "2024-11-10",
+            "PaidTransactions": 2,
+            "ModifiedDate": "2024-11-18",
+            "ShipTo": {
+                "Name": "XYZ Corp",
+                "Attention": "Jane Smith",
+                "Address": "456 Elm Street",
+                "City": "Los Angeles",
+                "State": "CA",
+                "Zip": "90001"
+            },
+            "VendorAddress": {
+                "Street": "123 Main Street",
+                "City": "New York",
+                "State": "NY",
+                "Zip": "10001"
+            },
+            "SentTo": "Accounting",
+            "SentDate": "2024-11-18",
+            "RoutingNotes": "Handle with care.",
+            "Comments": "Verify all details before shipping.",
+            "TaxPct": 5.00,
+            "ApproveDate": "2024-11-17",
+            "VoidBy": null,
+            "ClosedBy": null,
+            "ReopenedBy": null,
+            "Approver": "Manager1",
+            "OrderQty": 100,
+            "RecvQty": 90,
+            "OrderType": "Standard",
+            "SOS": "S123",
+            "SOSD": "Details here",
+            "Store": "Store001",
+            "ERPOrdNo": "ERP12345",
+            "ERPSeg": "Segment001",
+            "ERPwo": "ERPWork001",
+            "VendorPO": "VendorPO123",
+            "EMConfig": "ConfigData",
+            "OwnerID": "Owner123"
+        },
+        "Details": [
+            {
+                "ProductID": "P001",
+                "ProductDesc": "Widget A",
+                "UnitPrice": 10.00,
+                "LineTotal": 100.00,
+                "OrderQty": 10,
+                "LineTax": 5.00,
+                "ReceivedQty": 8,
+                "GLAccount": "GL123",
+                "CostCenter": "CC001",
+                "DueDate": "2024-11-25",
+                "POdetailKey": "DetailKey001",
+                "POHeaderKey": "HeaderKey001",
+                "IsSplit": false,
+                "IsTaxed": true,
+                "SOS": "S123",
+                "SOSD": "DetailSOS",
+                "Store": "Store001",
+                "ERPOrdNo": "ERPDetail123",
+                "ERPSeg": "DetailSegment001",
+                "WONo": "WorkOrder001",
+                "Division": "Division001",
+                "NewUsed": "New",
+                "UnitType": "Box",
+                "UnitID": "U001",
+                "InventoryCustomer": "Customer001",
+                "ProductMake": "BrandA"
+            },
+            {
+                "ProductID": "P002",
+                "ProductDesc": "Widget B",
+                "UnitPrice": 20.00,
+                "LineTotal": 200.00,
+                "OrderQty": 10,
+                "LineTax": 10.00,
+                "ReceivedQty": 10,
+                "GLAccount": "GL124",
+                "CostCenter": "CC002",
+                "DueDate": "2024-11-25",
+                "POdetailKey": "DetailKey002",
+                "POHeaderKey": "HeaderKey001",
+                "IsSplit": false,
+                "IsTaxed": true,
+                "SOS": "S124",
+                "SOSD": "DetailSOS2",
+                "Store": "Store002",
+                "ERPOrdNo": "ERPDetail124",
+                "ERPSeg": "DetailSegment002",
+                "WONo": "WorkOrder002",
+                "Division": "Division002",
+                "NewUsed": "Used",
+                "UnitType": "Pallet",
+                "UnitID": "U002",
+                "InventoryCustomer": "Customer002",
+                "ProductMake": "BrandB"
+            }
+        ]
+    }
+}
+
+
+
+
