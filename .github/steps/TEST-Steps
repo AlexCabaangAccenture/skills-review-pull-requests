@@ -1,1 +1,52 @@
 
+When an existing vendor purchase order (PO) is updated in DBS, that vendor po is updated in D365FO. As an Accounts payable manager, I require that DBS Purchase order receipts are updated on purchase orders in D365FO so that AP can use the value in posting of vendor invoices.
+
+---
+
+Feature 1 – Vendor PO Update
+User Story 1 – As a user, I want the Purchase Orders created in DBS to be sent to D365 F&O
+
+Narrative & Scope
+This is to allow a purchase order created in DBS to be integrated in D365 F&O via webservice (API). This should be done interactively and even during business hours without any record/ file locks.
+
+
+List of Related Requirement/Pre-Requisites/Notes to Remember
+
+•	Below fields are being sent from DBS:
+o	OrderNumber
+o	Store
+o	SOS
+o	ProductID
+o	OrderQuantity
+o	UnitPrice
+o	ProductDescription
+o	PurchaseOrderID
+o	VendorID
+o	VendorName
+o	UserProfileID
+o	Account
+o	StreetAddress
+o	CityState
+o	OrderBy
+o	ReceivedQuantity
+o	PurchaseOrderLine
+
+
+•	Then separate the above data to PO header and PO detail and insert to D365
+•	Below is the purchase order information mapping from DBS to D365 for PO Header:
+
+Change
+
+Generate and send request to D365 F&O.
+Process response from D365 F&O and pass to FNC7040.
+Call the new program to send the customer details via webservice.
+Mapping File
+
+
+Testing Scenarios:
+•	Add Purchase Order with all information is populated. 
+•	Add Purchase Order where all characters for each detail are maxed out.
+•	Add Purchase Order with only a little information is populated.
+•	Add Purchase Order that already exist in D365 F&O.
+•	Add Purchase Order but integration is down.
+•	Add Purchase Order with special characters.
