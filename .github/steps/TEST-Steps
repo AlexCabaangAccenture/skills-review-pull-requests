@@ -1,1 +1,144 @@
 
+Infra files for coding
+
+using System.Threading.Tasks;
+
+namespace CAT.App.D365.Service.Infra.Service
+{
+    public interface IVendorPurchaseOrderService
+    {
+        Task<string> CreatePurchaseOrderAsync(string purchaseOrderPayload);
+        Task<string> UpdatePurchaseOrderAsync(string purchaseOrderPayload);
+        Task<string> GetPurchaseOrderDetailsAsync(string purchaseOrderId);
+    }
+}
+
+
+-------------------------------------------------
+
+
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using CAT.App.D365.Service.Core.Utilities.Interface;
+using Newtonsoft.Json;
+
+namespace CAT.App.D365.Service.Infra.Service
+{
+    public class VendorPurchaseOrderService : IVendorPurchaseOrderService
+    {
+        private readonly IAPICaller _apiCaller;
+        private readonly IConfiguration _config;
+
+        public VendorPurchaseOrderService(IAPICaller apiCaller, IConfiguration config)
+        {
+            _apiCaller = apiCaller;
+            _config = config;
+        }
+
+        public async Task<string> CreatePurchaseOrderAsync(string purchaseOrderPayload)
+        {
+            try
+            {
+                string resourceUrl = _config["D365API:CreatePurchaseOrderEndpoint"];
+                var content = new StringContent(purchaseOrderPayload, Encoding.UTF8, "application/json");
+                var response = await _apiCaller.FinOpsApiCallAsync(HttpMethod.Post, resourceUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Error creating Purchase Order: {error}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in {nameof(CreatePurchaseOrderAsync)}: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<string> UpdatePurchaseOrderAsync(string purchaseOrderPayload)
+        {
+            try
+            {
+                string resourceUrl = _config["D365API:UpdatePurchaseOrderEndpoint"];
+                var content = new StringContent(purchaseOrderPayload, Encoding.UTF8, "application/json");
+                var response = await _apiCaller.FinOpsApiCallAsync(HttpMethod.Put, resourceUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Error updating Purchase Order: {error}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in {nameof(UpdatePurchaseOrderAsync)}: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<string> GetPurchaseOrderDetailsAsync(string purchaseOrderId)
+        {
+            try
+            {
+                string resourceUrl = $"{_config["D365API:GetPurchaseOrderDetailsEndpoint"]}/{purchaseOrderId}";
+                var response = await _apiCaller.FinOpsApiCallAsync(HttpMethod.Get, resourceUrl);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    string error = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Error retrieving Purchase Order details: {error}");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in {nameof(GetPurchaseOrderDetailsAsync)}: {ex.Message}", ex);
+            }
+        }
+    }
+}
+
+
+"D365API": {
+  "CreatePurchaseOrderEndpoint": "api/services/POService/CreatePurchaseOrder",
+  "UpdatePurchaseOrderEndpoint": "api/services/POService/UpdatePurchaseOrder",
+  "GetPurchaseOrderDetailsEndpoint": "api/services/POService/GetPurchaseOrderDetails"
+}
+
+
+---------------------------------------------------------------------------------------------
+
+
+"D365API": {
+  "CreatePurchaseOrderEndpoint": "api/services/POService/CreatePurchaseOrder",
+  "UpdatePurchaseOrderEndpoint": "api/services/POService/UpdatePurchaseOrder",
+  "GetPurchaseOrderDetailsEndpoint": "api/services/POService/GetPurchaseOrderDetails"
+}
+
+Best Practice Implementation
+Add Configurations in the Host Project (CAT.App.D365.Service.FA): Place the configuration in local.settings.json (for local development) or Azure App Configuration (for production):
+
+Example: local.settings.json
+
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "D365API:CreatePurchaseOrderEndpoint": "api/services/POService/CreatePurchaseOrder",
+    "D365API:UpdatePurchaseOrderEndpoint": "api/services/POService/UpdatePurchaseOrder",
+    "D365API:GetPurchaseOrderDetailsEndpoint": "api/services/POService/GetPurchaseOrderDetails"
+  }
+}
