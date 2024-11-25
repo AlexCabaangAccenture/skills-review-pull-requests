@@ -1,1 +1,50 @@
-TEST FILES
+namespace CAT.App.D365.Service.Application.Service.Interface
+{
+    public interface IVendorPurchaseOrderApplication
+    {
+        Task<string> CreatePurchaseOrderAsync(string purchaseOrderData);
+        Task<string> UpdatePurchaseOrderAsync(string purchaseOrderData);
+        Task<string> DeletePurchaseOrderAsync(string purchaseOrderId);
+    }
+}
+
+------------------------------------------------------
+
+
+using System.Threading.Tasks;
+
+namespace CAT.App.D365.Service.Application.Service
+{
+    public class VendorPurchaseOrderApplication : IVendorPurchaseOrderApplication
+    {
+        public async Task<string> CreatePurchaseOrderAsync(string purchaseOrderData)
+        {
+            // Implementation for creating a purchase order
+            return "Purchase Order Created Successfully";
+        }
+
+        public async Task<string> UpdatePurchaseOrderAsync(string purchaseOrderData)
+        {
+            // Implementation for updating a purchase order
+            return "Purchase Order Updated Successfully";
+        }
+
+        public async Task<string> DeletePurchaseOrderAsync(string purchaseOrderId)
+        {
+            // Implementation for deleting a purchase order
+            return $"Purchase Order with ID {purchaseOrderId} deleted successfully";
+        }
+    }
+}
+
+
+------------------------------------------------------------
+
+DELETE /api/v1/purchase-orders/delete/{purchaseOrderId}
+
+DELETE /api/v1/purchase-orders/delete/PO12345
+
+{
+    "message": "Purchase Order with ID PO12345 deleted successfully"
+}
+
