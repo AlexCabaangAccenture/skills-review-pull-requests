@@ -1,9 +1,5 @@
-Hi team,
-While setting up my environment, I'm unable to access Azure Portal (Error 53003 – Restricted by Administrator).
+Blocker: Azure Portal access (Error 53003).
 
-I already checked SailPoint and reviewed my entitlements. I located my project as Estate Guardians (SPESTG) and verified my identity attributes.
+I already checked SailPoint, located my entitlements, and identified the project as Estate Guardians (SPESTG).
 
-I need confirmation on the correct Azure Subscription / Azure AD Group to request for this project so I can raise the correct access request.
-
-Thanks,
-Alex
+To proceed, I need to know the correct Azure subscription name or Azure access group for this project so I can submit the request in SailPoint.
