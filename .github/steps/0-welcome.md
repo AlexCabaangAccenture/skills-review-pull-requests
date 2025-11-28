@@ -1,64 +1,17 @@
-<!-- readme -->
-1. Validate DIA sFTP Access
+Subtasks created for SP ESTG-5 (1.2 Integrate SFTP with DIA)
 
-Confirm endpoint and connection details
+Pending actions today:
 
-Validate credentials & permissions
+Verify access to Azure Subscription & DIA environment
 
-Confirm required encryption standard
+Review SFTP credential requirements
 
-Test access in DEV environment
+Check required Function Apps, Storage Accounts, and permissions
 
-2. Validate Environment Access (Subscriptions / RG / Key Vault / Storage / Function Apps)
+Identify missing details for DIA workflow integration
 
-Verify access to all required Azure resources
+Will continue investigation and document findings throughout the day.
 
-Test ability to view secrets, logs, and configurations
+Raised personal POD inquiry with courier regarding missing supplements delivery (affects early morning schedule).
 
-3. Review Existing Estate Guardians Workflow
-
-Understand current manual process for receiving DIA files
-
-Identify steps that will be automated
-
-Document “as-is” workflow
-
-4. Monitor & Alert Requirements Definition
-
-Define missing/delayed file detection
-
-Confirm 6-hour monitoring window
-
-Define notification channel (email / D365 / dashboard)
-
-5. File Processing & Decryption Requirements
-
-Confirm encryption requirements
-
-Clarify decryption tool or service
-
-Identify validation rules
-
-6. Missing File Handling Rules
-
-Confirm escalation procedures
-
-Confirm timing and frequency of checks
-
-Document follow-up process with DIA
-
-7. Document Open Questions for Business
-
-Delivery timing
-
-Naming convention
-
-Encryption standard
-
-Retention rules
-
-Late file reprocessing
-
-8. Prepare Initial Integration Flow Diagram
-
-Draft high-level process flow for discussion next sprint
+Will sync with team if any blockers appear.
