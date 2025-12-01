@@ -1,27 +1,76 @@
-<!--
-  <<< Author notes: Step 1 >>>
-  Choose 3-5 steps for your course.
-  The first step is always the hardest, so pick something easy!
-  Link to docs.github.com for further explanations.
-  Encourage users to open new tabs for steps!
--->
+1. Introduction
 
-## Step 1: Open a pull request
+The Department of Internal Affairs (DIA) currently sends daily death notifications manually via email attachments. Files are manually downloaded, verified, and uploaded to Estate Guardians. This process is time-consuming, prone to delay, and lacks monitoring capability.
 
-_Welcome to "Review pull requests"! :wave:_
+2. Purpose
 
-Let's get started by opening a pull request.
+Define and implement a secure, automated SFTP-based integration with DIA so Westpac systems can reliably receive, decrypt, validate, and process death notification files under the Estate Guardians (EG) workflow.
 
-**What is a pull request?**: Collaboration happens on a pull request. The pull request shows the changes in your branch to other people. This pull request is going to keep the changes you just made on your branch and propose applying them to the `main` branch.
+3. Scope
 
-### :keyboard: Activity: Create a pull request
+This story covers:
 
-1. Click on the **Pull requests** tab in your repository.
-2. Click **New pull request**.
-3. In the **base:** dropdown, make sure **main** is selected.
-4. Select the **compare:** dropdown, and click `update-game`.
-5. Click **Create pull request**.
-6. Enter a title for your pull request: `Update the game over message`.
-7. Enter a description for your pull request: `Update the game over message so people know how to play again!`
-8. Click **Create pull request**.
-9. Wait about 20 seconds then refresh this page (the one you're following instructions from). [GitHub Actions](https://docs.github.com/en/actions) will automatically update to the next step.
+Secure reception of DIA files via sFTP
+
+AES256 decryption of incoming files
+
+Validation of file presence before end-of-day processing
+
+Basic monitoring & alerting for missing or invalid files
+
+Preparing outputs for onward consumption by Estate Guardians workflow
+
+Storing decrypted files in the EG State Management SharePoint location
+
+Not in scope:
+
+DIA-side changes
+
+D365 update logic
+
+Business validation workflow
+
+Full monitoring dashboard (covered in SP-ESTG-21)
+
+4. High-Level Summary of Target Design
+
+At a high level, the automated solution will:
+
+Receive encrypted death notification files from DIA via sFTP.
+
+Automatically detect new file arrival.
+
+Begin decryption using AES256 and Westpac-secured private keys.
+
+Extract and prepare clean daily death notification data for Estate Guardians.
+
+Save processed output into the State Management SharePoint library.
+
+Raise alerts if:
+
+File is missing by cut-off
+
+File integrity is invalid
+
+Decryption fails
+
+File does not meet encryption requirement
+
+5. Interfaces & Integration Points
+
+sFTP Endpoint (DIA → Westpac)
+For secure file transfer.
+
+Azure Function App – File Ingestion
+Detect, pull, decrypt, validate files.
+
+Azure Storage (Blob / KeyVault)
+For temporary storage & key retrieval.
+
+SharePoint EG State Management Library
+Final resting place of processed outputs.
+
+Alerting (App Insights / Email / Logs)
+Based on monitoring definitions.
+
+
