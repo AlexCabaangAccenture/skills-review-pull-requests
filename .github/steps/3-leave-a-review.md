@@ -1,16 +1,27 @@
-Hi Swapna / Kaustav,
+Hi Swapna, Kaustav
 
-As discussed, I’ve completed the high-level design and detailed requirements under SP-ESTG-5.
-To proceed with the development setup, may I kindly request provisioning of the following resources:
+As discussed, I’ve completed the detailed HLD draft and consolidated requirements in SP-ESTG-5 (Story Description).
 
-1. Resource Group under the correct subscription
-2. Storage Account (Blob + KeyVault access for encryption keys)
-3. Function App (for File Ingestion + Decryption)
-4. SFTP endpoint credentials (DIA > Westpac transfer)
-5. App Insights / Logging access
-6. Service Bus Namespace (if required based on final design)
+Please review when convenient.
 
-Please let me know if anything additional is needed on my side.
+To proceed with the environment setup and begin implementation work, kindly help confirm/provision the following Azure resources:
 
-Thanks,
+Resource Group under the correct subscription
+
+Storage Account (Blob) for temporary encrypted/decrypted file handling
+
+Key Vault for storing private keys and SFTP credentials
+
+Function App for File Ingestion + AES256 Decryption + Validation
+
+SFTP Endpoint Credentials (DIA → Westpac secure transfer)
+
+Application Insights for monitoring, logging and alerting
+
+Service Bus Namespace (if required, based on the final design and whether we decouple steps asynchronously)
+
+Let me know if you need the export of the HLD text or if we should upload a copy into Confluence after access is enabled.
+
+Thanks!
+
 Alex
