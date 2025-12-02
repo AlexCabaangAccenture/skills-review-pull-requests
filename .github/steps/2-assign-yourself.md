@@ -1,81 +1,25 @@
-Please provision the following resources in the target subscription:
+Title:
+DIA SFTP/ELZ File Retrieval Service (Blocked Pending Contract)
 
-A. Storage & Keys
+Story Description:
+This story captures the work required for DIA → Westpac Azure integration.
+The service will connect to DIA’s Azure-hosted file repository, fetch the encrypted DIA file daily, and drop it into the project Blob Storage.
 
-Azure Storage Account
+Status:
+BLOCKED — pending DIA contract signing and credential provisioning.
 
-For temporary file landing
+Acceptance Criteria (AC):
 
-For decrypted file staging
+Connectivity to DIA Azure SFTP / repository is established.
 
-Blob Container(s)
+Credentials (service principal / keys) are provisioned by enterprise security.
 
-/incoming (raw DIA files)
+Daily schedule fetches the file and writes it to Blob.
 
-/processed
+Logs are available in App Insights.
 
-Azure Key Vault
+Error notifications are raised on failed fetch.
 
-AES private key (Westpac)
+Security and networking config approved (VNet, firewall, IP allowlist).
 
-DIA public key (optional)
-
-SFTP credential secret (username/password OR key pair)
-
-B. Compute
-
-Azure Function App
-
-Runtime: .NET 8
-
-Managed Identity enabled
-
-Access to Key Vault
-
-Access to Storage
-
-App settings placeholder for:
-
-SFTP_HOST
-
-SFTP_PORT
-
-SFTP_USERNAME
-
-KEYVAULT_URL
-
-C. sFTP Connectivity
-
-DIA sFTP Endpoint Whitelist
-
-Outbound IPs for the Function App
-
-Credentials
-
-Test environment username/password, or
-
-Keypair for authentication
-
-D. Monitoring
-
-Application Insights
-
-Log Analytics workspace (linked)
-
-E. DevOps
-
-Deployment Pipeline Access
-
-Permission to create/edit YAML pipeline
-
-Repository access
-
-To push code + configuration
-
-F. SharePoint (Final Output)
-
-EG SharePoint Library access
-
-Target folder where decrypted file should be uploaded
-
-Service account that the Function App will use to upload
+Unblocked when the DIA contract is signed and access is provided.
