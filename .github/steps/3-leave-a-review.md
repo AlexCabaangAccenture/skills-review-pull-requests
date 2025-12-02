@@ -1,27 +1,40 @@
-Hi Swapna, Kaustav
+Summary:
 
-As discussed, I’ve completed the detailed HLD draft and consolidated requirements in SP-ESTG-5 (Story Description).
+DIA Integration – Azure Blob to Dataverse Staging Table (Service B)
 
-Please review when convenient.
+Description:
+This sub-story covers all DIA integration steps that can be completed without waiting for DIA–Westpac contract activation. The scope includes consumption of files already present in Azure Blob, data deserialization, building the Dataverse staging table, and outlining the matching logic without touching the live D365 functionality.
 
-To proceed with the environment setup and begin implementation work, kindly help confirm/provision the following Azure resources:
+Acceptance Criteria:
 
-Resource Group under the correct subscription
+Azure Function can read the file from Blob Storage.
 
-Storage Account (Blob) for temporary encrypted/decrypted file handling
+File schema is validated (row count, column names, date formats).
 
-Key Vault for storing private keys and SFTP credentials
+File is deserialized and inserted into a Dataverse staging table.
 
-Function App for File Ingestion + AES256 Decryption + Validation
+Basic matching logic outline is documented (Excel-based version OK).
 
-SFTP Endpoint Credentials (DIA → Westpac secure transfer)
+No DIA dependency required (manual file placement into blob allowed).
 
-Application Insights for monitoring, logging and alerting
+Monitoring and error logs are added.
 
-Service Bus Namespace (if required, based on the final design and whether we decouple steps asynchronously)
+Story is independent and unblocked.
 
-Let me know if you need the export of the HLD text or if we should upload a copy into Confluence after access is enabled.
+Story B is created for blocked contract work.
 
-Thanks!
+Sub-Tasks for Story A:
 
-Alex
+Define staging table structure in Dataverse
+
+Build Blob file-reading Function
+
+Build deserialization module
+
+Insert rows into Dataverse
+
+Document matching logic outline
+
+Implement logging/monitoring
+
+Update Confluence section “DIA Integration – Service B”
