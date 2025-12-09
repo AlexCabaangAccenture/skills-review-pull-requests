@@ -1,25 +1,10 @@
-Title:
-DIA SFTP/ELZ File Retrieval Service (Blocked Pending Contract)
+Integration notes and current plan (aligned with SPESTG-64)
+– SPESTG-64 (“Create a staging table in D365”) owns the staging table design + Power Automate matching script on the D365 side.
+– SPESTG-38 focuses on the Azure integration:
 
-Story Description:
-This story captures the work required for DIA → Westpac Azure integration.
-The service will connect to DIA’s Azure-hosted file repository, fetch the encrypted DIA file daily, and drop it into the project Blob Storage.
+Read decrypted DIA CSV file from Azure Blob (or manually uploaded file during POC).
 
-Status:
-BLOCKED — pending DIA contract signing and credential provisioning.
+Create one staging record per file in the Deceased Estate Staging table, attach the CSV, and populate metadata fields (File Name, File Type, Received On, Processing Started On, Processing Status, Retry Count, Error Message / Error Details when applicable).
 
-Acceptance Criteria (AC):
-
-Connectivity to DIA Azure SFTP / repository is established.
-
-Credentials (service principal / keys) are provisioned by enterprise security.
-
-Daily schedule fetches the file and writes it to Blob.
-
-Logs are available in App Insights.
-
-Error notifications are raised on failed fetch.
-
-Security and networking config approved (VNet, firewall, IP allowlist).
-
-Unblocked when the DIA contract is signed and access is provided.
+Set Processing Status to Pending / In progress / Failed from the integration side.
+– The Power Automate matching script (owned by the D365 team under SPESTG-64) will later read the attached CSV from this staging record and update D365 cases/customers. That implementation is out of scope for SPESTG-38 but depends on the fields produced by this story.
