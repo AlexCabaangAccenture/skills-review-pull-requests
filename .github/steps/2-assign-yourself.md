@@ -1,10 +1,40 @@
-Integration notes and current plan (aligned with SPESTG-64)
-– SPESTG-64 (“Create a staging table in D365”) owns the staging table design + Power Automate matching script on the D365 side.
-– SPESTG-38 focuses on the Azure integration:
+Update – Integration Alignment & Next Steps
 
-Read decrypted DIA CSV file from Azure Blob (or manually uploaded file during POC).
+Azure subscription access issue is still pending
+Evidence provided to Kostav; awaiting access activation to proceed with Function App deployment setup.
 
-Create one staging record per file in the Deceased Estate Staging table, attach the CSV, and populate metadata fields (File Name, File Type, Received On, Processing Started On, Processing Status, Retry Count, Error Message / Error Details when applicable).
+Staging Table Design Reviewed (Story 64)
 
-Set Processing Status to Pending / In progress / Failed from the integration side.
-– The Power Automate matching script (owned by the D365 team under SPESTG-64) will later read the attached CSV from this staging record and update D365 cases/customers. That implementation is out of scope for SPESTG-38 but depends on the fields produced by this story.
+Confirmed that one staging record = one CSV file
+
+Integration will only insert the metadata; row-level processing is performed by D365/PowerAutomate
+
+Azure Function – planned responsibilities
+
+Trigger on new Blob file
+
+Extract file metadata
+
+Insert staging entry into D365 (via API)
+
+Set initial fields (ReceivedOn, ProcessingStatus = Pending)
+
+Out of scope for this story
+
+Power Automate matching script
+
+Updating processing timestamps and status after processing
+
+Any D365-side retries or validation logic
+
+Next Steps (pending access)
+
+Prepare function skeleton for Blob Trigger
+
+Confirm endpoint + authentication for D365 API insert
+
+Prepare draft flow diagram for internal processing
+
+Coordinate with D365 team once sample CSV file format is shared
+
+Will proceed with design tasks while waiting for environment access.
