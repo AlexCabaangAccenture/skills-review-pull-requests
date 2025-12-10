@@ -1,47 +1,53 @@
-Hi team,
+Hi Kostov / Swapna,
 
-I reviewed the staging table design and aligned it with the integration requirements for SPESTG-38.
-Below is the confirmed understanding and how the integration will use the staging table:
+As discussed earlier, my role has been corrected to Software Engineer and all my previous IQ entitlements were removed. I attempted to raise the IQ requests myself, but the SailPoint UI is currently not allowing selections or submissions (Next button disabled, access groups not applying, and role propagation seems incomplete).
 
-* Integration Alignment (SPESTG-38 -> Staging Table)
+To avoid further delays to SPSTG-38, could you please raise the following IQs on my behalf:
 
-One staging record corresponds to one uploaded CSV file (not per row).
-The row-by-row processing will be handled within Power Automate / D365, not on the Azure side.
+Required Access (SPSTG-38 – Estate Management Integration)
 
-Azure Function will populate:
+Azure Subscription Access
 
-File Name
+WNZL-Access-Azure-t3_d365connect_dev-Owner
 
-File Type
+(Primary subscription for our project)
 
-Received On (date/time when file is received)
+Resource Group Access
 
-Processing Status = Pending
+Contributor access to the RG associated with the above subscription
 
-File (attachment) — if enabled on the table (else SharePoint link)
+Storage Account Access
 
-Power Automate will be responsible for:
+Storage Blob Data Contributor
 
-Updating Processing Started On
+Storage Account Contributor
 
-Updating Processing Status (In Progress, Completed, Partial, Failed)
+Function App Hosting Access
 
-Updating Processed On
+App Service Contributor
 
-Populating Retry Count
+Function App Contributor
 
-Writing to Error Message and Error Details
+Key Vault Access
 
-The staging table fields fully support the expected end-to-end flow for:
+Key Vault Secrets User / Contributor
 
-File receipt
+D365 API Access
 
-Processing orchestration
+Access to D365 File Upload API
 
-Status update and troubleshooting
+Access to D365 Staging Record API
 
-No additional schema requirements from the integration side at this time.
+Azure DevOps Access
 
-Thanks, let me know if further alignment is needed.
+Repo create/read/write
 
-That's your final comment for SPESTG-64.
+Pipeline creation permission
+
+Justification:
+My previous access entitlements were revoked after the role change. These accesses are required to begin SPSTG-38 integration development (Blob ingestion, Function App deployment, D365 API integration). Without these accesses, development cannot proceed.
+
+Let me know if you need any additional details.
+Thank you!
+
+— Alex
