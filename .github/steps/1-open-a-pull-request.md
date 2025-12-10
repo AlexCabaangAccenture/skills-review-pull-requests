@@ -1,53 +1,12 @@
-Hi Kostov / Swapna,
+Hi team, quick update:
+I’ve already sent an email to Kostov and Swapna with the full list of access items required for SPSTG-38 / SPSTG-64 so we can proceed with development.
 
-As discussed earlier, my role has been corrected to Software Engineer and all my previous IQ entitlements were removed. I attempted to raise the IQ requests myself, but the SailPoint UI is currently not allowing selections or submissions (Next button disabled, access groups not applying, and role propagation seems incomplete).
+I attempted to raise the IQ requests myself in SailPoint, but after the recent role update my entitlements were reset. The system is currently blocking me from completing the request (Next button disabled + required access elements won’t apply).
 
-To avoid further delays to SPSTG-38, could you please raise the following IQs on my behalf:
+Because of that, I escalated the request through email so the needed permissions can be raised on my behalf. Once the access is restored, I’ll continue with the remaining setup items.
 
-Required Access (SPSTG-38 – Estate Management Integration)
+Just keeping everyone in Manila looped in so there’s visible progress on this task.
 
-Azure Subscription Access
-
-WNZL-Access-Azure-t3_d365connect_dev-Owner
-
-(Primary subscription for our project)
-
-Resource Group Access
-
-Contributor access to the RG associated with the above subscription
-
-Storage Account Access
-
-Storage Blob Data Contributor
-
-Storage Account Contributor
-
-Function App Hosting Access
-
-App Service Contributor
-
-Function App Contributor
-
-Key Vault Access
-
-Key Vault Secrets User / Contributor
-
-D365 API Access
-
-Access to D365 File Upload API
-
-Access to D365 Staging Record API
-
-Azure DevOps Access
-
-Repo create/read/write
-
-Pipeline creation permission
-
-Justification:
-My previous access entitlements were revoked after the role change. These accesses are required to begin SPSTG-38 integration development (Blob ingestion, Function App deployment, D365 API integration). Without these accesses, development cannot proceed.
-
-Let me know if you need any additional details.
-Thank you!
+Thanks!
 
 — Alex
