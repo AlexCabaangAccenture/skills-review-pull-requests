@@ -1,12 +1,11 @@
-Hi team, quick update:
-I’ve already sent an email to Kostov and Swapna with the full list of access items required for SPSTG-38 / SPSTG-64 so we can proceed with development.
+Hi team, quick update on the environment setup.
 
-I attempted to raise the IQ requests myself in SailPoint, but after the recent role update my entitlements were reset. The system is currently blocking me from completing the request (Next button disabled + required access elements won’t apply).
+I re-attempted the SailPoint request for the Azure access group (same item we discussed earlier). When I select the entitlement, SailPoint shows a pop-up saying my AD account (W818140) was previously associated with this access, but it won't allow me to proceed — the checkbox won’t activate and the “Next” button is disabled.
 
-Because of that, I escalated the request through email so the needed permissions can be raised on my behalf. Once the access is restored, I’ll continue with the remaining setup items.
+The only option shown is “Create New Account,” which I believe is not appropriate for this type of request.
 
-Just keeping everyone in Manila looped in so there’s visible progress on this task.
+This seems related to the recent role change, and the prerequisite permissions needed to request Azure access are likely missing.
+
+I’ve already sent the detailed request via email. Just sharing this update here so the team is aware that I cannot proceed through IQ self-service at the moment. Once the base permission is restored, I’ll continue with the setup.
 
 Thanks!
-
-— Alex
