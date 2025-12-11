@@ -1,40 +1,35 @@
-Update – Integration Alignment & Next Steps
+Design – DIA File to D365 Staging Integration Flow
 
-Azure subscription access issue is still pending
-Evidence provided to Kostav; awaiting access activation to proceed with Function App deployment setup.
+Purpose
+Design a high-level integration flow for the DIA file into the Deceased Estate staging table in D365.
 
-Staging Table Design Reviewed (Story 64)
+This is preparatory design work while access to the Dev/Azure environment is being resolved.
 
-Confirmed that one staging record = one CSV file
+Scope
+– File arrival in DIA location (e.g., SFTP / DIA drop / Storage)
+– Ingestion by DIA/Deceased Estate Function/App or equivalent integration component
+– Validation and basic logging (success / error)
+– Creation/update of records in the Deceased Estate staging table in D365
+– Linking or storing the file in the appropriate SharePoint / document location
+– Initial status handling for records (e.g., Pending, Success, Failed, Partial Success)
+– Handover points where D365 or subsequent flows take over
 
-Integration will only insert the metadata; row-level processing is performed by D365/PowerAutomate
+Outputs
+– A sequence diagram showing the end-to-end DIA → Staging → D365 flow
+– Open questions and assumptions clearly listed (for Kostubh / Swapna / D365 team)
 
-Azure Function – planned responsibilities
+Notes
+– This task does not require working environment access; it can be done based on current understanding, previous discussions, and existing documents.
+– The diagram will help the team align on responsibilities between DIA integration, D365, and environments once access is fully granted.
 
-Trigger on new Blob file
 
-Extract file metadata
+Acceptance criteria
 
-Insert staging entry into D365 (via API)
+Sequence diagram created for the DIA → Deceased Estate staging → D365 flow.
+Diagram is stored in a shared location (Confluence or shared folder).
+Link to the diagram is added in this subtask.
+Any open questions/assumptions are written in a short list in this subtask’s comments.
+Subtask status moved to Done once 1–4 are completed.
 
-Set initial fields (ReceivedOn, ProcessingStatus = Pending)
-
-Out of scope for this story
-
-Power Automate matching script
-
-Updating processing timestamps and status after processing
-
-Any D365-side retries or validation logic
-
-Next Steps (pending access)
-
-Prepare function skeleton for Blob Trigger
-
-Confirm endpoint + authentication for D365 API insert
-
-Prepare draft flow diagram for internal processing
-
-Coordinate with D365 team once sample CSV file format is shared
-
-Will proceed with design tasks while waiting for environment access.
+--------------------------
+As discussed in this morning’s stand-up, I’ll use this subtask to track the DIA integration design work while my access is being reset via Fixit. First output will be a sequence diagram for the file-to-staging flow; I’ll attach/link it here once v1 is ready
