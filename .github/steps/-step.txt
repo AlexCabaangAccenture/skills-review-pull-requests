@@ -1,21 +1,27 @@
-script: |
-  Write-Host "Current directory:"
-  Get-Location
+- task: PowerShell@2
+  displayName: Publish
+  condition: and(succeeded(), ne('${{ parameters.publishProjects }}', ''))
+  inputs:
+    targetType: inline
+    workingDirectory: '$(Build.SourcesDirectory)'
+    script: |
+      Write-Host "Current directory:"
+      Get-Location
 
-  $projectPath = Get-ChildItem -Path . -Recurse -Filter "WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj" |
-    Select-Object -First 1 -ExpandProperty FullName
+      $projectPath = Get-ChildItem -Path . -Recurse -Filter "WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj" |
+        Select-Object -First 1 -ExpandProperty FullName
 
-  Write-Host "Publishing project:"
-  Write-Host $projectPath
+      Write-Host "Publishing project:"
+      Write-Host $projectPath
 
-  if (-not $projectPath) {
-    throw "Azure Functions csproj not found from current working directory."
-  }
+      if (-not $projectPath) {
+        throw "Azure Functions csproj not found from Build.SourcesDirectory."
+      }
 
-  Write-Host "Project exists:"
-  Write-Host (Test-Path $projectPath)
+      Write-Host "Project exists:"
+      Write-Host (Test-Path $projectPath)
 
-  dotnet publish $projectPath `
-    --configuration ${{ parameters.buildConfiguration }} `
-    --framework net8.0 `
-    --output "$(Build.ArtifactStagingDirectory)"
+      dotnet publish $projectPath `
+        --configuration ${{ parameters.buildConfiguration }} `
+        --framework net8.0 `
+        --output "$(Build.ArtifactStagingDirectory)"
