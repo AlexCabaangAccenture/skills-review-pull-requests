@@ -3,17 +3,9 @@ script: |
   Get-Location
 
   Write-Host ""
-  Write-Host "Root contents:"
+  Write-Host "Current folder contents:"
   Get-ChildItem -Path . -Force
 
   Write-Host ""
-  Write-Host "src contents:"
-  Get-ChildItem -Path .\src -Force
-
-  Write-Host ""
-  Write-Host "IntServices contents:"
-  Get-ChildItem -Path .\src\WNZL.ICOW.DeceasedEstates.IntServices -Force
-
-  Write-Host ""
   Write-Host "AzureFunctions contents:"
-  Get-ChildItem -Path .\src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions -Force
+  Get-ChildItem -Path .\WNZL.ICOW.DeceasedEstates.AzureFunctions -Force
