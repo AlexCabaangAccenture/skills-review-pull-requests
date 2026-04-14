@@ -1,10 +1,15 @@
 script: |
-  $projectPath = Join-Path "$(Build.SourcesDirectory)" "src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions\WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj"
+  $projectPath = Get-ChildItem -Path "$(Build.SourcesDirectory)" -Recurse -Filter "WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj" |
+    Select-Object -First 1 -ExpandProperty FullName
 
   Write-Host "Publishing project:"
   Write-Host $projectPath
   Write-Host "Project exists:"
   Write-Host (Test-Path $projectPath)
+
+  if (-not $projectPath) {
+    throw "Azure Functions csproj not found."
+  }
 
   dotnet publish $projectPath `
     --configuration ${{ parameters.buildConfiguration }} `
