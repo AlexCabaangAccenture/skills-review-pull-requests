@@ -1,36 +1,74 @@
-steps:
-- checkout: self
-  clean: true
-  persistCredentials: true
+# Purpose
+# ------
+# Stage template that builds a dotnetcore function app and associated terraform.
+#
 
-- task: PowerShell@2
-  displayName: Debug repo paths
-  inputs:
-    targetType: inline
-    script: |
-      Write-Host "Repo root contents:"
-      Get-ChildItem -Path . -Force
+parameters:
+- name: azureServiceConnection
+  type: string
 
-      Write-Host ""
-      Write-Host "src contents:"
-      Get-ChildItem -Path .\src -Force
+- name: backendVariableGroup
+  type: string
 
-      Write-Host ""
-      Write-Host "IntServices contents:"
-      Get-ChildItem -Path .\src\WNZL.ICOW.DeceasedEstates.IntServices -Force
+# Kept for backwards compatibility; empty string indicates unused
+- name: proxyVariableGroup
+  type: string
+  default: ''
 
-      Write-Host ""
-      Write-Host "Checking solution path:"
-      Write-Host (Test-Path '.\src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions.sln')
+# Defaults to first item in configuration directory, if have multiple directories then defaults to parent directory
+- name: publishDirectory
+  type: string
+  default: ''
 
-      Write-Host ""
-      Write-Host "Checking csproj path:"
-      Write-Host (Test-Path '.\src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions\WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj')
+- name: buildSolution
+  type: string
+  default: '**/*.sln'
 
-- template: elz_local/dotnetcore-build.yml
-  parameters:
-    buildConfiguration: Release
-    buildSolution: ${{ parameters.buildSolution }}
-    publishProjects: ${{ parameters.publishProjects }}
-    nugetConfigPath: ${{ parameters.nugetConfigPath }}
-    nuGetServiceConnections: ${{ parameters.nuGetServiceConnections }}
+- name: publishProjects
+  type: string
+  default: ''
+
+- name: nugetConfigPath
+  type: string
+  default: 'nuget.config'
+
+- name: nuGetServiceConnections
+  type: string
+  default: ''
+
+stages:
+- stage: Build
+
+  variables:
+  - group: ${{ parameters.backendVariableGroup }}
+
+  jobs:
+  - job: buildApp
+    displayName: Build App
+
+    # https://docs.microsoft.com/en-us/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#limit-job-authorization-scope-to-referenced-azure-devops-repositories
+    # Ideally should be using this, however not supported in Azure DevOps Server yet.
+    # Ensure Project Settings > Settings > Limit job authorization scope to referenced Azure DevOps repositories is off
+    #uses:
+    #  repositories:
+    #  - global_vars
+
+    steps:
+    - checkout: self
+      clean: true
+      persistCredentials: true
+
+    - template: elz_local/dotnetcore-build.yml
+      parameters:
+        buildConfiguration: Release
+        buildSolution: ${{ parameters.buildSolution }}
+        publishProjects: ${{ parameters.publishProjects }}
+        nugetConfigPath: ${{ parameters.nugetConfigPath }}
+        nuGetServiceConnections: ${{ parameters.nuGetServiceConnections }}
+
+    - task: PublishBuildArtifacts@1
+      displayName: Publish drop artifact
+      inputs:
+        PathtoPublish: $(Build.ArtifactStagingDirectory)
+        ArtifactName: drop
+        publishLocation: Container
