@@ -1,15 +1,15 @@
 - task: PowerShell@2
-  displayName: Debug publish project path
+  displayName: Publish
+  condition: and(succeeded(), ne('${{ parameters.publishProjects }}', ''))
   inputs:
     targetType: inline
     script: |
-      Write-Host "Current directory:"
-      Get-Location
+      $projectPath = "src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions\WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj"
 
-      Write-Host ""
-      Write-Host "Matching AzureFunctions csproj files:"
-      Get-ChildItem -Path . -Recurse -Filter WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj | ForEach-Object { $_.FullName }
+      Write-Host "Publishing project:"
+      Write-Host $projectPath
 
-      Write-Host ""
-      Write-Host "Matching all csproj files:"
-      Get-ChildItem -Path . -Recurse -Filter *.csproj | ForEach-Object { $_.FullName }
+      dotnet publish $projectPath `
+        --configuration ${{ parameters.buildConfiguration }} `
+        --framework net8.0 `
+        --output "$(Build.ArtifactStagingDirectory)"
