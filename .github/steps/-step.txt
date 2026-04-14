@@ -58,6 +58,30 @@ stages:
       clean: true
       persistCredentials: true
 
+    - task: PowerShell@2
+      displayName: Debug repo paths
+      inputs:
+        targetType: inline
+        script: |
+          Write-Host "Repo root contents:"
+          Get-ChildItem -Path . -Force
+
+          Write-Host ""
+          Write-Host "src contents:"
+          Get-ChildItem -Path .\src -Force
+
+          Write-Host ""
+          Write-Host "IntServices contents:"
+          Get-ChildItem -Path .\src\WNZL.ICOW.DeceasedEstates.IntServices -Force
+
+          Write-Host ""
+          Write-Host "Checking solution path:"
+          Write-Host (Test-Path '.\src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions.sln')
+
+          Write-Host ""
+          Write-Host "Checking csproj path:"
+          Write-Host (Test-Path '.\src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions\WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj')
+
     - template: elz_local/dotnetcore-build.yml
       parameters:
         buildConfiguration: Release
