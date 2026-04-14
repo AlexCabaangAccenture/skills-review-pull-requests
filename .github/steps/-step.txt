@@ -1,2 +1,15 @@
-buildSolution: 'src/WNZL.ICOW.DeceasedEstates.IntServices/*.sln'
-publishProjects: 'src/WNZL.ICOW.DeceasedEstates.IntServices/WNZL.ICOW.DeceasedEstates.AzureFunctions/*.csproj'
+- task: PowerShell@2
+  displayName: Debug publish project path
+  inputs:
+    targetType: inline
+    script: |
+      Write-Host "Current directory:"
+      Get-Location
+
+      Write-Host ""
+      Write-Host "Matching AzureFunctions csproj files:"
+      Get-ChildItem -Path . -Recurse -Filter WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj | ForEach-Object { $_.FullName }
+
+      Write-Host ""
+      Write-Host "Matching all csproj files:"
+      Get-ChildItem -Path . -Recurse -Filter *.csproj | ForEach-Object { $_.FullName }
