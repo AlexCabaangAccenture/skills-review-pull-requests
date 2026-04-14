@@ -1,11 +1,22 @@
 script: |
-  Write-Host "Current directory:"
-  Get-Location
+  Write-Host "Build.SourcesDirectory:"
+  Write-Host "$(Build.SourcesDirectory)"
+
+  $intServicesPath = Join-Path "$(Build.SourcesDirectory)" "src\WNZL.ICOW.DeceasedEstates.IntServices"
+  $functionsDir = Join-Path $intServicesPath "WNZL.ICOW.DeceasedEstates.AzureFunctions"
+  $functionsProj = Join-Path $functionsDir "WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj"
 
   Write-Host ""
-  Write-Host "Current folder contents:"
-  Get-ChildItem -Path . -Force
+  Write-Host "IntServices path:"
+  Write-Host $intServicesPath
+  Write-Host (Test-Path $intServicesPath)
 
   Write-Host ""
-  Write-Host "AzureFunctions contents:"
-  Get-ChildItem -Path .\WNZL.ICOW.DeceasedEstates.AzureFunctions -Force
+  Write-Host "AzureFunctions dir:"
+  Write-Host $functionsDir
+  Write-Host (Test-Path $functionsDir)
+
+  Write-Host ""
+  Write-Host "AzureFunctions csproj:"
+  Write-Host $functionsProj
+  Write-Host (Test-Path $functionsProj)
