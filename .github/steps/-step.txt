@@ -1,27 +1,30 @@
-- task: PowerShell@2
-  displayName: Publish
-  condition: and(succeeded(), ne('${{ parameters.publishProjects }}', ''))
-  inputs:
-    targetType: inline
-    workingDirectory: '$(Build.SourcesDirectory)'
-    script: |
-      Write-Host "Current directory:"
-      Get-Location
+script: |
+  Write-Host "Current directory:"
+  Get-Location
 
-      $projectPath = Get-ChildItem -Path . -Recurse -Filter "WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj" |
-        Select-Object -First 1 -ExpandProperty FullName
+  $projectPath = Get-ChildItem -Path . -Recurse -Filter "WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj" |
+    Select-Object -First 1 -ExpandProperty FullName
 
-      Write-Host "Publishing project:"
-      Write-Host $projectPath
+  Write-Host ""
+  Write-Host "Resolved Function csproj path:"
+  Write-Host $projectPath
 
-      if (-not $projectPath) {
-        throw "Azure Functions csproj not found from Build.SourcesDirectory."
-      }
+  if (-not $projectPath) {
+    throw "Azure Functions csproj not found in debug step."
+  }
 
-      Write-Host "Project exists:"
-      Write-Host (Test-Path $projectPath)
+  Write-Host "##vso[task.setvariable variable=FunctionCsprojPath]$projectPath"
 
-      dotnet publish $projectPath `
-        --configuration ${{ parameters.buildConfiguration }} `
-        --framework net8.0 `
-        --output "$(Build.ArtifactStagingDirectory)"
+
+script: |
+  Write-Host "FunctionCsprojPath:"
+  Write-Host "$(FunctionCsprojPath)"
+
+  if (-not "$(FunctionCsprojPath)") {
+    throw "FunctionCsprojPath variable is empty."
+  }
+
+  dotnet publish "$(FunctionCsprojPath)" `
+    --configuration ${{ parameters.buildConfiguration }} `
+    --framework net8.0 `
+    --output "$(Build.ArtifactStagingDirectory)"
