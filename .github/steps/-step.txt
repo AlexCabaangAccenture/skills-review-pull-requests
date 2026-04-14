@@ -1,5 +1,36 @@
-Blocker: Azure Portal access (Error 53003).
+steps:
+- checkout: self
+  clean: true
+  persistCredentials: true
 
-I already checked SailPoint, located my entitlements, and identified the project as Estate Guardians (SPESTG).
+- task: PowerShell@2
+  displayName: Debug repo paths
+  inputs:
+    targetType: inline
+    script: |
+      Write-Host "Repo root contents:"
+      Get-ChildItem -Path . -Force
 
-To proceed, I need to know the correct Azure subscription name or Azure access group for this project so I can submit the request in SailPoint.
+      Write-Host ""
+      Write-Host "src contents:"
+      Get-ChildItem -Path .\src -Force
+
+      Write-Host ""
+      Write-Host "IntServices contents:"
+      Get-ChildItem -Path .\src\WNZL.ICOW.DeceasedEstates.IntServices -Force
+
+      Write-Host ""
+      Write-Host "Checking solution path:"
+      Write-Host (Test-Path '.\src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions.sln')
+
+      Write-Host ""
+      Write-Host "Checking csproj path:"
+      Write-Host (Test-Path '.\src\WNZL.ICOW.DeceasedEstates.IntServices\WNZL.ICOW.DeceasedEstates.AzureFunctions\WNZL.ICOW.DeceasedEstates.AzureFunctions.csproj')
+
+- template: elz_local/dotnetcore-build.yml
+  parameters:
+    buildConfiguration: Release
+    buildSolution: ${{ parameters.buildSolution }}
+    publishProjects: ${{ parameters.publishProjects }}
+    nugetConfigPath: ${{ parameters.nugetConfigPath }}
+    nuGetServiceConnections: ${{ parameters.nuGetServiceConnections }}
