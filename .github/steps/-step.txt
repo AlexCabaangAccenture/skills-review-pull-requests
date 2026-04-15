@@ -1,53 +1,52 @@
-script: |
-  $intServicesPath = Join-Path "$(Build.SourcesDirectory)" "src\WNZL.ICOW.DeceasedEstates.IntServices"
+$intServicesPath = Join-Path "$(Build.SourcesDirectory)" "src\WNZL.ICOW.DeceasedEstates.IntServices"
 
-  Write-Host "IntServices path:"
-  Write-Host $intServicesPath
-  Write-Host (Test-Path $intServicesPath)
+Write-Host "IntServices path:"
+Write-Host $intServicesPath
+Write-Host (Test-Path $intServicesPath)
 
-  Write-Host ""
-  Write-Host "Child items under IntServices:"
-  Get-ChildItem -Path $intServicesPath -Force | Select-Object Name, FullName
+Write-Host ""
+Write-Host "Child items under IntServices:"
+Get-ChildItem -Path $intServicesPath -Force | Select-Object Name, FullName
 
-  $functionsDir = Get-ChildItem -Path $intServicesPath -Directory | Where-Object { $_.Name -like "*AzureFunctions*" } | Select-Object -First 1
+$functionsDir = Get-ChildItem -Path $intServicesPath -Directory | Where-Object { $_.Name -like "*AzureFunctions*" } | Select-Object -First 1
 
-  if (-not $functionsDir) {
-    throw "AzureFunctions directory not found under IntServices."
-  }
+if (-not $functionsDir) {
+  throw "AzureFunctions directory not found under IntServices."
+}
 
-  Write-Host ""
-  Write-Host "Resolved AzureFunctions dir:"
-  Write-Host $functionsDir.FullName
+Write-Host ""
+Write-Host "Resolved AzureFunctions dir:"
+Write-Host $functionsDir.FullName
 
-  $functionsProj = Get-ChildItem -Path $functionsDir.FullName -Filter "*.csproj" | Select-Object -First 1
+$functionsProj = Get-ChildItem -Path $functionsDir.FullName -Filter "*.csproj" | Select-Object -First 1
 
-  if (-not $functionsProj) {
-    throw "AzureFunctions csproj not found inside resolved AzureFunctions directory."
-  }
+if (-not $functionsProj) {
+  throw "AzureFunctions csproj not found inside resolved AzureFunctions directory."
+}
 
-  Write-Host ""
-  Write-Host "Resolved AzureFunctions csproj:"
-  Write-Host $functionsProj.FullName
+Write-Host ""
+Write-Host "Resolved AzureFunctions csproj:"
+Write-Host $functionsProj.FullName
 
-  $publishDir = "$(Build.ArtifactStagingDirectory)\publish"
-  $zipPath = "$(Build.ArtifactStagingDirectory)\s.zip"
+$publishDir = "$(Build.ArtifactStagingDirectory)\publish"
+$zipPath = "$(Build.ArtifactStagingDirectory)\s.zip"
 
-  if (Test-Path $publishDir) {
-    Remove-Item $publishDir -Recurse -Force
-  }
+if (Test-Path $publishDir) {
+  Remove-Item $publishDir -Recurse -Force
+}
 
-  if (Test-Path $zipPath) {
-    Remove-Item $zipPath -Force
-  }
+if (Test-Path $zipPath) {
+  Remove-Item $zipPath -Force
+}
 
-  dotnet publish $functionsProj.FullName `
-    --configuration ${{ parameters.buildConfiguration }} `
-    --framework net8.0 `
-    --output $publishDir
+dotnet publish $functionsProj.FullName `
+  --configuration ${{ parameters.buildConfiguration }} `
+  --framework net8.0 `
+  --output $publishDir
 
-  Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
+Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
 
-  Write-Host ""
-  Write-Host "Created zip:"
-  Write-Host $zipPath
-  Write-Host (Test-Path $zipPath)
+Write-Host ""
+Write-Host "Created zip:"
+Write-Host $zipPath
+Write-Host (Test-Path $zipPath)
