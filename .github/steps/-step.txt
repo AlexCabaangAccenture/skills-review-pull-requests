@@ -29,7 +29,25 @@ script: |
   Write-Host "Resolved AzureFunctions csproj:"
   Write-Host $functionsProj.FullName
 
+  $publishDir = "$(Build.ArtifactStagingDirectory)\publish"
+  $zipPath = "$(Build.ArtifactStagingDirectory)\s.zip"
+
+  if (Test-Path $publishDir) {
+    Remove-Item $publishDir -Recurse -Force
+  }
+
+  if (Test-Path $zipPath) {
+    Remove-Item $zipPath -Force
+  }
+
   dotnet publish $functionsProj.FullName `
     --configuration ${{ parameters.buildConfiguration }} `
     --framework net8.0 `
-    --output "$(Build.ArtifactStagingDirectory)"
+    --output $publishDir
+
+  Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
+
+  Write-Host ""
+  Write-Host "Created zip:"
+  Write-Host $zipPath
+  Write-Host (Test-Path $zipPath)
