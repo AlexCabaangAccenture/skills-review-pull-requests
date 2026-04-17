@@ -1,52 +1,21 @@
-$intServicesPath = Join-Path "$(Build.SourcesDirectory)" "src\WNZL.ICOW.DeceasedEstates.IntServices"
+module "function_app_sites_private_endpoint" {
+  source  = "terraform.westpac.co.nz/WNZL/module-network-privateendpoint/azurerm"
+  version = "~> 1"
 
-Write-Host "IntServices path:"
-Write-Host $intServicesPath
-Write-Host (Test-Path $intServicesPath)
-
-Write-Host ""
-Write-Host "Child items under IntServices:"
-Get-ChildItem -Path $intServicesPath -Force | Select-Object Name, FullName
-
-$functionsDir = Get-ChildItem -Path $intServicesPath -Directory | Where-Object { $_.Name -like "*AzureFunctions*" } | Select-Object -First 1
-
-if (-not $functionsDir) {
-  throw "AzureFunctions directory not found under IntServices."
+  name                = "${local.env.function_app_name}-pe"
+  resource_group_name = local.env.resource_group_name
+  location            = module.global_variables.azure.location
+  resource_id         = azurerm_windows_function_app.function_app.id
+  subnet_id           = data.azurerm_subnet.private_endpoint.id
+  subresource_names   = ["sites"]
+  tags                = local.tags
 }
 
-Write-Host ""
-Write-Host "Resolved AzureFunctions dir:"
-Write-Host $functionsDir.FullName
+module "wait_for_function_app_dns_sites_reg" {
+  depends_on = [module.function_app_sites_private_endpoint]
+  source     = "terraform.westpac.co.nz/WNZL/module-network-privateendpoint/azurerm//wait_for_dns_registration"
+  version    = "~> 1"
 
-$functionsProj = Get-ChildItem -Path $functionsDir.FullName -Filter "*.csproj" | Select-Object -First 1
-
-if (-not $functionsProj) {
-  throw "AzureFunctions csproj not found inside resolved AzureFunctions directory."
+  fqdn              = "${local.env.function_app_name}.privatelink.azurewebsites.net"
+  shell_interpreter = "powershell"
 }
-
-Write-Host ""
-Write-Host "Resolved AzureFunctions csproj:"
-Write-Host $functionsProj.FullName
-
-$publishDir = "$(Build.ArtifactStagingDirectory)\publish"
-$zipPath = "$(Build.ArtifactStagingDirectory)\s.zip"
-
-if (Test-Path $publishDir) {
-  Remove-Item $publishDir -Recurse -Force
-}
-
-if (Test-Path $zipPath) {
-  Remove-Item $zipPath -Force
-}
-
-dotnet publish $functionsProj.FullName `
-  --configuration ${{ parameters.buildConfiguration }} `
-  --framework net8.0 `
-  --output $publishDir
-
-Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
-
-Write-Host ""
-Write-Host "Created zip:"
-Write-Host $zipPath
-Write-Host (Test-Path $zipPath)
