@@ -1,21 +1,29 @@
-module "function_app_sites_private_endpoint" {
-  source  = "terraform.westpac.co.nz/WNZL/module-network-privateendpoint/azurerm"
-  version = "~> 1"
-
-  name                = "${local.env.function_app_name}-pe"
-  resource_group_name = local.env.resource_group_name
-  location            = module.global_variables.azure.location
-  resource_id         = azurerm_windows_function_app.function_app.id
-  subnet_id           = data.azurerm_subnet.private_endpoint.id
-  subresource_names   = ["sites"]
-  tags                = local.tags
+resource "azurerm_role_assignment" "func_kv_secrets_user" {
+  scope                = data.azurerm_key_vault.function_app_kv.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
 }
 
-module "wait_for_function_app_dns_sites_reg" {
-  depends_on = [module.function_app_sites_private_endpoint]
-  source     = "terraform.westpac.co.nz/WNZL/module-network-privateendpoint/azurerm//wait_for_dns_registration"
-  version    = "~> 1"
+resource "azurerm_role_assignment" "func_storage_blob_data_contributor" {
+  scope                = data.azurerm_storage_account.function_storage.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
+}
 
-  fqdn              = "${local.env.function_app_name}.privatelink.azurewebsites.net"
-  shell_interpreter = "powershell"
+resource "azurerm_role_assignment" "func_storage_queue_data_contributor" {
+  scope                = data.azurerm_storage_account.function_storage.id
+  role_definition_name = "Storage Queue Data Contributor"
+  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "func_storage_file_smb_share_contributor" {
+  scope                = data.azurerm_storage_account.function_storage.id
+  role_definition_name = "Storage File Data SMB Share Contributor"
+  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
+}
+
+resource "azurerm_role_assignment" "func_storage_table_data_contributor" {
+  scope                = data.azurerm_storage_account.function_storage.id
+  role_definition_name = "Storage Table Data Contributor"
+  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
 }
