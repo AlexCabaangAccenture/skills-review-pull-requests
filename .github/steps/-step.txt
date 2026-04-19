@@ -7,33 +7,18 @@ pool:
   - visualstudio
 
 stages:
-- stage: Test
-  displayName: Deploy to Test
-  variables:
-  - name: workspace
-    value: test
-  - name: azureServiceConnection
-    value: 'Azure ELZ DE Test'
-  - name: backendVariableGroup
-    value: 'Terraform ELZ Test Backend'
-  - name: resourceGroup
-    value: 't3-syd-d365cn-DeceasedEstate-test-arg'
-  - name: functionAppName
-    value: 'fn-deceasedestate-test'
+- template: azure-function-build.yml
+  parameters:
+    azureServiceConnection: 'Azure ELZ DE Test'
+    backendVariableGroup: 'Terraform ELZ Test Backend'
+    buildSolution: 'src/WNZL.ICOW.DeceasedEstates.IntServices/*.sln'
+    publishProjects: 'src/WNZL.ICOW.DeceasedEstates.IntServices/WNZL.ICOW.DeceasedEstates.AzureFunctions/*.csproj'
 
-  jobs:
-  - template: azure-function-build.yml
-    parameters:
-      azureServiceConnection: $(azureServiceConnection)
-      backendVariableGroup: $(backendVariableGroup)
-      buildSolution: 'src/WNZL.ICOW.DeceasedEstates.IntServices/*.sln'
-      publishProjects: 'src/WNZL.ICOW.DeceasedEstates.IntServices/WNZL.ICOW.DeceasedEstates.AzureFunctions/*.csproj'
-
-  - template: azure-function-deploy.yml
-    parameters:
-      workspace: $(workspace)
-      azureServiceConnection: $(azureServiceConnection)
-      backendVariableGroup: $(backendVariableGroup)
-      functionAppName: $(functionAppName)
-      functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
-      resourceGroup: $(resourceGroup)
+- template: azure-function-deploy.yml
+  parameters:
+    workspace: 'test'
+    azureServiceConnection: 'Azure ELZ DE Test'
+    backendVariableGroup: 'Terraform ELZ Test Backend'
+    functionAppName: 'fn-deceasedestate-test'
+    functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
+    resourceGroup: 't3-syd-d365cn-DeceasedEstate-test-arg'
