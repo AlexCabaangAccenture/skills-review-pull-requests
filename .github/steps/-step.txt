@@ -1,29 +1,39 @@
-resource "azurerm_role_assignment" "func_kv_secrets_user" {
-  scope                = data.azurerm_key_vault.function_app_kv.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
-}
+trigger: none
 
-resource "azurerm_role_assignment" "func_storage_blob_data_contributor" {
-  scope                = data.azurerm_storage_account.function_storage.id
-  role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
-}
+pool:
+  name: Default
+  demands:
+  - msbuild
+  - visualstudio
 
-resource "azurerm_role_assignment" "func_storage_queue_data_contributor" {
-  scope                = data.azurerm_storage_account.function_storage.id
-  role_definition_name = "Storage Queue Data Contributor"
-  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
-}
+stages:
+- stage: Test
+  displayName: Deploy to Test
+  variables:
+  - name: workspace
+    value: test
+  - name: azureServiceConnection
+    value: 'Azure ELZ DE Test'
+  - name: backendVariableGroup
+    value: 'Terraform ELZ Test Backend'
+  - name: resourceGroup
+    value: 't3-syd-d365cn-DeceasedEstate-test-arg'
+  - name: functionAppName
+    value: 'fn-deceasedestate-test'
 
-resource "azurerm_role_assignment" "func_storage_file_smb_share_contributor" {
-  scope                = data.azurerm_storage_account.function_storage.id
-  role_definition_name = "Storage File Data SMB Share Contributor"
-  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
-}
+  jobs:
+  - template: azure-function-build.yml
+    parameters:
+      azureServiceConnection: $(azureServiceConnection)
+      backendVariableGroup: $(backendVariableGroup)
+      buildSolution: 'src/WNZL.ICOW.DeceasedEstates.IntServices/*.sln'
+      publishProjects: 'src/WNZL.ICOW.DeceasedEstates.IntServices/WNZL.ICOW.DeceasedEstates.AzureFunctions/*.csproj'
 
-resource "azurerm_role_assignment" "func_storage_table_data_contributor" {
-  scope                = data.azurerm_storage_account.function_storage.id
-  role_definition_name = "Storage Table Data Contributor"
-  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
-}
+  - template: azure-function-deploy.yml
+    parameters:
+      workspace: $(workspace)
+      azureServiceConnection: $(azureServiceConnection)
+      backendVariableGroup: $(backendVariableGroup)
+      functionAppName: $(functionAppName)
+      functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
+      resourceGroup: $(resourceGroup)
