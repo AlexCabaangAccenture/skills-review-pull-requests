@@ -1,18 +1,24 @@
-resource "azurerm_storage_management_policy" "function_storage_lifecycle" {
-  storage_account_id = data.azurerm_storage_account.function_storage.id
+data "azurerm_storage_account" "function_storage" {
+  name                = module.global_variables.resource_names.storage_account
+  resource_group_name = local.env.resource_group_name
+  depends_on          = [module.storage_account]
+}
 
-  rule {
-    name    = "default-lifecycle"
-    enabled = true
+resource "azurerm_monitor_diagnostic_setting" "storage_table_logs" {
+  name               = "WNZL-Logging-Logs"
+  target_resource_id = "${data.azurerm_storage_account.function_storage.id}/tableServices/default"
 
-    filters {
-      blob_types = ["blockBlob"]
-    }
+  # log analytics workspace id here
 
-    actions {
-      base_blob {
-        delete_after_days_since_modification_greater_than = 30
-      }
-    }
+  enabled_log {
+    category = "StorageRead"
+  }
+
+  enabled_log {
+    category = "StorageWrite"
+  }
+
+  enabled_log {
+    category = "StorageDelete"
   }
 }
