@@ -1,24 +1,18 @@
-trigger: none
+resource "azurerm_storage_management_policy" "function_storage_lifecycle" {
+  storage_account_id = data.azurerm_storage_account.function_storage.id
 
-pool:
-  name: Default
-  demands:
-  - msbuild
-  - visualstudio
+  rule {
+    name    = "default-lifecycle"
+    enabled = true
 
-stages:
-- template: azure-function-build.yml
-  parameters:
-    azureServiceConnection: 'Azure ELZ DE Test'
-    backendVariableGroup: 'Terraform ELZ Test Backend'
-    buildSolution: 'src/WNZL.ICOW.DeceasedEstates.IntServices/*.sln'
-    publishProjects: 'src/WNZL.ICOW.DeceasedEstates.IntServices/WNZL.ICOW.DeceasedEstates.AzureFunctions/*.csproj'
+    filters {
+      blob_types = ["blockBlob"]
+    }
 
-- template: azure-function-deploy.yml
-  parameters:
-    workspace: 'test'
-    azureServiceConnection: 'Azure ELZ DE Test'
-    backendVariableGroup: 'Terraform ELZ Test Backend'
-    functionAppName: 'fn-deceasedestate-test'
-    functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
-    resourceGroup: 't3-syd-d365cn-DeceasedEstate-test-arg'
+    actions {
+      base_blob {
+        delete_after_days_since_modification_greater_than = 30
+      }
+    }
+  }
+}
