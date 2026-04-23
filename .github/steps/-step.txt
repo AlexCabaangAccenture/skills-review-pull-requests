@@ -1,24 +1,25 @@
-data "azurerm_storage_account" "function_storage" {
-  name                = module.global_variables.resource_names.storage_account
-  resource_group_name = local.env.resource_group_name
-  depends_on          = [module.storage_account]
+resource "azurerm_monitor_diagnostic_setting" "de_table_logs" {
+  name                       = "WNZL - Logging Logs - australiaeast"
+  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/tableServices/default"
+  log_analytics_workspace_id = "/subscriptions/b4381e2c-2621-493f-8f37-271204366fe2/resourceGroups/t1-syd-logs-logging-resources-nonprod-prg/providers/Microsoft.OperationalInsights/workspaces/syd-customer-nonprod-logging-law"
+
+  enabled_log {
+    category_group = "allLogs"
+  }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "storage_table_logs" {
-  name               = "WNZL-Logging-Logs"
-  target_resource_id = "${data.azurerm_storage_account.function_storage.id}/tableServices/default"
+resource "azurerm_monitor_diagnostic_setting" "de_table_metrics" {
+  name                       = "WNZL - Logging Metrics - australiaeast"
+  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/tableServices/default"
+  log_analytics_workspace_id = "/subscriptions/b4381e2c-2621-493f-8f37-271204366fe2/resourceGroups/t1-syd-logs-logging-resources-nonprod-prg/providers/Microsoft.OperationalInsights/workspaces/syd-customer-nonprod-logging-law"
 
-  # log analytics workspace id here
-
-  enabled_log {
-    category = "StorageRead"
+  metric {
+    category = "Capacity"
+    enabled  = true
   }
 
-  enabled_log {
-    category = "StorageWrite"
-  }
-
-  enabled_log {
-    category = "StorageDelete"
+  metric {
+    category = "Transaction"
+    enabled  = true
   }
 }
