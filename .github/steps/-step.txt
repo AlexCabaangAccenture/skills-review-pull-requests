@@ -1,6 +1,6 @@
-resource "azurerm_monitor_diagnostic_setting" "de_table_logs" {
+resource "azurerm_monitor_diagnostic_setting" "de_file_logs" {
   name                       = "WNZL - Logging Logs - australiaeast"
-  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/tableServices/default"
+  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/fileServices/default"
   log_analytics_workspace_id = "/subscriptions/b4381e2c-2621-493f-8f37-271204366fe2/resourceGroups/t1-syd-logs-logging-resources-nonprod-prg/providers/Microsoft.OperationalInsights/workspaces/syd-customer-nonprod-logging-law"
 
   enabled_log {
@@ -8,9 +8,9 @@ resource "azurerm_monitor_diagnostic_setting" "de_table_logs" {
   }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "de_table_metrics" {
+resource "azurerm_monitor_diagnostic_setting" "de_file_metrics" {
   name                       = "WNZL - Logging Metrics - australiaeast"
-  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/tableServices/default"
+  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/fileServices/default"
   log_analytics_workspace_id = "/subscriptions/b4381e2c-2621-493f-8f37-271204366fe2/resourceGroups/t1-syd-logs-logging-resources-nonprod-prg/providers/Microsoft.OperationalInsights/workspaces/syd-customer-nonprod-logging-law"
 
   metric {
@@ -23,3 +23,63 @@ resource "azurerm_monitor_diagnostic_setting" "de_table_metrics" {
     enabled  = true
   }
 }
+
+#---------------------------
+
+resource "azurerm_monitor_diagnostic_setting" "de_blob_logs" {
+  name                       = "WNZL - Logging Logs - australiaeast"
+  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/blobServices/default"
+  log_analytics_workspace_id = "/subscriptions/b4381e2c-2621-493f-8f37-271204366fe2/resourceGroups/t1-syd-logs-logging-resources-nonprod-prg/providers/Microsoft.OperationalInsights/workspaces/syd-customer-nonprod-logging-law"
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "de_blob_metrics" {
+  name                       = "WNZL - Logging Metrics - australiaeast"
+  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/blobServices/default"
+  log_analytics_workspace_id = "/subscriptions/b4381e2c-2621-493f-8f37-271204366fe2/resourceGroups/t1-syd-logs-logging-resources-nonprod-prg/providers/Microsoft.OperationalInsights/workspaces/syd-customer-nonprod-logging-law"
+
+  metric {
+    category = "Capacity"
+    enabled  = true
+  }
+
+  metric {
+    category = "Transaction"
+    enabled  = true
+  }
+}
+
+#-----------------------------------
+
+resource "azurerm_monitor_diagnostic_setting" "de_queue_logs" {
+  name                       = "WNZL - Logging Logs - australiaeast"
+  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/queueServices/default"
+  log_analytics_workspace_id = "/subscriptions/b4381e2c-2621-493f-8f37-271204366fe2/resourceGroups/t1-syd-logs-logging-resources-nonprod-prg/providers/Microsoft.OperationalInsights/workspaces/syd-customer-nonprod-logging-law"
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "de_queue_metrics" {
+  name                       = "WNZL - Logging Metrics - australiaeast"
+  target_resource_id         = "${data.azurerm_storage_account.function_storage.id}/queueServices/default"
+  log_analytics_workspace_id = "/subscriptions/b4381e2c-2621-493f-8f37-271204366fe2/resourceGroups/t1-syd-logs-logging-resources-nonprod-prg/providers/Microsoft.OperationalInsights/workspaces/syd-customer-nonprod-logging-law"
+
+  metric {
+    category = "Capacity"
+    enabled  = true
+  }
+
+  metric {
+    category = "Transaction"
+    enabled  = true
+  }
+}
+
+#-------------------------
+
+
