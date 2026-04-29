@@ -1,76 +1,12 @@
-DIA Exception Handling and Notification Flow
-	1. Objective
-Design the exception-handling flow for the DIA post-ingestion processing chain covering missing file detection, corrupt file handling, decryption failure, SharePoint save failure, notification behavior, and retry applicability. 
-	2. Scope
-This design covers the processing flow after file ingestion, including: 
-	• expected file arrival monitoring 
-	• file validation/corruption detection 
-	• decryption failure handling 
-	• SharePoint save failure handling 
-	• notification routing 
-	• retry classification 
-	• clarification of duplicate or ambiguous requirements 
-	3. Related Requirements 
-	• Req 43: file not received at expected time 
-	• Req 44: received file is corrupt 
-	• Req 45: failed to decrypt DIA file 
-	• Req 46: failed to save decrypted DIA file to SharePoint 
-	• Req 47: appears duplicate of Req 45 and requires clarification 
-	4. High-Level Flow 
-	• system expects DIA file via SFTP by configured schedule 
-	• if file is not received by cut-off time, trigger notification flow 
-	• if file is received, validate file integrity/readability 
-	• if file is corrupt, trigger notification flow 
-	• if file is valid, attempt decryption 
-	• if decryption fails, trigger notification flow 
-	• if decryption succeeds, attempt save to designated SharePoint folder 
-	• if SharePoint save fails, trigger notification flow 
-	• if all steps succeed, continue downstream staging/processing 
-	
-	5. Scenario Breakdown
-Scenario 1
-Missing expected DIA file 
-	• likely requires timer/scheduled monitoring logic 
-	• not normal retryable processing 
-	• notify Collections Leaders, copy Estate Guardians 
-Scenario 2
-Corrupt DIA file
-	• file received but invalid/unreadable 
-	• terminal for that file 
-	• notify Collections Leaders, copy Estate Guardians 
-Scenario 3
-DIA decryption failure
-	• file received but decryption fails 
-	• retry only if transient cause exists 
-	• notify relevant Technology team / Estate Guardians 
-Scenario 4
-SharePoint save failure
-	• file decrypted successfully but save/upload fails 
-	• likely retryable if transient 
-	• notify relevant Technology team / Estate Guardians 
-Scenario 5
-Duplicate decryption requirement
-	• Req 47 appears same as Req 45 
-	• clarification needed before implementation 
-	6. Retry Classification
-Non-retry scenarios 
-	• missing file by expected time 
-	• corrupt file 
-	• permanent decryption failure 
-Conditional retry scenarios
-	• transient decryption failure 
-	• SharePoint save failure caused by temporary access/connectivity/service issue 
-	7. Technical Considerations 
-	• expected-time rule must be confirmed 
-	• corruption criteria must be defined 
-	• arrival-tracking mechanism must be identified 
-	• SharePoint access/security/permissions/path handling must be confirmed 
-	• email routing and trigger timing must be confirmed 
-	• logging/traceability should be included to support supportability and investigation 
-	8. Open Clarifications 
-	• what is the exact cut-off time or monitoring rule for Req 43 
-	• where should file arrival status be checked or recorded 
-	• how is “corrupt” technically defined 
-	• is Req 47 really duplicate of Req 45 
-	• should email be sent immediately or only after retry exhaustion for retryable failures 
-what is the final routing for the relevant Technology team
+Thanks Vishal. Noted on the clarifications.
+
+I’ll update the draft design accordingly with the following:
+
+use 7 AM NZT as the current working cut-off time for Req 43, subject to final confirmation
+treat “corrupt” at Function App scope as unexpected file type/extension or decrypted file format only
+remove SharePoint handling from Scenario 4
+update Scenario 4 to D365/Dataverse row save failure with retry, then notify after retry exhaustion
+treat Req 47 as duplicate of Req 45
+include App Insights logging for file read/transfer activity instead of introducing separate arrival-tracking storage
+
+I’ll revise the design note and sequence diagram based on this.
