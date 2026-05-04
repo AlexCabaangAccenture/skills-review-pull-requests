@@ -1,22 +1,42 @@
-_logger.LogInformation("PGP TRACE: after GNUServices.DecryptAsync. Output length: {Length}", outputms.Length);
-
-if (outputms.Length == 0)
+if (string.IsNullOrWhiteSpace(selectedFile))
 {
+    await HandleMissingDiaFileAsync();
+    return;
+}
+------------
+
+private async Task HandleMissingDiaFileAsync()
+{
+    DateTime nzNow = GetNewZealandNow();
+
+    if (nzNow.Hour < 7)
+    {
+        _logger.LogInformation(
+            "No valid DIA file found yet. Current NZ time is before 7 AM. NzNow: {NzNow}",
+            nzNow);
+
+        return;
+    }
+
     var exception = new InvalidOperationException(
-        $"DIA decrypted output is empty. File: {payload.FileName}");
+        $"No valid DIA file found by 7 AM NZT. NzNow: {nzNow:o}");
 
     _logger.LogError(
         exception,
-        "Invalid DIA decrypted file format detected after decryption. FileName: {FileName}",
-        payload.FileName);
+        "DIA file missing after 7 AM NZT. NzNow: {NzNow}",
+        nzNow);
 
     await _diaExceptionNotificationService.NotifyFailureAsync(
-        payload.FileName,
-        "InvalidDecryptedFileFormat",
-        exception,
-        cancellationToken);
-
-    return;
+        "N/A",
+        "MissingDiaFileAfter7AmNzt",
+        exception);
 }
 
-string filename = $"{DateTime.Now:Mdy_HHmm}_{Guid.NewGuid().ToString("N")[..5]}.txt";
+-----------------
+
+private static DateTime GetNewZealandNow()
+{
+    TimeZoneInfo nzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
+    return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nzTimeZone);
+}
+
