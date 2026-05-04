@@ -1,54 +1,19 @@
-
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
+try
 {
-    public interface IDiaExceptionNotificationService
-    {
-        Task NotifyFailureAsync(
-            string fileName,
-            string failureType,
-            Exception exception,
-            CancellationToken cancellationToken = default);
-
-        Task NotifyRetryExhaustedAsync(
-            string fileName,
-            string failureType,
-            Exception exception,
-            CancellationToken cancellationToken = default);
-    }
+    await GNUServices.DecryptAsync(fileBytes, outputms);
 }
-
-=========================
-
-public Task NotifyFailureAsync(
-    string fileName,
-    string failureType,
-    Exception exception,
-    CancellationToken cancellationToken = default)
+catch (Exception ex)
 {
     _logger.LogError(
-        exception,
-        "DIA exception notification required. FailureType: {FailureType}, FileName: {FileName}, TechnologyTeam: {TechnologyTeam}, EstateManagementTeam: {EstateManagementTeam}.",
-        failureType,
-        fileName,
-        "Estate_Guardians@westpac.co.nz",
-        "Collections_Leaders@westpac.co.nz");
+        ex,
+        "DIA decryption failed. FileName: {FileName}",
+        payload.FileName);
 
-    return Task.CompletedTask;
-}
-
-public Task NotifyRetryExhaustedAsync(
-    string fileName,
-    string failureType,
-    Exception exception,
-    CancellationToken cancellationToken = default)
-{
-    return NotifyFailureAsync(
-        fileName,
-        failureType,
-        exception,
+    await _diaExceptionNotificationService.NotifyFailureAsync(
+        payload.FileName,
+        "DecryptionFailure",
+        ex,
         cancellationToken);
+
+    throw;
 }
