@@ -1,12 +1,37 @@
-Thanks Vishal. Noted on the clarifications.
+public async Task<Guid> Create(string filename, string fileType, MemoryStream outputStream)
+{
+    const int maxAttempts = 3;
+    const int retryDelayMilliseconds = 2000;
 
-I’ll update the draft design accordingly with the following:
+    for (int attempt = 1; attempt <= maxAttempts; attempt++)
+    {
+        try
+        {
+            var deStagingRecord = new icow_deceasedestatestaging();
+            deStagingRecord.icow_filename = filename;
+            deStagingRecord.statecode = icow_deceasedestatestaging_statecode.Active;
+            deStagingRecord.icow_FileType = fileType;
 
-use 7 AM NZT as the current working cut-off time for Req 43, subject to final confirmation
-treat “corrupt” at Function App scope as unexpected file type/extension or decrypted file format only
-remove SharePoint handling from Scenario 4
-update Scenario 4 to D365/Dataverse row save failure with retry, then notify after retry exhaustion
-treat Req 47 as duplicate of Req 45
-include App Insights logging for file read/transfer activity instead of introducing separate arrival-tracking storage
+            Guid recordId = await _dataverseRepo.CreateAsync(deStagingRecord);
 
-I’ll revise the design note and sequence diagram based on this.
+            outputStream.Position = 0;
+
+            await _dataverseRepo.UploadFileToColumnAsync(
+                tableLogicalName: "icow_deceasedestatestaging",
+                rowId: recordId,
+                fileColumnLogicalName: "icow_file",
+                fileName: filename,
+                mimeType: "text/plain",
+                fileStream: outputStream
+            );
+
+            return recordId;
+        }
+        catch when (attempt < maxAttempts)
+        {
+            await Task.Delay(retryDelayMilliseconds);
+        }
+    }
+
+    throw new InvalidOperationException("D365 staging save failed after retry exhaustion.");
+}
