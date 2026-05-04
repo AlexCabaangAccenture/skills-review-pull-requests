@@ -1,72 +1,54 @@
-public async Task<Guid> Create(string filename, string fileType, MemoryStream outputStream)
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
 {
-    const int maxAttempts = 3;
-    const int retryDelayMilliseconds = 2000;
-
-    Exception? lastException = null;
-
-    for (int attempt = 1; attempt <= maxAttempts; attempt++)
+    public interface IDiaExceptionNotificationService
     {
-        try
+        Task NotifyRetryExhaustedAsync(
+            string fileName,
+            string failureType,
+            Exception exception,
+            CancellationToken cancellationToken = default);
+    }
+}
+
+--------------------------
+
+using Microsoft.Extensions.Logging;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using WNZL.ICOW.DeceasedEstates.Services.Contracts;
+
+namespace WNZL.ICOW.DeceasedEstates.Services.Services
+{
+    public class DiaExceptionNotificationService : IDiaExceptionNotificationService
+    {
+        private readonly ILogger<DiaExceptionNotificationService> _logger;
+
+        public DiaExceptionNotificationService(
+            ILogger<DiaExceptionNotificationService> logger)
         {
-            _logger.LogInformation(
-                "DIA Dataverse staging save attempt {Attempt} of {MaxAttempts} started for file {FileName}.",
-                attempt,
-                maxAttempts,
-                filename);
-
-            var deStagingRecord = new icow_deceasedestatestaging();
-            deStagingRecord.icow_filename = filename;
-            deStagingRecord.statecode = icow_deceasedestatestaging_statecode.Active;
-            deStagingRecord.icow_FileType = fileType;
-
-            Guid recordId = await _dataverseRepo.CreateAsync(deStagingRecord);
-
-            outputStream.Position = 0;
-
-            await _dataverseRepo.UploadFileToColumnAsync(
-                tableLogicalName: "icow_deceasedestatestaging",
-                rowId: recordId,
-                fileColumnLogicalName: "icow_file",
-                fileName: filename,
-                mimeType: "text/plain",
-                fileStream: outputStream
-            );
-
-            _logger.LogInformation(
-                "DIA Dataverse staging save succeeded for file {FileName}. RecordId: {RecordId}.",
-                filename,
-                recordId);
-
-            return recordId;
+            _logger = logger;
         }
-        catch (Exception ex) when (attempt < maxAttempts)
+
+        public Task NotifyRetryExhaustedAsync(
+            string fileName,
+            string failureType,
+            Exception exception,
+            CancellationToken cancellationToken = default)
         {
-            lastException = ex;
-
-            _logger.LogWarning(
-                ex,
-                "DIA Dataverse staging save attempt {Attempt} of {MaxAttempts} failed for file {FileName}. Retrying after {RetryDelayMilliseconds} ms.",
-                attempt,
-                maxAttempts,
-                filename,
-                retryDelayMilliseconds);
-
-            await Task.Delay(retryDelayMilliseconds);
-        }
-        catch (Exception ex)
-        {
-            lastException = ex;
-
             _logger.LogError(
-                ex,
-                "DIA Dataverse staging save failed after {MaxAttempts} attempts for file {FileName}.",
-                maxAttempts,
-                filename);
+                exception,
+                "DIA exception notification required. FailureType: {FailureType}, FileName: {FileName}, TechnologyTeam: {TechnologyTeam}, EstateManagementTeam: {EstateManagementTeam}.",
+                failureType,
+                fileName,
+                "Estate_Guardians@westpac.co.nz",
+                "Collections_Leaders@westpac.co.nz");
+
+            return Task.CompletedTask;
         }
     }
-
-    throw new InvalidOperationException(
-        $"D365 staging save failed after retry exhaustion for file {filename}.",
-        lastException);
 }
