@@ -1,42 +1,66 @@
+var selectionResult = await SelectTargetFileAsync(files);
+
+if (selectionResult.FailureHandled)
+{
+    return;
+}
+
+string? selectedFile = selectionResult.SelectedFile;
+
 if (string.IsNullOrWhiteSpace(selectedFile))
 {
     await HandleMissingDiaFileAsync();
     return;
 }
-------------
+---------------
 
-private async Task HandleMissingDiaFileAsync()
+private async Task<(string? SelectedFile, bool FailureHandled)> SelectTargetFileAsync(string[] files)
 {
-    DateTime nzNow = GetNewZealandNow();
+    _logger.LogInformation("File selection started.");
 
-    if (nzNow.Hour < 7)
+    if (files == null || files.Length == 0)
     {
-        _logger.LogInformation(
-            "No valid DIA file found yet. Current NZ time is before 7 AM. NzNow: {NzNow}",
-            nzNow);
-
-        return;
+        _logger.LogWarning("No files available for selection.");
+        return (null, false);
     }
 
-    var exception = new InvalidOperationException(
-        $"No valid DIA file found by 7 AM NZT. NzNow: {nzNow:o}");
+    DateTime today = GetNewZealandNow().Date;
 
-    _logger.LogError(
-        exception,
-        "DIA file missing after 7 AM NZT. NzNow: {NzNow}",
-        nzNow);
+    List<string> validFiles = files
+        .Where(file => IsValidDiaFile(file, today))
+        .ToList();
 
-    await _diaExceptionNotificationService.NotifyFailureAsync(
-        "N/A",
-        "MissingDiaFileAfter7AmNzt",
-        exception);
+    if (validFiles.Count == 0)
+    {
+        _logger.LogWarning("No valid DIA file found for today.");
+        return (null, false);
+    }
+
+    if (validFiles.Count > 1)
+    {
+        string fileList = string.Join(", ", validFiles);
+
+        var exception = new InvalidOperationException(
+            $"Multiple valid DIA files found for today. Files: {fileList}");
+
+        _logger.LogError(
+            exception,
+            "Multiple valid DIA files found for today. Aborting processing. Files: {Files}",
+            fileList);
+
+        await _diaExceptionNotificationService.NotifyFailureAsync(
+            "Multiple",
+            "MultipleValidDiaFiles",
+            exception);
+
+        return (null, true);
+    }
+
+    string selectedFile = validFiles.First();
+
+    _logger.LogInformation(
+        "Selected file for processing: {SelectedFile}",
+        selectedFile);
+
+    return (selectedFile, false);
 }
-
------------------
-
-private static DateTime GetNewZealandNow()
-{
-    TimeZoneInfo nzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
-    return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nzTimeZone);
-}
-
