@@ -1,19 +1,18 @@
-try
+if (!looksArmoredPgp && looksPlainText)
 {
-    await GNUServices.DecryptAsync(fileBytes, outputms);
-}
-catch (Exception ex)
-{
+    var exception = new InvalidOperationException(
+        $"Selected DIA file has .pgp extension but content appears to be plain text, not encrypted PGP. File: {payload.FileName}");
+
     _logger.LogError(
-        ex,
-        "DIA decryption failed. FileName: {FileName}",
+        exception,
+        "Invalid DIA encrypted file format detected before decryption. FileName: {FileName}",
         payload.FileName);
 
     await _diaExceptionNotificationService.NotifyFailureAsync(
         payload.FileName,
-        "DecryptionFailure",
-        ex,
+        "InvalidEncryptedFileFormat",
+        exception,
         cancellationToken);
 
-    throw;
+    return;
 }
