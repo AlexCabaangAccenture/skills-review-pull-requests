@@ -3,10 +3,18 @@ public async Task<Guid> Create(string filename, string fileType, MemoryStream ou
     const int maxAttempts = 3;
     const int retryDelayMilliseconds = 2000;
 
+    Exception? lastException = null;
+
     for (int attempt = 1; attempt <= maxAttempts; attempt++)
     {
         try
         {
+            _logger.LogInformation(
+                "DIA Dataverse staging save attempt {Attempt} of {MaxAttempts} started for file {FileName}.",
+                attempt,
+                maxAttempts,
+                filename);
+
             var deStagingRecord = new icow_deceasedestatestaging();
             deStagingRecord.icow_filename = filename;
             deStagingRecord.statecode = icow_deceasedestatestaging_statecode.Active;
@@ -25,13 +33,40 @@ public async Task<Guid> Create(string filename, string fileType, MemoryStream ou
                 fileStream: outputStream
             );
 
+            _logger.LogInformation(
+                "DIA Dataverse staging save succeeded for file {FileName}. RecordId: {RecordId}.",
+                filename,
+                recordId);
+
             return recordId;
         }
-        catch when (attempt < maxAttempts)
+        catch (Exception ex) when (attempt < maxAttempts)
         {
+            lastException = ex;
+
+            _logger.LogWarning(
+                ex,
+                "DIA Dataverse staging save attempt {Attempt} of {MaxAttempts} failed for file {FileName}. Retrying after {RetryDelayMilliseconds} ms.",
+                attempt,
+                maxAttempts,
+                filename,
+                retryDelayMilliseconds);
+
             await Task.Delay(retryDelayMilliseconds);
+        }
+        catch (Exception ex)
+        {
+            lastException = ex;
+
+            _logger.LogError(
+                ex,
+                "DIA Dataverse staging save failed after {MaxAttempts} attempts for file {FileName}.",
+                maxAttempts,
+                filename);
         }
     }
 
-    throw new InvalidOperationException("D365 staging save failed after retry exhaustion.");
+    throw new InvalidOperationException(
+        $"D365 staging save failed after retry exhaustion for file {filename}.",
+        lastException);
 }
