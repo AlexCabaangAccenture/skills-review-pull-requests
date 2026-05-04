@@ -1,18 +1,22 @@
-if (!looksArmoredPgp && looksPlainText)
+_logger.LogInformation("PGP TRACE: after GNUServices.DecryptAsync. Output length: {Length}", outputms.Length);
+
+if (outputms.Length == 0)
 {
     var exception = new InvalidOperationException(
-        $"Selected DIA file has .pgp extension but content appears to be plain text, not encrypted PGP. File: {payload.FileName}");
+        $"DIA decrypted output is empty. File: {payload.FileName}");
 
     _logger.LogError(
         exception,
-        "Invalid DIA encrypted file format detected before decryption. FileName: {FileName}",
+        "Invalid DIA decrypted file format detected after decryption. FileName: {FileName}",
         payload.FileName);
 
     await _diaExceptionNotificationService.NotifyFailureAsync(
         payload.FileName,
-        "InvalidEncryptedFileFormat",
+        "InvalidDecryptedFileFormat",
         exception,
         cancellationToken);
 
     return;
 }
+
+string filename = $"{DateTime.Now:Mdy_HHmm}_{Guid.NewGuid().ToString("N")[..5]}.txt";
