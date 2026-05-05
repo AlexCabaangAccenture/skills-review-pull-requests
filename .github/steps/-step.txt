@@ -1,66 +1,56 @@
-var selectionResult = await SelectTargetFileAsync(files);
+using Microsoft.Extensions.Logging;
+using Microsoft.Xrm.Sdk;
+using Moq;
+using WNZL.ICOW.DeceasedEstates.Services.Contracts;
+using WNZL.ICOW.DeceasedEstates.Services.Services;
+using Xunit;
 
-if (selectionResult.FailureHandled)
+namespace WNZL.ICOW.DeceasedEstates.Services.Tests
 {
-    return;
-}
-
-string? selectedFile = selectionResult.SelectedFile;
-
-if (string.IsNullOrWhiteSpace(selectedFile))
-{
-    await HandleMissingDiaFileAsync();
-    return;
-}
----------------
-
-private async Task<(string? SelectedFile, bool FailureHandled)> SelectTargetFileAsync(string[] files)
-{
-    _logger.LogInformation("File selection started.");
-
-    if (files == null || files.Length == 0)
+    public class DEDIANotificationServicesTests
     {
-        _logger.LogWarning("No files available for selection.");
-        return (null, false);
+        [Fact]
+        public async Task Create_WhenDataverseCreateFails_ShouldRetryAndThrowAfterExhaustion()
+        {
+            // Arrange
+            var dataverseRepoMock = new Mock<IDataverseRepository>();
+            var loggerMock = new Mock<ILogger<DEDIANotificationServices>>();
+
+            dataverseRepoMock
+                .Setup(repo => repo.CreateAsync(It.IsAny<Entity>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("Dataverse create failed"));
+
+            var service = new DEDIANotificationServices(
+                dataverseRepoMock.Object,
+                loggerMock.Object);
+
+            using var outputStream = new MemoryStream();
+            using var writer = new StreamWriter(outputStream, leaveOpen: true);
+            await writer.WriteAsync("test decrypted content");
+            await writer.FlushAsync();
+            outputStream.Position = 0;
+
+            // Act
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.Create("test.txt", "txt", outputStream));
+
+            // Assert
+            Assert.Contains("D365 staging save failed after retry exhaustion", exception.Message);
+
+            dataverseRepoMock.Verify(
+                repo => repo.CreateAsync(It.IsAny<Entity>(), It.IsAny<CancellationToken>()),
+                Times.Exactly(3));
+
+            dataverseRepoMock.Verify(
+                repo => repo.UploadFileToColumnAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<Guid>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Stream>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Never);
+        }
     }
-
-    DateTime today = GetNewZealandNow().Date;
-
-    List<string> validFiles = files
-        .Where(file => IsValidDiaFile(file, today))
-        .ToList();
-
-    if (validFiles.Count == 0)
-    {
-        _logger.LogWarning("No valid DIA file found for today.");
-        return (null, false);
-    }
-
-    if (validFiles.Count > 1)
-    {
-        string fileList = string.Join(", ", validFiles);
-
-        var exception = new InvalidOperationException(
-            $"Multiple valid DIA files found for today. Files: {fileList}");
-
-        _logger.LogError(
-            exception,
-            "Multiple valid DIA files found for today. Aborting processing. Files: {Files}",
-            fileList);
-
-        await _diaExceptionNotificationService.NotifyFailureAsync(
-            "Multiple",
-            "MultipleValidDiaFiles",
-            exception);
-
-        return (null, true);
-    }
-
-    string selectedFile = validFiles.First();
-
-    _logger.LogInformation(
-        "Selected file for processing: {SelectedFile}",
-        selectedFile);
-
-    return (selectedFile, false);
 }
