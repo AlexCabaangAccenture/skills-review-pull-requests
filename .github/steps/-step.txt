@@ -1,56 +1,54 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Xrm.Sdk;
-using Moq;
-using WNZL.ICOW.DeceasedEstates.Services.Contracts;
-using WNZL.ICOW.DeceasedEstates.Services.Services;
-using Xunit;
-
-namespace WNZL.ICOW.DeceasedEstates.Services.Tests
+[Fact]
+public async Task Create_WhenDataverseFileUploadFails_ShouldRetryAndThrowAfterExhaustion()
 {
-    public class DEDIANotificationServicesTests
-    {
-        [Fact]
-        public async Task Create_WhenDataverseCreateFails_ShouldRetryAndThrowAfterExhaustion()
-        {
-            // Arrange
-            var dataverseRepoMock = new Mock<IDataverseRepository>();
-            var loggerMock = new Mock<ILogger<DEDIANotificationServices>>();
+    // Arrange
+    var dataverseRepoMock = new Mock<IDataverseRepository>();
+    var loggerMock = new Mock<ILogger<DEDIANotificationServices>>();
 
-            dataverseRepoMock
-                .Setup(repo => repo.CreateAsync(It.IsAny<Entity>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new Exception("Dataverse create failed"));
+    dataverseRepoMock
+        .Setup(repo => repo.CreateAsync(It.IsAny<Entity>(), It.IsAny<CancellationToken>()))
+        .ReturnsAsync(Guid.NewGuid());
 
-            var service = new DEDIANotificationServices(
-                dataverseRepoMock.Object,
-                loggerMock.Object);
+    dataverseRepoMock
+        .Setup(repo => repo.UploadFileToColumnAsync(
+            It.IsAny<string>(),
+            It.IsAny<Guid>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<Stream>(),
+            It.IsAny<CancellationToken>()))
+        .ThrowsAsync(new Exception("Dataverse file upload failed"));
 
-            using var outputStream = new MemoryStream();
-            using var writer = new StreamWriter(outputStream, leaveOpen: true);
-            await writer.WriteAsync("test decrypted content");
-            await writer.FlushAsync();
-            outputStream.Position = 0;
+    var service = new DEDIANotificationServices(
+        dataverseRepoMock.Object,
+        loggerMock.Object);
 
-            // Act
-            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                service.Create("test.txt", "txt", outputStream));
+    using var outputStream = new MemoryStream();
+    using var writer = new StreamWriter(outputStream, leaveOpen: true);
+    await writer.WriteAsync("test decrypted content");
+    await writer.FlushAsync();
+    outputStream.Position = 0;
 
-            // Assert
-            Assert.Contains("D365 staging save failed after retry exhaustion", exception.Message);
+    // Act
+    var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        service.Create("test.txt", "txt", outputStream));
 
-            dataverseRepoMock.Verify(
-                repo => repo.CreateAsync(It.IsAny<Entity>(), It.IsAny<CancellationToken>()),
-                Times.Exactly(3));
+    // Assert
+    Assert.Contains("D365 staging save failed after retry exhaustion", exception.Message);
 
-            dataverseRepoMock.Verify(
-                repo => repo.UploadFileToColumnAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Stream>(),
-                    It.IsAny<CancellationToken>()),
-                Times.Never);
-        }
-    }
+    dataverseRepoMock.Verify(
+        repo => repo.CreateAsync(It.IsAny<Entity>(), It.IsAny<CancellationToken>()),
+        Times.Exactly(3));
+
+    dataverseRepoMock.Verify(
+        repo => repo.UploadFileToColumnAsync(
+            It.IsAny<string>(),
+            It.IsAny<Guid>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<Stream>(),
+            It.IsAny<CancellationToken>()),
+        Times.Exactly(3));
 }
