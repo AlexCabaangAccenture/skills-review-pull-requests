@@ -1,11 +1,12 @@
-catch (Exception ex)
-{
-    _logger.LogError(
-        ex,
-        "DIA processing failed unexpectedly during decrypt/stage flow. FailureType: {FailureType}, FileName: {FileName}, FileType: {FileType}",
-        "UnexpectedDecryptOrStageFailure",
-        payload.FileName,
-        fileType);
+_logger.LogError(
+    exception,
+    "DIA file missing after 7 AM NZT. FailureType: {FailureType}, NzNow: {NzNow}",
+    "MissingDiaFileAfter7AmNzt",
+    nzNow);
 
-    throw;
-}
+
+_logger.LogError(
+    exception,
+    "Multiple valid DIA files found for today. Aborting processing. FailureType: {FailureType}, Files: {Files}",
+    "MultipleValidDiaFiles",
+    fileList);
