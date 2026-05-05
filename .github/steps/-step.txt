@@ -1,39 +1,28 @@
-using Microsoft.Extensions.Logging;
-using Moq;
-using WNZL.ICOW.DeceasedEstates.Services.Services;
-using Xunit;
-
-namespace WNZL.ICOW.DeceasedEstates.Services.Tests
+[Fact]
+public async Task NotifyRetryExhaustedAsync_WhenCalled_ShouldCompleteSuccessfully()
 {
-    public class DiaExceptionNotificationServiceTests
-    {
-        [Fact]
-        public async Task NotifyFailureAsync_WhenCalled_ShouldCompleteSuccessfully()
-        {
-            // Arrange
-            var loggerMock = new Mock<ILogger<DiaExceptionNotificationService>>();
+    // Arrange
+    var loggerMock = new Mock<ILogger<DiaExceptionNotificationService>>();
 
-            var service = new DiaExceptionNotificationService(
-                loggerMock.Object);
+    var service = new DiaExceptionNotificationService(
+        loggerMock.Object);
 
-            var exception = new InvalidOperationException("Test failure");
+    var exception = new InvalidOperationException("Retry exhausted");
 
-            // Act
-            await service.NotifyFailureAsync(
-                "test-file.txt",
-                "DecryptionFailure",
-                exception);
+    // Act
+    await service.NotifyRetryExhaustedAsync(
+        "test-file.txt",
+        "D365DataverseSaveFailure",
+        exception);
 
-            // Assert
-            loggerMock.Verify(
-                logger => logger.Log(
-                    LogLevel.Error,
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((value, type) =>
-                        value.ToString()!.Contains("DIA exception notification required")),
-                    exception,
-                    It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-                Times.Once);
-        }
-    }
+    // Assert
+    loggerMock.Verify(
+        logger => logger.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((value, type) =>
+                value.ToString()!.Contains("DIA exception notification required")),
+            exception,
+            It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+        Times.Once);
 }
