@@ -1,13 +1,15 @@
 [Fact]
-public async Task Create_WhenDataverseFileUploadFails_ShouldRetryAndThrowAfterExhaustion()
+public async Task Create_WhenDataverseSaveSucceeds_ShouldReturnRecordIdAndUploadFile()
 {
     // Arrange
+    Guid expectedRecordId = Guid.NewGuid();
+
     var dataverseRepoMock = new Mock<IDataverseRepository>();
     var loggerMock = new Mock<ILogger<DEDIANotificationServices>>();
 
     dataverseRepoMock
         .Setup(repo => repo.CreateAsync(It.IsAny<Entity>(), It.IsAny<CancellationToken>()))
-        .ReturnsAsync(Guid.NewGuid());
+        .ReturnsAsync(expectedRecordId);
 
     dataverseRepoMock
         .Setup(repo => repo.UploadFileToColumnAsync(
@@ -18,7 +20,7 @@ public async Task Create_WhenDataverseFileUploadFails_ShouldRetryAndThrowAfterEx
             It.IsAny<string>(),
             It.IsAny<Stream>(),
             It.IsAny<CancellationToken>()))
-        .ThrowsAsync(new Exception("Dataverse file upload failed"));
+        .Returns(Task.CompletedTask);
 
     var service = new DEDIANotificationServices(
         dataverseRepoMock.Object,
@@ -31,24 +33,23 @@ public async Task Create_WhenDataverseFileUploadFails_ShouldRetryAndThrowAfterEx
     outputStream.Position = 0;
 
     // Act
-    var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-        service.Create("test.txt", "txt", outputStream));
+    Guid actualRecordId = await service.Create("test.txt", "txt", outputStream);
 
     // Assert
-    Assert.Contains("D365 staging save failed after retry exhaustion", exception.Message);
+    Assert.Equal(expectedRecordId, actualRecordId);
 
     dataverseRepoMock.Verify(
         repo => repo.CreateAsync(It.IsAny<Entity>(), It.IsAny<CancellationToken>()),
-        Times.Exactly(3));
+        Times.Once);
 
     dataverseRepoMock.Verify(
         repo => repo.UploadFileToColumnAsync(
-            It.IsAny<string>(),
-            It.IsAny<Guid>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<string>(),
+            "icow_deceasedestatestaging",
+            expectedRecordId,
+            "icow_file",
+            "test.txt",
+            "text/plain",
             It.IsAny<Stream>(),
             It.IsAny<CancellationToken>()),
-        Times.Exactly(3));
+        Times.Once);
 }
