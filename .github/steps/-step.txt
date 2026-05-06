@@ -1,16 +1,40 @@
-IDEDIANotificationServices
-using System;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
+[Fact]
+public async Task HandoffAsync_WhenPayloadIsNull_ShouldReturnWithoutProcessing()
 {
-    public interface IDEDIANotificationServices
-    {
-        Task<Guid> Create(
-            string filename,
-            string fileType,
-            MemoryStream outputStream);
-    }
+    // Arrange
+    var dediaNotificationServicesMock = new Mock<IDEDIANotificationServices>();
+    var exceptionNotificationServiceMock = new Mock<IDiaExceptionNotificationService>();
+    var decryptionServiceMock = new Mock<IDiaDecryptionService>();
+
+    var orchestrator = CreateOrchestrator(
+        dediaNotificationServicesMock,
+        exceptionNotificationServiceMock,
+        decryptionServiceMock);
+
+    // Act
+    await orchestrator.HandoffAsync(null!);
+
+    // Assert
+    decryptionServiceMock.Verify(
+        service => service.DecryptAsync(
+            It.IsAny<byte[]>(),
+            It.IsAny<MemoryStream>(),
+            It.IsAny<CancellationToken>()),
+        Times.Never);
+
+    dediaNotificationServicesMock.Verify(
+        service => service.Create(
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<MemoryStream>()),
+        Times.Never);
+
+    exceptionNotificationServiceMock.Verify(
+        service => service.NotifyFailureAsync(
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<Exception>(),
+            It.IsAny<CancellationToken>()),
+        Times.Never);
 }
 
