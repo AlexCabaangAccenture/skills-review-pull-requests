@@ -1,36 +1,38 @@
-IDiaDecryptionService
-
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
-{
-    public interface IDiaDecryptionService
-    {
-        Task DecryptAsync(
-            byte[] fileBytes,
-            MemoryStream outputStream,
-            CancellationToken cancellationToken = default);
-    }
-}
-
-DiaDecryptionService
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.Logging;
+using Moq;
 using WNZL.ICOW.DeceasedEstates.Services.Contracts;
+using WNZL.ICOW.DeceasedEstates.Services.Services;
+using Xunit;
 
-namespace WNZL.ICOW.DeceasedEstates.Services.Services
+namespace WNZL.ICOW.DeceasedEstates.Services.Tests
 {
-    public class DiaDecryptionService : IDiaDecryptionService
+    public class DiaIngestionOrchestratorTests
     {
-        public Task DecryptAsync(
-            byte[] fileBytes,
-            MemoryStream outputStream,
-            CancellationToken cancellationToken = default)
+        private static DiaIngestionOrchestrator CreateOrchestrator(
+            Mock<DEDIANotificationServices>? dediaNotificationServicesMock = null,
+            Mock<IDiaExceptionNotificationService>? exceptionNotificationServiceMock = null,
+            Mock<IDiaDecryptionService>? decryptionServiceMock = null)
         {
-            return GNUServices.DecryptAsync(fileBytes, outputStream);
+            var loggerMock = new Mock<ILogger<DiaIngestionOrchestrator>>();
+            var blobServiceClientMock = new Mock<BlobServiceClient>();
+
+            return new DiaIngestionOrchestrator(
+                loggerMock.Object,
+                dediaNotificationServicesMock?.Object ?? CreateDediaNotificationServicesMock().Object,
+                blobServiceClientMock.Object,
+                exceptionNotificationServiceMock?.Object ?? new Mock<IDiaExceptionNotificationService>().Object,
+                decryptionServiceMock?.Object ?? new Mock<IDiaDecryptionService>().Object);
+        }
+
+        private static Mock<DEDIANotificationServices> CreateDediaNotificationServicesMock()
+        {
+            var dataverseRepoMock = new Mock<IDataverseRepository>();
+            var loggerMock = new Mock<ILogger<DEDIANotificationServices>>();
+
+            return new Mock<DEDIANotificationServices>(
+                dataverseRepoMock.Object,
+                loggerMock.Object);
         }
     }
 }
