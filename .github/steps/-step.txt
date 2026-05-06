@@ -1,22 +1,48 @@
-private static DiaIngestionOrchestrator CreateOrchestrator(
-    Mock<IDEDIANotificationServices>? dediaNotificationServicesMock = null,
-    Mock<IDiaExceptionNotificationService>? exceptionNotificationServiceMock = null,
-    Mock<IDiaDecryptionService>? decryptionServiceMock = null)
+using WNZL.ICOW.DeceasedEstates.Services.Models;
 
-dediaNotificationServicesMock?.Object ?? new Mock<IDEDIANotificationServices>().Object,
-
-private static DiaIngestionOrchestrator CreateOrchestrator(
-    Mock<IDEDIANotificationServices>? dediaNotificationServicesMock = null,
-    Mock<IDiaExceptionNotificationService>? exceptionNotificationServiceMock = null,
-    Mock<IDiaDecryptionService>? decryptionServiceMock = null)
+[Fact]
+public async Task HandoffAsync_WhenFileNameIsMissing_ShouldReturnWithoutProcessing()
 {
-    var loggerMock = new Mock<ILogger<DiaIngestionOrchestrator>>();
-    var blobServiceClientMock = new Mock<BlobServiceClient>();
+    // Arrange
+    var dediaNotificationServicesMock = new Mock<IDEDIANotificationServices>();
+    var exceptionNotificationServiceMock = new Mock<IDiaExceptionNotificationService>();
+    var decryptionServiceMock = new Mock<IDiaDecryptionService>();
 
-    return new DiaIngestionOrchestrator(
-        loggerMock.Object,
-        dediaNotificationServicesMock?.Object ?? new Mock<IDEDIANotificationServices>().Object,
-        blobServiceClientMock.Object,
-        exceptionNotificationServiceMock?.Object ?? new Mock<IDiaExceptionNotificationService>().Object,
-        decryptionServiceMock?.Object ?? new Mock<IDiaDecryptionService>().Object);
+    var orchestrator = CreateOrchestrator(
+        dediaNotificationServicesMock,
+        exceptionNotificationServiceMock,
+        decryptionServiceMock);
+
+    var payload = new DiaHandoffPayload
+    {
+        FileName = "",
+        FilePath = "folder/test-file.txt.pgp",
+        FileType = "DIA"
+    };
+
+    // Act
+    await orchestrator.HandoffAsync(payload);
+
+    // Assert
+    decryptionServiceMock.Verify(
+        service => service.DecryptAsync(
+            It.IsAny<byte[]>(),
+            It.IsAny<MemoryStream>(),
+            It.IsAny<CancellationToken>()),
+        Times.Never);
+
+    dediaNotificationServicesMock.Verify(
+        service => service.Create(
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<MemoryStream>()),
+        Times.Never);
+
+    exceptionNotificationServiceMock.Verify(
+        service => service.NotifyFailureAsync(
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<Exception>(),
+            It.IsAny<CancellationToken>()),
+        Times.Never);
 }
