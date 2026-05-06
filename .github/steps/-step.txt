@@ -1,53 +1,35 @@
-using Azure.Storage.Blobs;
-using Microsoft.Extensions.Logging;
-using Moq;
-using System.Reflection;
-using WNZL.ICOW.DeceasedEstates.Services.Contracts;
-using WNZL.ICOW.DeceasedEstates.Services.Models;
-using WNZL.ICOW.DeceasedEstates.Services.Services;
-using Xunit;
-
-namespace WNZL.ICOW.DeceasedEstates.Services.Tests
+[Fact]
+public async Task SelectTargetFileAsync_WhenMultipleValidFilesExist_ShouldNotifyAndMarkFailureHandled()
 {
-    public class DiaIngestionProcessingServiceTests
+    // Arrange
+    var notificationMock = new Mock<IDiaExceptionNotificationService>();
+    var service = CreateService(notificationMock);
+
+    DateTime today = TimeZoneInfo.ConvertTimeFromUtc(
+        DateTime.UtcNow,
+        TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time")).Date;
+
+    string startDate = today.AddDays(-1).ToString("yyyy-MM-dd");
+    string endDate = today.AddDays(1).ToString("yyyy-MM-dd");
+
+    string[] files =
     {
-        private static DiaIngestionProcessingService CreateService(
-            Mock<IDiaExceptionNotificationService>? notificationMock = null)
-        {
-            var loggerMock = new Mock<ILogger<DiaIngestionProcessingService>>();
-            var blobServiceClientMock = new Mock<BlobServiceClient>();
-            var configProviderMock = new Mock<IIngestionConfigurationProvider>();
-            var orchestratorMock = new Mock<IDiaIngestionOrchestrator>();
+        $"BDM_Westpac_ISA_Deaths_A_{startDate}_{endDate}.txt.pgp",
+        $"BDM_Westpac_ISA_Deaths_B_{startDate}_{endDate}.txt.pgp"
+    };
 
-            configProviderMock
-                .Setup(provider => provider.GetSettings())
-                .Returns(new IngestionSettings
-                {
-                    BlobContainerName = "dia-input"
-                });
+    // Act
+    var result = await InvokeSelectTargetFileAsync(service, files);
 
-            return new DiaIngestionProcessingService(
-                loggerMock.Object,
-                blobServiceClientMock.Object,
-                configProviderMock.Object,
-                orchestratorMock.Object,
-                notificationMock?.Object ?? new Mock<IDiaExceptionNotificationService>().Object);
-        }
+    // Assert
+    Assert.Null(result.SelectedFile);
+    Assert.True(result.FailureHandled);
 
-        private static async Task<(string? SelectedFile, bool FailureHandled)> InvokeSelectTargetFileAsync(
-            DiaIngestionProcessingService service,
-            string[] files)
-        {
-            MethodInfo? method = typeof(DiaIngestionProcessingService)
-                .GetMethod("SelectTargetFileAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            Assert.NotNull(method);
-
-            var task = (Task<(string? SelectedFile, bool FailureHandled)>)method.Invoke(
-                service,
-                new object[] { files })!;
-
-            return await task;
-        }
-    }
+    notificationMock.Verify(
+        service => service.NotifyFailureAsync(
+            "Multiple",
+            "MultipleValidDiaFiles",
+            It.IsAny<InvalidOperationException>(),
+            It.IsAny<CancellationToken>()),
+        Times.Once);
 }
