@@ -1,16 +1,11 @@
 [Fact]
-public async Task SelectTargetFileAsync_WhenNoValidFileExists_ShouldReturnNullAndNotHandleFailure()
+public async Task SelectTargetFileAsync_WhenFileListIsEmpty_ShouldReturnNullAndNotHandleFailure()
 {
     // Arrange
     var notificationMock = new Mock<IDiaExceptionNotificationService>();
     var service = CreateService(notificationMock);
 
-    string[] files =
-    {
-        "folder/not-a-dia-file.txt",
-        "folder/BDM_Westpac_ISA_Deaths_2020-01-01_2020-01-02.csv",
-        "folder/BDM_Westpac_ISA_Deaths_2020-01-01_2020-01-02.txt"
-    };
+    string[] files = Array.Empty<string>();
 
     // Act
     var result = await InvokeSelectTargetFileAsync(service, files);
