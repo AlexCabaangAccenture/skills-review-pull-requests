@@ -1,38 +1,16 @@
-using Azure.Storage.Blobs;
-using Microsoft.Extensions.Logging;
-using Moq;
-using WNZL.ICOW.DeceasedEstates.Services.Contracts;
-using WNZL.ICOW.DeceasedEstates.Services.Services;
-using Xunit;
+IDEDIANotificationServices
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
-namespace WNZL.ICOW.DeceasedEstates.Services.Tests
+namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
 {
-    public class DiaIngestionOrchestratorTests
+    public interface IDEDIANotificationServices
     {
-        private static DiaIngestionOrchestrator CreateOrchestrator(
-            Mock<DEDIANotificationServices>? dediaNotificationServicesMock = null,
-            Mock<IDiaExceptionNotificationService>? exceptionNotificationServiceMock = null,
-            Mock<IDiaDecryptionService>? decryptionServiceMock = null)
-        {
-            var loggerMock = new Mock<ILogger<DiaIngestionOrchestrator>>();
-            var blobServiceClientMock = new Mock<BlobServiceClient>();
-
-            return new DiaIngestionOrchestrator(
-                loggerMock.Object,
-                dediaNotificationServicesMock?.Object ?? CreateDediaNotificationServicesMock().Object,
-                blobServiceClientMock.Object,
-                exceptionNotificationServiceMock?.Object ?? new Mock<IDiaExceptionNotificationService>().Object,
-                decryptionServiceMock?.Object ?? new Mock<IDiaDecryptionService>().Object);
-        }
-
-        private static Mock<DEDIANotificationServices> CreateDediaNotificationServicesMock()
-        {
-            var dataverseRepoMock = new Mock<IDataverseRepository>();
-            var loggerMock = new Mock<ILogger<DEDIANotificationServices>>();
-
-            return new Mock<DEDIANotificationServices>(
-                dataverseRepoMock.Object,
-                loggerMock.Object);
-        }
+        Task<Guid> Create(
+            string filename,
+            string fileType,
+            MemoryStream outputStream);
     }
 }
+
