@@ -1,48 +1,10 @@
-using WNZL.ICOW.DeceasedEstates.Services.Models;
+Continued unit test coverage for SPESTG-480 DIA exception scenarios.
 
-[Fact]
-public async Task HandoffAsync_WhenFileNameIsMissing_ShouldReturnWithoutProcessing()
-{
-    // Arrange
-    var dediaNotificationServicesMock = new Mock<IDEDIANotificationServices>();
-    var exceptionNotificationServiceMock = new Mock<IDiaExceptionNotificationService>();
-    var decryptionServiceMock = new Mock<IDiaDecryptionService>();
+Added additional unit tests for DIA ingestion file-selection and orchestrator guard paths. Current coverage includes Dataverse staging retry behavior, notification service logging, file-selection scenarios, null payload guard, and missing filename guard.
 
-    var orchestrator = CreateOrchestrator(
-        dediaNotificationServicesMock,
-        exceptionNotificationServiceMock,
-        decryptionServiceMock);
+Validation completed:
+- Test Explorer: 11 passed, 0 failed, 0 skipped
+- dotnet test: passing before latest checkpoints
+- Changes committed and pushed to users/alex/SPESTG-480-dia-exception-handling
 
-    var payload = new DiaHandoffPayload
-    {
-        FileName = "",
-        FilePath = "folder/test-file.txt.pgp",
-        FileType = "DIA"
-    };
-
-    // Act
-    await orchestrator.HandoffAsync(payload);
-
-    // Assert
-    decryptionServiceMock.Verify(
-        service => service.DecryptAsync(
-            It.IsAny<byte[]>(),
-            It.IsAny<MemoryStream>(),
-            It.IsAny<CancellationToken>()),
-        Times.Never);
-
-    dediaNotificationServicesMock.Verify(
-        service => service.Create(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<MemoryStream>()),
-        Times.Never);
-
-    exceptionNotificationServiceMock.Verify(
-        service => service.NotifyFailureAsync(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Exception>(),
-            It.IsAny<CancellationToken>()),
-        Times.Never);
-}
+Remaining unit test work is focused on the deeper orchestrator exception paths, including invalid encrypted file format, decryption failure, invalid decrypted output, and staging retry-exhaustion notification. These require Blob download mocking, so I will continue them in the next focused block.
