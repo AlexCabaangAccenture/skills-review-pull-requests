@@ -1,17 +1,53 @@
-Started unit test implementation for the SPESTG-480 DIA exception scenarios.
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.Logging;
+using Moq;
+using System.Reflection;
+using WNZL.ICOW.DeceasedEstates.Services.Contracts;
+using WNZL.ICOW.DeceasedEstates.Services.Models;
+using WNZL.ICOW.DeceasedEstates.Services.Services;
+using Xunit;
 
-Created and added a new xUnit test project for the DIA services, with Moq added for dependency mocking. Initial unit tests were added for the Dataverse staging save and notification service paths.
+namespace WNZL.ICOW.DeceasedEstates.Services.Tests
+{
+    public class DiaIngestionProcessingServiceTests
+    {
+        private static DiaIngestionProcessingService CreateService(
+            Mock<IDiaExceptionNotificationService>? notificationMock = null)
+        {
+            var loggerMock = new Mock<ILogger<DiaIngestionProcessingService>>();
+            var blobServiceClientMock = new Mock<BlobServiceClient>();
+            var configProviderMock = new Mock<IIngestionConfigurationProvider>();
+            var orchestratorMock = new Mock<IDiaIngestionOrchestrator>();
 
-Current coverage added:
-- Dataverse staging row creation failure retries and throws after retry exhaustion
-- Dataverse file upload failure retries and throws after retry exhaustion
-- Successful Dataverse staging save returns the record ID and uploads the file
-- DIA exception notification logs the notification intent
-- Retry-exhausted notification path logs through the notification wrapper
+            configProviderMock
+                .Setup(provider => provider.GetSettings())
+                .Returns(new IngestionSettings
+                {
+                    BlobContainerName = "dia-input"
+                });
 
-Validation completed:
-- Test Explorer result: 5 passed, 0 failed, 0 skipped
-- dotnet test result: 5 passed, 0 failed, 0 skipped
-- Changes pushed to branch users/alex/SPESTG-480-dia-exception-handling
+            return new DiaIngestionProcessingService(
+                loggerMock.Object,
+                blobServiceClientMock.Object,
+                configProviderMock.Object,
+                orchestratorMock.Object,
+                notificationMock?.Object ?? new Mock<IDiaExceptionNotificationService>().Object);
+        }
 
-This subtask remains in progress because more unit tests are still needed for the broader DIA flow, including ingestion file selection, missing file handling, multiple valid files, decryption failure, invalid encrypted/decrypted format handling, and other existing integration paths that were not previously covered.
+        private static async Task<(string? SelectedFile, bool FailureHandled)> InvokeSelectTargetFileAsync(
+            DiaIngestionProcessingService service,
+            string[] files)
+        {
+            MethodInfo? method = typeof(DiaIngestionProcessingService)
+                .GetMethod("SelectTargetFileAsync", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.NotNull(method);
+
+            var task = (Task<(string? SelectedFile, bool FailureHandled)>)method.Invoke(
+                service,
+                new object[] { files })!;
+
+            return await task;
+        }
+    }
+}
