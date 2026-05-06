@@ -10,7 +10,7 @@ namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
     {
         Task DecryptAsync(
             byte[] fileBytes,
-            Stream outputStream,
+            MemoryStream outputStream,
             CancellationToken cancellationToken = default);
     }
 }
@@ -27,7 +27,7 @@ namespace WNZL.ICOW.DeceasedEstates.Services.Services
     {
         public Task DecryptAsync(
             byte[] fileBytes,
-            Stream outputStream,
+            MemoryStream outputStream,
             CancellationToken cancellationToken = default)
         {
             return GNUServices.DecryptAsync(fileBytes, outputStream);
