@@ -1,5 +1,5 @@
 [Fact]
-public async Task SelectTargetFileAsync_WhenMultipleValidFilesExist_ShouldNotifyAndMarkFailureHandled()
+public async Task SelectTargetFileAsync_WhenSingleValidFileExists_ShouldReturnSelectedFileAndNotNotify()
 {
     // Arrange
     var notificationMock = new Mock<IDiaExceptionNotificationService>();
@@ -12,24 +12,26 @@ public async Task SelectTargetFileAsync_WhenMultipleValidFilesExist_ShouldNotify
     string startDate = today.AddDays(-1).ToString("yyyy-MM-dd");
     string endDate = today.AddDays(1).ToString("yyyy-MM-dd");
 
+    string expectedFile = $"folder/BDM_Westpac_ISA_Deaths_{startDate}_{endDate}.txt.pgp";
+
     string[] files =
     {
-        $"BDM_Westpac_ISA_Deaths_A_{startDate}_{endDate}.txt.pgp",
-        $"BDM_Westpac_ISA_Deaths_B_{startDate}_{endDate}.txt.pgp"
+        "folder/not-a-dia-file.txt",
+        expectedFile
     };
 
     // Act
     var result = await InvokeSelectTargetFileAsync(service, files);
 
     // Assert
-    Assert.Null(result.SelectedFile);
-    Assert.True(result.FailureHandled);
+    Assert.Equal(expectedFile, result.SelectedFile);
+    Assert.False(result.FailureHandled);
 
     notificationMock.Verify(
         service => service.NotifyFailureAsync(
-            "Multiple",
-            "MultipleValidDiaFiles",
-            It.IsAny<InvalidOperationException>(),
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<Exception>(),
             It.IsAny<CancellationToken>()),
-        Times.Once);
+        Times.Never);
 }
