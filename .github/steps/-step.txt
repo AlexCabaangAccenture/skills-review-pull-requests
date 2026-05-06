@@ -1,30 +1,22 @@
 [Fact]
-public async Task SelectTargetFileAsync_WhenSingleValidFileExists_ShouldReturnSelectedFileAndNotNotify()
+public async Task SelectTargetFileAsync_WhenNoValidFileExists_ShouldReturnNullAndNotHandleFailure()
 {
     // Arrange
     var notificationMock = new Mock<IDiaExceptionNotificationService>();
     var service = CreateService(notificationMock);
 
-    DateTime today = TimeZoneInfo.ConvertTimeFromUtc(
-        DateTime.UtcNow,
-        TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time")).Date;
-
-    string startDate = today.AddDays(-1).ToString("yyyy-MM-dd");
-    string endDate = today.AddDays(1).ToString("yyyy-MM-dd");
-
-    string expectedFile = $"folder/BDM_Westpac_ISA_Deaths_{startDate}_{endDate}.txt.pgp";
-
     string[] files =
     {
         "folder/not-a-dia-file.txt",
-        expectedFile
+        "folder/BDM_Westpac_ISA_Deaths_2020-01-01_2020-01-02.csv",
+        "folder/BDM_Westpac_ISA_Deaths_2020-01-01_2020-01-02.txt"
     };
 
     // Act
     var result = await InvokeSelectTargetFileAsync(service, files);
 
     // Assert
-    Assert.Equal(expectedFile, result.SelectedFile);
+    Assert.Null(result.SelectedFile);
     Assert.False(result.FailureHandled);
 
     notificationMock.Verify(
