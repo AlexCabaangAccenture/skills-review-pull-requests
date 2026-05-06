@@ -1,24 +1,36 @@
-[Fact]
-public async Task SelectTargetFileAsync_WhenFileListIsEmpty_ShouldReturnNullAndNotHandleFailure()
+IDiaDecryptionService
+
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
 {
-    // Arrange
-    var notificationMock = new Mock<IDiaExceptionNotificationService>();
-    var service = CreateService(notificationMock);
+    public interface IDiaDecryptionService
+    {
+        Task DecryptAsync(
+            byte[] fileBytes,
+            Stream outputStream,
+            CancellationToken cancellationToken = default);
+    }
+}
 
-    string[] files = Array.Empty<string>();
+DiaDecryptionService
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using WNZL.ICOW.DeceasedEstates.Services.Contracts;
 
-    // Act
-    var result = await InvokeSelectTargetFileAsync(service, files);
-
-    // Assert
-    Assert.Null(result.SelectedFile);
-    Assert.False(result.FailureHandled);
-
-    notificationMock.Verify(
-        service => service.NotifyFailureAsync(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<Exception>(),
-            It.IsAny<CancellationToken>()),
-        Times.Never);
+namespace WNZL.ICOW.DeceasedEstates.Services.Services
+{
+    public class DiaDecryptionService : IDiaDecryptionService
+    {
+        public Task DecryptAsync(
+            byte[] fileBytes,
+            Stream outputStream,
+            CancellationToken cancellationToken = default)
+        {
+            return GNUServices.DecryptAsync(fileBytes, outputStream);
+        }
+    }
 }
