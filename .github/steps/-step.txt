@@ -1,42 +1,22 @@
-Perform developer integration validation for DIA exception handling flow
-Validate the SPESTG-480 DIA exception-handling changes against the deployed environment using real or QA-aligned test files and runtime dependencies.
+Completed automated unit test coverage for SPESTG-480 DIA exception scenarios.
 
-This is separate from automated unit test coverage. Unit tests validate mocked code paths, while this task validates real integration behavior across Blob storage, decryption, Dataverse staging, App Insights logging, and notification handling.
+Added xUnit/Moq-based tests covering:
+- Dataverse staging retry exhaustion for row creation
+- Dataverse staging retry exhaustion for file upload
+- successful Dataverse staging save
+- DIA exception notification logging
+- retry-exhausted notification wrapper path
+- DIA file-selection scenarios: multiple valid files, single valid file, no valid file, and empty file list
+- orchestrator guard scenarios for null payload and missing filename
+- invalid encrypted file format handling
+- decryption failure handling
+- invalid decrypted output handling
+- D365 staging retry-exhaustion notification from the orchestrator
 
+Validation completed:
+- 15 unit tests passed
+- 0 failed
+- 0 skipped
+- changes committed and pushed to users/alex/SPESTG-480-dia-exception-handling
 
-Deploy to environment
-Prepare test blob files
-Trigger DIA ingestion
-Check App Insights logs
-Check Dataverse staging row/file
-Confirm notification behavior or current notification placeholder/log
-
-
-1. Confirm target environment for developer validation
-2. Confirm test data/file requirements with QA or available DIA sample files
-3. Prepare test blob files for the main exception scenarios
-4. Trigger DIA ingestion flow
-5. Validate App Insights logs and FailureType traceability
-6. Validate Dataverse staging behavior where applicable
-7. Confirm current notification behavior, including whether it is still log-only or actual email delivery
-8. Capture evidence/screenshots/log snippets for PR and Jira
-9. Document any gaps that should be handled separately from SPESTG-480
-
-1. Valid DIA file flow
-2. Missing DIA file after 7 AM NZT
-3. Multiple valid DIA files
-4. Invalid encrypted file format
-5. Decryption failure
-6. Empty or invalid decrypted output
-7. D365/Dataverse staging retry exhaustion
-8. App Insights traceability for each failure type
-
-
-Automated unit test coverage for the main SPESTG-480 exception scenarios has been completed and pushed. Current result is 15 tests passing, 0 failed, 0 skipped.
-
-I also identified the next validation layer needed before PR completion: developer integration validation against real runtime dependencies. This is separate from unit testing because it needs to confirm behavior with real Blob storage input, actual decryption behavior, Dataverse staging, App Insights traceability, and current notification handling.
-
-I will create a separate subtask to track this validation work so the remaining activities and evidence capture are visible before raising the PR.
-
-
-The unit test coverage is now completed for the main SPESTG-480 exception paths, with 15 tests passing. I also identified the next validation layer before PR, which is developer integration validation using the deployed environment and real runtime dependencies like Blob, decryption, Dataverse, App Insights, and notification behavior. I’ll create a separate subtask for that so the validation effort and evidence are tracked properly before raising the PR.
+Note: real environment validation is tracked separately under the developer integration validation subtask, covering real Blob input, real decryption behavior, Dataverse staging, App Insights evidence, and notification behavior.
