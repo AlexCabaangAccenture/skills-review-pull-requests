@@ -1,8 +1,29 @@
-private static DiaIngestionOrchestrator CreateOrchestrator(
-    Mock<IDEDIANotificationServices>? dediaNotificationServicesMock = null,
-    Mock<IDiaExceptionNotificationService>? exceptionNotificationServiceMock = null,
-    Mock<IDiaDecryptionService>? decryptionServiceMock = null,
-    Mock<BlobServiceClient>? blobServiceClientMock = null)
+using System.Text;
+using Azure.Storage.Blobs;
 
-blobServiceClientMock ??= new Mock<BlobServiceClient>();
+private static Mock<BlobServiceClient> CreateBlobServiceClientMock(string blobContent)
+{
+    var blobServiceClientMock = new Mock<BlobServiceClient>();
+    var blobContainerClientMock = new Mock<BlobContainerClient>();
+    var blobClientMock = new Mock<BlobClient>();
 
+    blobServiceClientMock
+        .Setup(client => client.GetBlobContainerClient(It.IsAny<string>()))
+        .Returns(blobContainerClientMock.Object);
+
+    blobContainerClientMock
+        .Setup(container => container.GetBlobClient(It.IsAny<string>()))
+        .Returns(blobClientMock.Object);
+
+    blobClientMock
+        .Setup(blob => blob.DownloadToAsync(It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+        .Callback<Stream, CancellationToken>((stream, cancellationToken) =>
+        {
+            byte[] bytes = System.Text.Encoding.ASCII.GetBytes(blobContent);
+            stream.Write(bytes, 0, bytes.Length);
+            stream.Position = 0;
+        })
+        .Returns(Task.CompletedTask);
+
+    return blobServiceClientMock;
+}
