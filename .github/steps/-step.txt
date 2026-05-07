@@ -1,29 +1,9 @@
-using System.Text;
-using Azure.Storage.Blobs;
-
-private static Mock<BlobServiceClient> CreateBlobServiceClientMock(string blobContent)
-{
-    var blobServiceClientMock = new Mock<BlobServiceClient>();
-    var blobContainerClientMock = new Mock<BlobContainerClient>();
-    var blobClientMock = new Mock<BlobClient>();
-
-    blobServiceClientMock
-        .Setup(client => client.GetBlobContainerClient(It.IsAny<string>()))
-        .Returns(blobContainerClientMock.Object);
-
-    blobContainerClientMock
-        .Setup(container => container.GetBlobClient(It.IsAny<string>()))
-        .Returns(blobClientMock.Object);
-
-    blobClientMock
-        .Setup(blob => blob.DownloadToAsync(It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-        .Callback<Stream, CancellationToken>((stream, cancellationToken) =>
-        {
-            byte[] bytes = System.Text.Encoding.ASCII.GetBytes(blobContent);
-            stream.Write(bytes, 0, bytes.Length);
-            stream.Position = 0;
-        })
-        .Returns(Task.CompletedTask);
-
-    return blobServiceClientMock;
-}
+blobClientMock
+    .Setup(blob => blob.DownloadToAsync(It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+    .Callback<Stream, CancellationToken>((stream, cancellationToken) =>
+    {
+        byte[] bytes = System.Text.Encoding.ASCII.GetBytes(blobContent);
+        stream.Write(bytes, 0, bytes.Length);
+        stream.Position = 0;
+    })
+    .ReturnsAsync((Azure.Response<Azure.Storage.Blobs.Models.BlobProperties>)null!);
