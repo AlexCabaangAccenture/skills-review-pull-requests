@@ -1,49 +1,9 @@
-[Fact]
-public async Task HandoffAsync_WhenEncryptedFileContentLooksPlainText_ShouldNotifyInvalidEncryptedFileFormat()
-{
-    // Arrange
-    var dediaNotificationServicesMock = new Mock<IDEDIANotificationServices>();
-    var exceptionNotificationServiceMock = new Mock<IDiaExceptionNotificationService>();
-    var decryptionServiceMock = new Mock<IDiaDecryptionService>();
-
-    var blobServiceClientMock = CreateBlobServiceClientMock("plain text content, not encrypted");
-
-    var orchestrator = CreateOrchestrator(
-        dediaNotificationServicesMock,
-        exceptionNotificationServiceMock,
-        decryptionServiceMock,
-        blobServiceClientMock);
-
-    var payload = new DiaHandoffPayload
+blobClientMock
+    .Setup(blob => blob.DownloadToAsync(It.IsAny<Stream>()))
+    .Callback<Stream>(stream =>
     {
-        FileName = "BDM_Westpac_ISA_Deaths_2026-05-05_2026-05-06.txt.pgp",
-        FilePath = "folder/BDM_Westpac_ISA_Deaths_2026-05-05_2026-05-06.txt.pgp",
-        FileType = "DIA"
-    };
-
-    // Act
-    await orchestrator.HandoffAsync(payload);
-
-    // Assert
-    exceptionNotificationServiceMock.Verify(
-        service => service.NotifyFailureAsync(
-            payload.FileName,
-            "InvalidEncryptedFileFormat",
-            It.IsAny<InvalidOperationException>(),
-            It.IsAny<CancellationToken>()),
-        Times.Once);
-
-    decryptionServiceMock.Verify(
-        service => service.DecryptAsync(
-            It.IsAny<byte[]>(),
-            It.IsAny<MemoryStream>(),
-            It.IsAny<CancellationToken>()),
-        Times.Never);
-
-    dediaNotificationServicesMock.Verify(
-        service => service.Create(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<MemoryStream>()),
-        Times.Never);
-}
+        byte[] bytes = System.Text.Encoding.ASCII.GetBytes(blobContent);
+        stream.Write(bytes, 0, bytes.Length);
+        stream.Position = 0;
+    })
+    .Returns(Task.FromResult((Azure.Response)null!));
