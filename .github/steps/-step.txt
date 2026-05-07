@@ -1,5 +1,5 @@
 [Fact]
-public async Task HandoffAsync_WhenDecryptedOutputIsEmpty_ShouldNotifyInvalidDecryptedFileFormat()
+public async Task HandoffAsync_WhenStagingRetryExhausted_ShouldNotifyD365DataverseSaveFailureAndRethrow()
 {
     // Arrange
     var dediaNotificationServicesMock = new Mock<IDEDIANotificationServices>();
@@ -13,7 +13,23 @@ public async Task HandoffAsync_WhenDecryptedOutputIsEmpty_ShouldNotifyInvalidDec
             It.IsAny<byte[]>(),
             It.IsAny<MemoryStream>(),
             It.IsAny<CancellationToken>()))
+        .Callback<byte[], MemoryStream, CancellationToken>((fileBytes, outputStream, cancellationToken) =>
+        {
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes("valid decrypted content");
+            outputStream.Write(bytes, 0, bytes.Length);
+            outputStream.Position = 0;
+        })
         .Returns(Task.CompletedTask);
+
+    var stagingException = new InvalidOperationException(
+        "D365 staging save failed after retry exhaustion.");
+
+    dediaNotificationServicesMock
+        .Setup(service => service.Create(
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<MemoryStream>()))
+        .ThrowsAsync(stagingException);
 
     var orchestrator = CreateOrchestrator(
         dediaNotificationServicesMock,
@@ -29,21 +45,17 @@ public async Task HandoffAsync_WhenDecryptedOutputIsEmpty_ShouldNotifyInvalidDec
     };
 
     // Act
-    await orchestrator.HandoffAsync(payload);
+    var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        orchestrator.HandoffAsync(payload));
 
     // Assert
+    Assert.Equal(stagingException, exception);
+
     exceptionNotificationServiceMock.Verify(
-        service => service.NotifyFailureAsync(
+        service => service.NotifyRetryExhaustedAsync(
             payload.FileName,
-            "InvalidDecryptedFileFormat",
-            It.IsAny<InvalidOperationException>(),
+            "D365DataverseSaveFailure",
+            stagingException,
             It.IsAny<CancellationToken>()),
         Times.Once);
-
-    dediaNotificationServicesMock.Verify(
-        service => service.Create(
-            It.IsAny<string>(),
-            It.IsAny<string>(),
-            It.IsAny<MemoryStream>()),
-        Times.Never);
 }
