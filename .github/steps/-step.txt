@@ -1,5 +1,5 @@
 [Fact]
-public async Task HandoffAsync_WhenDecryptionFails_ShouldNotifyDecryptionFailureAndRethrow()
+public async Task HandoffAsync_WhenDecryptedOutputIsEmpty_ShouldNotifyInvalidDecryptedFileFormat()
 {
     // Arrange
     var dediaNotificationServicesMock = new Mock<IDEDIANotificationServices>();
@@ -8,14 +8,12 @@ public async Task HandoffAsync_WhenDecryptionFails_ShouldNotifyDecryptionFailure
 
     var blobServiceClientMock = CreateBlobServiceClientMock("-----BEGIN PGP MESSAGE----- encrypted content");
 
-    var decryptionException = new InvalidOperationException("Decryption failed");
-
     decryptionServiceMock
         .Setup(service => service.DecryptAsync(
             It.IsAny<byte[]>(),
             It.IsAny<MemoryStream>(),
             It.IsAny<CancellationToken>()))
-        .ThrowsAsync(decryptionException);
+        .Returns(Task.CompletedTask);
 
     var orchestrator = CreateOrchestrator(
         dediaNotificationServicesMock,
@@ -31,17 +29,14 @@ public async Task HandoffAsync_WhenDecryptionFails_ShouldNotifyDecryptionFailure
     };
 
     // Act
-    var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-        orchestrator.HandoffAsync(payload));
+    await orchestrator.HandoffAsync(payload);
 
     // Assert
-    Assert.Equal(decryptionException, exception);
-
     exceptionNotificationServiceMock.Verify(
         service => service.NotifyFailureAsync(
             payload.FileName,
-            "DecryptionFailure",
-            decryptionException,
+            "InvalidDecryptedFileFormat",
+            It.IsAny<InvalidOperationException>(),
             It.IsAny<CancellationToken>()),
         Times.Once);
 
