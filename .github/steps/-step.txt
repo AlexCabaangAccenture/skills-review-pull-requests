@@ -1,10 +1,8 @@
-Continued unit test coverage for SPESTG-480 DIA exception scenarios.
+private static DiaIngestionOrchestrator CreateOrchestrator(
+    Mock<IDEDIANotificationServices>? dediaNotificationServicesMock = null,
+    Mock<IDiaExceptionNotificationService>? exceptionNotificationServiceMock = null,
+    Mock<IDiaDecryptionService>? decryptionServiceMock = null,
+    Mock<BlobServiceClient>? blobServiceClientMock = null)
 
-Added additional unit tests for DIA ingestion file-selection and orchestrator guard paths. Current coverage includes Dataverse staging retry behavior, notification service logging, file-selection scenarios, null payload guard, and missing filename guard.
+blobServiceClientMock ??= new Mock<BlobServiceClient>();
 
-Validation completed:
-- Test Explorer: 11 passed, 0 failed, 0 skipped
-- dotnet test: passing before latest checkpoints
-- Changes committed and pushed to users/alex/SPESTG-480-dia-exception-handling
-
-Remaining unit test work is focused on the deeper orchestrator exception paths, including invalid encrypted file format, decryption failure, invalid decrypted output, and staging retry-exhaustion notification. These require Blob download mocking, so I will continue them in the next focused block.
