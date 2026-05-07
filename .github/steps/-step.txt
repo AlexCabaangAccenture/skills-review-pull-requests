@@ -1,9 +1,54 @@
-blobClientMock
-    .Setup(blob => blob.DownloadToAsync(It.IsAny<Stream>()))
-    .Callback<Stream>(stream =>
+[Fact]
+public async Task HandoffAsync_WhenDecryptionFails_ShouldNotifyDecryptionFailureAndRethrow()
+{
+    // Arrange
+    var dediaNotificationServicesMock = new Mock<IDEDIANotificationServices>();
+    var exceptionNotificationServiceMock = new Mock<IDiaExceptionNotificationService>();
+    var decryptionServiceMock = new Mock<IDiaDecryptionService>();
+
+    var blobServiceClientMock = CreateBlobServiceClientMock("-----BEGIN PGP MESSAGE----- encrypted content");
+
+    var decryptionException = new InvalidOperationException("Decryption failed");
+
+    decryptionServiceMock
+        .Setup(service => service.DecryptAsync(
+            It.IsAny<byte[]>(),
+            It.IsAny<MemoryStream>(),
+            It.IsAny<CancellationToken>()))
+        .ThrowsAsync(decryptionException);
+
+    var orchestrator = CreateOrchestrator(
+        dediaNotificationServicesMock,
+        exceptionNotificationServiceMock,
+        decryptionServiceMock,
+        blobServiceClientMock);
+
+    var payload = new DiaHandoffPayload
     {
-        byte[] bytes = System.Text.Encoding.ASCII.GetBytes(blobContent);
-        stream.Write(bytes, 0, bytes.Length);
-        stream.Position = 0;
-    })
-    .Returns(Task.FromResult((Azure.Response)null!));
+        FileName = "BDM_Westpac_ISA_Deaths_2026-05-05_2026-05-06.txt.pgp",
+        FilePath = "folder/BDM_Westpac_ISA_Deaths_2026-05-05_2026-05-06.txt.pgp",
+        FileType = "DIA"
+    };
+
+    // Act
+    var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        orchestrator.HandoffAsync(payload));
+
+    // Assert
+    Assert.Equal(decryptionException, exception);
+
+    exceptionNotificationServiceMock.Verify(
+        service => service.NotifyFailureAsync(
+            payload.FileName,
+            "DecryptionFailure",
+            decryptionException,
+            It.IsAny<CancellationToken>()),
+        Times.Once);
+
+    dediaNotificationServicesMock.Verify(
+        service => service.Create(
+            It.IsAny<string>(),
+            It.IsAny<string>(),
+            It.IsAny<MemoryStream>()),
+        Times.Never);
+}
