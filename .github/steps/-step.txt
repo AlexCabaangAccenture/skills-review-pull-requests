@@ -1,7 +1,6 @@
-Hi Steven, I checked my Visual Studio environment. SonarQube for Visual Studio is not currently installed, and the Extension Manager cannot browse the Visual Studio Marketplace feed from this VM.
+Tribe/Squad/Team: WNZL Estate Management / Azure Integration
 
-Since I’m still doing the developer validation for SPESTG-480 before raising the PR, I wanted to check the proper route for early Sonar validation.
+Role being undertaken: Developer working on SPESTG-480 DIA exception-handling changes.
 
-Do you know if SonarQube for Visual Studio should be requested through FixIT / approved software installation, or is there another way to trigger/validate the Sonar scan against my feature branch before PR?
-
-I’m asking so I can catch any Sonar findings earlier while I’m still completing the validation work.
+Reason for access:
+Requesting SonarQube user access to review and validate code quality findings for my feature branch before raising the PR. This is to help identify SonarQube issues earlier for the DIA exception-handling implementation, unit tests, App Insights traceability updates, and related validation work. Access will be used for project code quality review only.
