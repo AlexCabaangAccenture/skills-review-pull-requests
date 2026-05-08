@@ -1,22 +1,7 @@
-Completed automated unit test coverage for SPESTG-480 DIA exception scenarios.
+Hi Steven, I checked my Visual Studio environment. SonarQube for Visual Studio is not currently installed, and the Extension Manager cannot browse the Visual Studio Marketplace feed from this VM.
 
-Added xUnit/Moq-based tests covering:
-- Dataverse staging retry exhaustion for row creation
-- Dataverse staging retry exhaustion for file upload
-- successful Dataverse staging save
-- DIA exception notification logging
-- retry-exhausted notification wrapper path
-- DIA file-selection scenarios: multiple valid files, single valid file, no valid file, and empty file list
-- orchestrator guard scenarios for null payload and missing filename
-- invalid encrypted file format handling
-- decryption failure handling
-- invalid decrypted output handling
-- D365 staging retry-exhaustion notification from the orchestrator
+Since I’m still doing the developer validation for SPESTG-480 before raising the PR, I wanted to check the proper route for early Sonar validation.
 
-Validation completed:
-- 15 unit tests passed
-- 0 failed
-- 0 skipped
-- changes committed and pushed to users/alex/SPESTG-480-dia-exception-handling
+Do you know if SonarQube for Visual Studio should be requested through FixIT / approved software installation, or is there another way to trigger/validate the Sonar scan against my feature branch before PR?
 
-Note: real environment validation is tracked separately under the developer integration validation subtask, covering real Blob input, real decryption behavior, Dataverse staging, App Insights evidence, and notification behavior.
+I’m asking so I can catch any Sonar findings earlier while I’m still completing the validation work.
