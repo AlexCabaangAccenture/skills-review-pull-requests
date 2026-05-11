@@ -1,6 +1,45 @@
-Tribe/Squad/Team: WNZL Estate Management / Azure Integration
+_logger.LogInformation(
+    "DIA Dataverse staging create started. Table: {TableName}, FileName: {FileName}, FileType: {FileType}.",
+    "icow_deceasedestatestaging",
+    filename,
+    fileType);
 
-Role being undertaken: Developer working on SPESTG-480 DIA exception-handling changes.
+_logger.LogInformation(
+    "DIA Dataverse staging create succeeded. RecordId: {RecordId}, FileName: {FileName}.",
+    recordId,
+    filename);
 
-Reason for access:
-Requesting SonarQube user access to review and validate code quality findings for my feature branch before raising the PR. This is to help identify SonarQube issues earlier for the DIA exception-handling implementation, unit tests, App Insights traceability updates, and related validation work. Access will be used for project code quality review only.
+
+--------------------
+
+_logger.LogInformation(
+    "DIA Dataverse file upload started. Table: {TableName}, RecordId: {RecordId}, FileColumn: {FileColumn}, FileName: {FileName}, StreamLength: {StreamLength}.",
+    "icow_deceasedestatestaging",
+    recordId,
+    "icow_file",
+    filename,
+    outputStream.Length);
+
+
+_logger.LogInformation(
+    "DIA Dataverse file upload succeeded. RecordId: {RecordId}, FileName: {FileName}.",
+    recordId,
+    filename);
+
+================================
+
+_logger.LogWarning(
+    ex,
+    "DIA Dataverse staging save attempt {Attempt} of {MaxAttempts} failed for file {FileName}. Error: {ErrorMessage}. Retrying after {RetryDelayMilliseconds} ms.",
+    attempt,
+    maxAttempts,
+    filename,
+    ex.Message,
+    retryDelayMilliseconds);
+
+
+_logger.LogError(
+    ex,
+    "DIA Dataverse staging save failed after {MaxAttempts} attempts for file {FileName}.",
+    maxAttempts,
+    filename);
