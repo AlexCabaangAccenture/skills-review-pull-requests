@@ -1,14 +1,19 @@
-_logger.LogError(
-    ex,
-    "DIA Dataverse staging save failed after {MaxAttempts} attempts for file {FileName}. Error: {ErrorMessage}.",
-    maxAttempts,
-    filename,
-    ex.Message);
+Developer integration validation completed in Dev.
 
+Validated the timer-triggered DIA ingestion flow using blob input and QA-aligned sample files. Confirmed that the latest SPESTG-480 code is deployed and active in Dev.
 
-dotnet build WNZL.ICOW.DeceasedEstates.AzureFunctions.sln
+Validated:
+- Blob discovery from dia-input
+- Today-dated DIA file selection
+- Missing DIA file after 7 AM NZT handling
+- Invalid encrypted file format handling
+- Decryption path execution
+- Dataverse staging retry/error handling
+- Dataverse staging create and file upload after configuration correction
+- App Insights FailureType traceability
+- Notification-required logging path
 
-git add WNZL.ICOW.DeceasedEstates.Services/Services/DiaIngestionProcessingService.cs
-git commit -m "SPESTG-480 add Dataverse staging diagnostic logs"
-git push origin users/alex/SPESTG-480-dia-exception-handling
+During validation, Dataverse staging initially failed with “Failed to connect to Dataverse.” Investigation confirmed the Dataverse:ClientSecret Function App setting was missing or not correctly available. After correcting the Function App configuration, the DIA file was decrypted, the Dataverse staging record was created, file upload succeeded, and the function completed successfully.
 
+Note:
+Actual outbound email delivery was not fully validated yet. The notification-required path was confirmed through logs. Email delivery validation and cleanup will be handled during PR preparation/follow-up validation.
