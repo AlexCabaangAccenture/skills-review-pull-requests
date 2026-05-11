@@ -1,45 +1,14 @@
-_logger.LogInformation(
-    "DIA Dataverse staging create started. Table: {TableName}, FileName: {FileName}, FileType: {FileType}.",
-    "icow_deceasedestatestaging",
-    filename,
-    fileType);
-
-_logger.LogInformation(
-    "DIA Dataverse staging create succeeded. RecordId: {RecordId}, FileName: {FileName}.",
-    recordId,
-    filename);
-
-
---------------------
-
-_logger.LogInformation(
-    "DIA Dataverse file upload started. Table: {TableName}, RecordId: {RecordId}, FileColumn: {FileColumn}, FileName: {FileName}, StreamLength: {StreamLength}.",
-    "icow_deceasedestatestaging",
-    recordId,
-    "icow_file",
-    filename,
-    outputStream.Length);
-
-
-_logger.LogInformation(
-    "DIA Dataverse file upload succeeded. RecordId: {RecordId}, FileName: {FileName}.",
-    recordId,
-    filename);
-
-================================
-
-_logger.LogWarning(
-    ex,
-    "DIA Dataverse staging save attempt {Attempt} of {MaxAttempts} failed for file {FileName}. Error: {ErrorMessage}. Retrying after {RetryDelayMilliseconds} ms.",
-    attempt,
-    maxAttempts,
-    filename,
-    ex.Message,
-    retryDelayMilliseconds);
-
-
 _logger.LogError(
     ex,
-    "DIA Dataverse staging save failed after {MaxAttempts} attempts for file {FileName}.",
+    "DIA Dataverse staging save failed after {MaxAttempts} attempts for file {FileName}. Error: {ErrorMessage}.",
     maxAttempts,
-    filename);
+    filename,
+    ex.Message);
+
+
+dotnet build WNZL.ICOW.DeceasedEstates.AzureFunctions.sln
+
+git add WNZL.ICOW.DeceasedEstates.Services/Services/DiaIngestionProcessingService.cs
+git commit -m "SPESTG-480 add Dataverse staging diagnostic logs"
+git push origin users/alex/SPESTG-480-dia-exception-handling
+
