@@ -1,8 +1,9 @@
-SPESTG-480 DIA exception handling and traceability updates
+git checkout users/alex/SPESTG-480-dia-exception-handling
+git fetch origin
+git merge origin/DEDIAAutomationDevelop
 
-Implemented and validated DIA exception-handling updates for SPESTG-480, including improved App Insights traceability, FailureType logging, invalid encrypted/decrypted file handling, and Dataverse staging retry exhaustion handling.
+git checkout --theirs src/WNZL.ICOW.DeceasedEstates.IntServices/Pipeline/azure-function-pipeline.yml
+git add src/WNZL.ICOW.DeceasedEstates.IntServices/Pipeline/azure-function-pipeline.yml
+git commit -m "SPESTG-480 resolve pipeline YAML conflict"
+git push origin users/alex/SPESTG-480-dia-exception-handling
 
-Validation completed in Dev using timer-triggered DIA ingestion flow, Blob input, QA-aligned sample file, App Insights logs, and Dataverse staging runtime dependency.
-
-Note:
-Req 43-47 require outbound email notification. Current implementation logs the notification-required path with mapped recipient/team details. During validation, no existing outbound email sender or SMTP/mail configuration was found in the current repo or Dev Function App settings. A separate draft branch has been created to prepare possible SMTP wiring pending confirmation of the approved project email/notification mechanism.
