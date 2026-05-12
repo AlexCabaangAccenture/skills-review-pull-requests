@@ -1,19 +1,8 @@
-Developer integration validation completed in Dev.
+SPESTG-480 DIA exception handling and traceability updates
 
-Validated the timer-triggered DIA ingestion flow using blob input and QA-aligned sample files. Confirmed that the latest SPESTG-480 code is deployed and active in Dev.
+Implemented and validated DIA exception-handling updates for SPESTG-480, including improved App Insights traceability, FailureType logging, invalid encrypted/decrypted file handling, and Dataverse staging retry exhaustion handling.
 
-Validated:
-- Blob discovery from dia-input
-- Today-dated DIA file selection
-- Missing DIA file after 7 AM NZT handling
-- Invalid encrypted file format handling
-- Decryption path execution
-- Dataverse staging retry/error handling
-- Dataverse staging create and file upload after configuration correction
-- App Insights FailureType traceability
-- Notification-required logging path
-
-During validation, Dataverse staging initially failed with “Failed to connect to Dataverse.” Investigation confirmed the Dataverse:ClientSecret Function App setting was missing or not correctly available. After correcting the Function App configuration, the DIA file was decrypted, the Dataverse staging record was created, file upload succeeded, and the function completed successfully.
+Validation completed in Dev using timer-triggered DIA ingestion flow, Blob input, QA-aligned sample file, App Insights logs, and Dataverse staging runtime dependency.
 
 Note:
-Actual outbound email delivery was not fully validated yet. The notification-required path was confirmed through logs. Email delivery validation and cleanup will be handled during PR preparation/follow-up validation.
+Req 43-47 require outbound email notification. Current implementation logs the notification-required path with mapped recipient/team details. During validation, no existing outbound email sender or SMTP/mail configuration was found in the current repo or Dev Function App settings. A separate draft branch has been created to prepare possible SMTP wiring pending confirmation of the approved project email/notification mechanism.
