@@ -1,9 +1,12 @@
-git checkout users/alex/SPESTG-480-dia-exception-handling
-git fetch origin
-git merge origin/DEDIAAutomationDevelop
 
 git checkout --theirs src/WNZL.ICOW.DeceasedEstates.IntServices/Pipeline/azure-function-pipeline.yml
 git add src/WNZL.ICOW.DeceasedEstates.IntServices/Pipeline/azure-function-pipeline.yml
 git commit -m "SPESTG-480 resolve pipeline YAML conflict"
 git push origin users/alex/SPESTG-480-dia-exception-handling
 
+
+cd C:\Users\W818140\source\repos2\WNZL.ICOW.DE.ELZIntServices
+git checkout --theirs src/WNZL.ICOW.DeceasedEstates.IntServices/Pipeline/azure-function-pipeline.yml
+git add src/WNZL.ICOW.DeceasedEstates.IntServices/Pipeline/azure-function-pipeline.yml
+git commit -m "SPESTG-480 resolve pipeline YAML conflict"
+git push origin users/alex/SPESTG-480-dia-exception-handling
