@@ -1,23 +1,15 @@
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
+public Task NotifyAsync(
+    bool sendErrorEmail,
+    bool logError,
+    string logErrorTitle,
+    string logErrorProcessName,
+    string errorEmailBody,
+    string errorEmailSubject,
+    string senderConfigKey,
+    string recipientConfigKey,
+    string logErrorFormattedError,
+    string logType,
+    CancellationToken cancellationToken = default)
 {
-    public interface IDiaExceptionNotificationService
-    {
-        Task NotifyAsync(
-            bool sendErrorEmail,
-            bool logError,
-            string logErrorTitle,
-            string logErrorProcessName,
-            string errorEmailBody,
-            string errorEmailSubject,
-            string senderConfigKey,
-            string recipientConfigKey,
-            string logErrorFormattedError,
-            string logType,
-            CancellationToken ct = default);
-    }
+    return Task.CompletedTask;
 }
-
-Add DIA exception notification service contract using PascalCase naming
