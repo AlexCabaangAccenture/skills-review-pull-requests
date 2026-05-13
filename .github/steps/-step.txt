@@ -1,11 +1,23 @@
-public Task<EntityCollection> RetrieveMultipleAsync(QueryExpression query, CancellationToken ct = default)
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace WNZL.ICOW.DeceasedEstates.Services.Contracts
 {
-    using ServiceClient svc = _factory.Create();
-    return Task.FromResult(svc.RetrieveMultiple(query));
+    public interface IDiaExceptionNotificationService
+    {
+        Task NotifyAsync(
+            bool sendErrorEmail,
+            bool logError,
+            string logErrorTitle,
+            string logErrorProcessName,
+            string errorEmailBody,
+            string errorEmailSubject,
+            string senderConfigKey,
+            string recipientConfigKey,
+            string logErrorFormattedError,
+            string logType,
+            CancellationToken ct = default);
+    }
 }
 
-public Task<OrganizationResponse> ExecuteAsync(OrganizationRequest request, CancellationToken ct = default)
-{
-    using ServiceClient svc = _factory.Create();
-    return Task.FromResult(svc.Execute(request));
-}
+Add DIA exception notification service contract using PascalCase naming
