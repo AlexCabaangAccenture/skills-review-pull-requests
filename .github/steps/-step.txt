@@ -1,1 +1,11 @@
-DeceasedEstateErrorHandling-430478CD-BBDB-F011-8544-002248E2DD6A.json
+public Task<EntityCollection> RetrieveMultipleAsync(QueryExpression query, CancellationToken ct = default)
+{
+    using ServiceClient svc = _factory.Create();
+    return Task.FromResult(svc.RetrieveMultiple(query));
+}
+
+public Task<OrganizationResponse> ExecuteAsync(OrganizationRequest request, CancellationToken ct = default)
+{
+    using ServiceClient svc = _factory.Create();
+    return Task.FromResult(svc.Execute(request));
+}
