@@ -1,10 +1,61 @@
-# Run unit tests and generate coverage for SonarQube
-- task: DotNetCoreCLI@2
-  displayName: 'Run unit tests with coverage'
-  inputs:
-    command: 'test'
-    projects: '$(testProjects)'
-    arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory "$(testResultsDir)" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover'
-    publishTestResults: false
+private async Task<Dictionary<string, string>> GetConfigurationValuesAsync(
+    string senderConfigKey,
+    string recipientConfigKey,
+    CancellationToken cancellationToken)
+{
+    var keys = new List<string>();
 
-Generate unit test coverage for SonarQube PR analysis
+    if (!string.IsNullOrWhiteSpace(senderConfigKey))
+    {
+        keys.Add(senderConfigKey);
+    }
+
+    if (!string.IsNullOrWhiteSpace(recipientConfigKey))
+    {
+        keys.Add(recipientConfigKey);
+    }
+
+    if (keys.Count == 0)
+    {
+        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    var query = new QueryExpression("tpc_configurationkeies")
+    {
+        ColumnSet = new ColumnSet(
+            "statecode",
+            "tpc_name",
+            "tpc_value_singlelinetext",
+            "tpc_description")
+    };
+
+    query.Criteria.AddCondition(
+        "tpc_name",
+        ConditionOperator.In,
+        keys.ToArray());
+
+    query.Criteria.AddCondition(
+        "statecode",
+        ConditionOperator.Equal,
+        0);
+
+    var result = await _dataverseRepository.RetrieveMultipleAsync(
+        query,
+        cancellationToken);
+
+    var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    foreach (var entity in result.Entities)
+    {
+        var name = entity.GetAttributeValue<string>("tpc_name");
+        var value = entity.GetAttributeValue<string>("tpc_value_singlelinetext");
+
+        if (!string.IsNullOrWhiteSpace(name) &&
+            !string.IsNullOrWhiteSpace(value))
+        {
+            values[name] = value;
+        }
+    }
+
+    return values;
+}
