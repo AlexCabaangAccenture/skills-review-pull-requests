@@ -1,48 +1,26 @@
-private async Task<Guid?> GetQueueIdByNameAsync(
-    string queueName,
-    CancellationToken cancellationToken)
+private static Entity CreateSenderParty(Guid senderQueueId)
 {
-    if (string.IsNullOrWhiteSpace(queueName))
-    {
-        return null;
-    }
+    var senderParty = new Entity("activityparty");
 
-    var query = new QueryExpression("queue")
-    {
-        ColumnSet = new ColumnSet("queueid", "name")
-    };
+    senderParty["participationtypemask"] = new OptionSetValue(1);
+    senderParty["partyid"] = new EntityReference("queue", senderQueueId);
 
-    query.Criteria.AddCondition(
-        "name",
-        ConditionOperator.Equal,
-        queueName);
-
-    var result = await _dataverseRepo.RetrieveMultipleAsync(
-        query,
-        cancellationToken);
-
-    var queue = result.Entities.FirstOrDefault();
-
-    if (queue == null)
-    {
-        return null;
-    }
-
-    return queue.Id;
-}
-----------------------
-Guid? senderQueueId = await GetQueueIdByNameAsync(
-    senderQueueName,
-    cancellationToken);
-
-if (!senderQueueId.HasValue)
-{
-    _logger.LogWarning(
-        "DIA notification email creation skipped because sender queue was not found. LogId: {LogId}, SenderQueueName: {SenderQueueName}.",
-        logId,
-        senderQueueName);
-
-    return;
+    return senderParty;
 }
 
-Add sender queue resolution for DIA exception notification
+private static Entity CreateRecipientParty(string recipientEmail)
+{
+    var recipientParty = new Entity("activityparty");
+
+    recipientParty["participationtypemask"] = new OptionSetValue(2);
+    recipientParty["addressused"] = recipientEmail;
+
+    return recipientParty;
+}
+
+var senderParty = CreateSenderParty(senderQueueId.Value);
+var recipientParties = recipients
+    .Select(CreateRecipientParty)
+    .ToList();
+
+Add activity party builders for DIA exception notification
