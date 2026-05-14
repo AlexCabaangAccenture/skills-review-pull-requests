@@ -1,24 +1,5 @@
-Hi Steven, good afternoon.
-
-Need your help to check the official SonarQube PR validation process for this INT Services PR.
-
-This is not related to my local SonarQube setup. This is about the actual Westpac project PR flow where the PR triggers the SonarQube check in Azure DevOps.
-
-I already fixed the original Sonar code smell findings for SPESTG-480 and pushed the changes. Based on the latest Sonar dashboard screenshot shared to me, the code smell findings are already cleared and the remaining quality gate issue is coverage on new code showing 0%.
-
-From the Sonar pipeline log, it looks like Sonar is looking for test/coverage files but none are being generated/imported.
-
-I also noticed the latest rerun is now failing earlier at this existing pipeline step:
-
-Install Microsoft.PowerPlatform.Dataverse.Client to agent temp
-
-Error shown:
-Can't find loc string for key: Info_NuGetSupportedAfter3_5
-Info_NuGetSupportedAfter3_5 7.6.0-rc...
-
-Can you help confirm the correct official pipeline pattern for this PR validation, especially how .NET test coverage should be generated/imported into SonarQube for this repo?
-
-PR link:
-<PASTE PR LINK HERE>
-
-Thanks Steven.
+- task: NuGetToolInstaller@1
+  displayName: "Install NuGet 6.x"
+  inputs:
+    versionSpec: '6.x'
+    checkLatest: false
