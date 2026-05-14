@@ -1,6 +1,3 @@
-catch (Exception ex)
-{
-    throw new InvalidOperationException(
-        $"DIA processing failed unexpectedly during decrypt/stage flow. FailureType: UnexpectedDecryptOrStageFailure, FileName: {payload.FileName}, FileType: {fileType}.",
-        ex);
-}
+Assert.Contains("DIA Dataverse staging save failed after retry exhaustion", exception.Message);
+Assert.Contains(payload.FileName, exception.Message);
+Assert.Equal(stagingException, exception.InnerException);
