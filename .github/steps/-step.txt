@@ -1,13 +1,10 @@
-Hi Kaustubh, just adding the exact blocker from my side.
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests with coverage'
+    inputs:
+      command: 'test'
+      projects: '$(testProjects)'
+      arguments: '--configuration $(buildConfiguration) --logger trx --results-directory "$(testResultsDir)" /p:CollectCoverage=true /p:CoverletOutput="$(Agent.TempDirectory)/coverage.opencover.xml" /p:CoverletOutputFormat=opencover'
+      publishTestResults: false
 
-I can raise the IIQ request, but I could not find the WNZLTEST remote login / RDP entitlement as requestable from my side.
 
-Yesterday I searched for CORPTESTNZ, Remote Desktop, Citrix Remote, and related keywords. The only Remote Desktop entitlement I could find was under Active Directory - WNZL, not Active Directory - WNZLTEST.
-
-From the sample account Aldous shared, the missing inherited groups seem to be around:
-- CORPTESTNZ-Resource-Remote Desktop
-- CORPTESTNZ-Resource-Citrix-Remote Access Users
-
-But I cannot confirm/request those directly from my side in IIQ.
-
-Could you please confirm the exact entitlement name I should request, or whether this needs to be added by fixIT/AD support instead of a normal IIQ request?
+Add unit test coverage generation for SonarQube analysis
