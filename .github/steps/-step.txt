@@ -1,61 +1,25 @@
-private async Task<Dictionary<string, string>> GetConfigurationValuesAsync(
-    string senderConfigKey,
-    string recipientConfigKey,
-    CancellationToken cancellationToken)
+if (!sendErrorEmail)
 {
-    var keys = new List<string>();
+    _logger.LogInformation(
+        "DIA notification email creation skipped because SendErrorEmail is false. LogId: {LogId}, Title: {LogErrorTitle}.",
+        logId,
+        logErrorTitle);
 
-    if (!string.IsNullOrWhiteSpace(senderConfigKey))
-    {
-        keys.Add(senderConfigKey);
-    }
+    return;
+}
 
-    if (!string.IsNullOrWhiteSpace(recipientConfigKey))
-    {
-        keys.Add(recipientConfigKey);
-    }
+var configurationValues = await GetConfigurationValuesAsync(
+    senderConfigKey,
+    recipientConfigKey,
+    cancellationToken);
 
-    if (keys.Count == 0)
-    {
-        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-    }
+if (configurationValues.Count == 0)
+{
+    _logger.LogWarning(
+        "DIA notification email creation skipped because no sender or recipient configuration values were found. LogId: {LogId}, SenderConfigKey: {SenderConfigKey}, RecipientConfigKey: {RecipientConfigKey}.",
+        logId,
+        senderConfigKey,
+        recipientConfigKey);
 
-    var query = new QueryExpression("tpc_configurationkeies")
-    {
-        ColumnSet = new ColumnSet(
-            "statecode",
-            "tpc_name",
-            "tpc_value_singlelinetext",
-            "tpc_description")
-    };
-
-    query.Criteria.AddCondition(
-        "tpc_name",
-        ConditionOperator.In,
-        keys.ToArray());
-
-    query.Criteria.AddCondition(
-        "statecode",
-        ConditionOperator.Equal,
-        0);
-
-    var result = await _dataverseRepository.RetrieveMultipleAsync(
-        query,
-        cancellationToken);
-
-    var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-    foreach (var entity in result.Entities)
-    {
-        var name = entity.GetAttributeValue<string>("tpc_name");
-        var value = entity.GetAttributeValue<string>("tpc_value_singlelinetext");
-
-        if (!string.IsNullOrWhiteSpace(name) &&
-            !string.IsNullOrWhiteSpace(value))
-        {
-            values[name] = value;
-        }
-    }
-
-    return values;
+    return;
 }
