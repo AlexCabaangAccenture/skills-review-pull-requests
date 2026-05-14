@@ -1,5 +1,5 @@
 [Fact]
-public async Task NotifyAsync_WhenConfigurationValuesAreMissing_ShouldSkipEmailCreation()
+public async Task NotifyAsync_WhenSenderQueueIsMissing_ShouldSkipEmailCreation()
 {
     // Arrange
     var loggerMock = new Mock<ILogger<DiaExceptionNotificationService>>();
@@ -13,9 +13,29 @@ public async Task NotifyAsync_WhenConfigurationValuesAreMissing_ShouldSkipEmailC
             It.IsAny<CancellationToken>()))
         .ReturnsAsync(logId);
 
+    var configResults = new EntityCollection(new List<Entity>
+    {
+        new Entity("tpc_configurationkeies")
+        {
+            ["tpc_name"] = "SenderConfig",
+            ["tpc_value_singlelinetext"] = "DIA Error Queue"
+        },
+        new Entity("tpc_configurationkeies")
+        {
+            ["tpc_name"] = "RecipientConfig",
+            ["tpc_value_singlelinetext"] = "test@example.com"
+        }
+    });
+
     dataverseRepoMock
         .Setup(repo => repo.RetrieveMultipleAsync(
             It.Is<QueryExpression>(query => query.EntityName == "tpc_configurationkeies"),
+            It.IsAny<CancellationToken>()))
+        .ReturnsAsync(configResults);
+
+    dataverseRepoMock
+        .Setup(repo => repo.RetrieveMultipleAsync(
+            It.Is<QueryExpression>(query => query.EntityName == "queue"),
             It.IsAny<CancellationToken>()))
         .ReturnsAsync(new EntityCollection());
 
@@ -50,6 +70,12 @@ public async Task NotifyAsync_WhenConfigurationValuesAreMissing_ShouldSkipEmailC
         Times.Once);
 
     dataverseRepoMock.Verify(
+        repo => repo.RetrieveMultipleAsync(
+            It.Is<QueryExpression>(query => query.EntityName == "queue"),
+            It.IsAny<CancellationToken>()),
+        Times.Once);
+
+    dataverseRepoMock.Verify(
         repo => repo.CreateAsync(
             It.Is<Entity>(entity => entity.LogicalName == "email"),
             It.IsAny<CancellationToken>()),
@@ -62,4 +88,4 @@ public async Task NotifyAsync_WhenConfigurationValuesAreMissing_ShouldSkipEmailC
         Times.Never);
 }
 
-Add missing config test for DIA exception notification
+Add missing sender queue test for DIA exception notification
