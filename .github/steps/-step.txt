@@ -1,6 +1,13 @@
-Assert.Contains("DIA processing failed unexpectedly during decrypt/stage flow", exception.Message);
-Assert.Contains(payload.FileName, exception.Message);
-Assert.Contains("DIA decryption failed for file", exception.InnerException?.Message);
-Assert.Equal(decryptionException, exception.InnerException?.InnerException);
+Hi Kaustubh, just adding the exact blocker from my side.
 
-Update DIA orchestrator test for contextual decryption exception
+I can raise the IIQ request, but I could not find the WNZLTEST remote login / RDP entitlement as requestable from my side.
+
+Yesterday I searched for CORPTESTNZ, Remote Desktop, Citrix Remote, and related keywords. The only Remote Desktop entitlement I could find was under Active Directory - WNZL, not Active Directory - WNZLTEST.
+
+From the sample account Aldous shared, the missing inherited groups seem to be around:
+- CORPTESTNZ-Resource-Remote Desktop
+- CORPTESTNZ-Resource-Citrix-Remote Access Users
+
+But I cannot confirm/request those directly from my side in IIQ.
+
+Could you please confirm the exact entitlement name I should request, or whether this needs to be added by fixIT/AD support instead of a normal IIQ request?
