@@ -1,36 +1,12 @@
+catch (Exception ex)
 {
-    _logger.LogInformation(
-        "DIA notification requested. SendErrorEmail: {SendErrorEmail}, LogError: {LogError}, Title: {LogErrorTitle}, ProcessName: {LogErrorProcessName}.",
-        sendErrorEmail,
-        logError,
-        logErrorTitle,
-        logErrorProcessName);
+    await _diaExceptionNotificationService.NotifyFailureAsync(
+        payload.FileName,
+        "DecryptionFailure",
+        ex,
+        cancellationToken);
 
-    if (!logError)
-    {
-        _logger.LogInformation(
-            "DIA notification log creation skipped because LogError is false. Title: {LogErrorTitle}.",
-            logErrorTitle);
-
-        return Task.CompletedTask;
-    }
-
-    var logEntity = new Microsoft.Xrm.Sdk.Entity("tpc_logs");
-
-    logEntity["tpc_name"] = logErrorTitle;
-    logEntity["tpc_emailcreated"] = sendErrorEmail;
-    logEntity["tpc_formattedmessage"] = logErrorFormattedError;
-    logEntity["tpc_processname"] = logErrorProcessName;
-
-    if (!string.IsNullOrWhiteSpace(logType) && int.TryParse(logType, out int parsedLogType))
-    {
-        logEntity["tpc_logtype"] = new Microsoft.Xrm.Sdk.OptionSetValue(parsedLogType);
-    }
-
-    Guid logId = await _dataverseRepository.CreateAsync(logEntity, cancellationToken);
-
-    _logger.LogInformation(
-        "DIA notification log record created. LogId: {LogId}, Title: {LogErrorTitle}.",
-        logId,
-        logErrorTitle);
+    throw new InvalidOperationException(
+        $"DIA decryption failed for file {payload.FileName}.",
+        ex);
 }
