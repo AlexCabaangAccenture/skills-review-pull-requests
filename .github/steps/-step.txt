@@ -1,11 +1,13 @@
 [Fact]
-public async Task NotifyAsync_WhenSenderQueueIsMissing_ShouldSkipEmailCreation()
+public async Task NotifyAsync_WhenConfigurationAndQueueAreValid_ShouldCreateEmailAndSend()
 {
     // Arrange
     var loggerMock = new Mock<ILogger<DiaExceptionNotificationService>>();
     var dataverseRepoMock = new Mock<IDataverseRepository>();
 
     var logId = Guid.NewGuid();
+    var queueId = Guid.NewGuid();
+    var emailId = Guid.NewGuid();
 
     dataverseRepoMock
         .Setup(repo => repo.CreateAsync(
@@ -23,7 +25,7 @@ public async Task NotifyAsync_WhenSenderQueueIsMissing_ShouldSkipEmailCreation()
         new Entity("tpc_configurationkeies")
         {
             ["tpc_name"] = "RecipientConfig",
-            ["tpc_value_singlelinetext"] = "test@example.com"
+            ["tpc_value_singlelinetext"] = "test1@example.com;test2@example.com"
         }
     });
 
@@ -33,11 +35,24 @@ public async Task NotifyAsync_WhenSenderQueueIsMissing_ShouldSkipEmailCreation()
             It.IsAny<CancellationToken>()))
         .ReturnsAsync(configResults);
 
+    var queue = new Entity("queue")
+    {
+        Id = queueId
+    };
+
+    var queueResults = new EntityCollection(new List<Entity> { queue });
+
     dataverseRepoMock
         .Setup(repo => repo.RetrieveMultipleAsync(
             It.Is<QueryExpression>(query => query.EntityName == "queue"),
             It.IsAny<CancellationToken>()))
-        .ReturnsAsync(new EntityCollection());
+        .ReturnsAsync(queueResults);
+
+    dataverseRepoMock
+        .Setup(repo => repo.CreateAsync(
+            It.Is<Entity>(entity => entity.LogicalName == "email"),
+            It.IsAny<CancellationToken>()))
+        .ReturnsAsync(emailId);
 
     var service = new DiaExceptionNotificationService(
         loggerMock.Object,
@@ -77,15 +92,23 @@ public async Task NotifyAsync_WhenSenderQueueIsMissing_ShouldSkipEmailCreation()
 
     dataverseRepoMock.Verify(
         repo => repo.CreateAsync(
-            It.Is<Entity>(entity => entity.LogicalName == "email"),
+            It.Is<Entity>(entity =>
+                entity.LogicalName == "email" &&
+                entity.GetAttributeValue<string>("subject") == "Test subject" &&
+                entity.GetAttributeValue<string>("description") == "Test body"),
             It.IsAny<CancellationToken>()),
-        Times.Never);
+        Times.Once);
 
     dataverseRepoMock.Verify(
         repo => repo.ExecuteAsync(
-            It.IsAny<OrganizationRequest>(),
+            It.Is<OrganizationRequest>(request =>
+                request.RequestName == "SendEmail" &&
+                request.Parameters.Contains("EmailId") &&
+                request.Parameters.Contains("IssueSend") &&
+                (Guid)request["EmailId"] == emailId &&
+                (bool)request["IssueSend"] == true),
             It.IsAny<CancellationToken>()),
-        Times.Never);
+        Times.Once);
 }
 
-Add missing sender queue test for DIA exception notification
+Add happy path test for DIA exception email notification
