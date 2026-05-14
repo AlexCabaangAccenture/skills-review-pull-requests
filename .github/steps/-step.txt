@@ -1,21 +1,13 @@
-if (!configurationValues.TryGetValue(senderConfigKey, out string senderQueueName) ||
-    string.IsNullOrWhiteSpace(senderQueueName))
+private static List<string> SplitRecipientEmails(string recipientEmails)
 {
-    _logger.LogWarning(
-        "DIA notification email creation skipped because sender queue configuration was not found. LogId: {LogId}, SenderConfigKey: {SenderConfigKey}.",
-        logId,
-        senderConfigKey);
+    if (string.IsNullOrWhiteSpace(recipientEmails))
+    {
+        return new List<string>();
+    }
 
-    return;
-}
-
-if (!configurationValues.TryGetValue(recipientConfigKey, out string recipientEmails) ||
-    string.IsNullOrWhiteSpace(recipientEmails))
-{
-    _logger.LogWarning(
-        "DIA notification email creation skipped because recipient email configuration was not found. LogId: {LogId}, RecipientConfigKey: {RecipientConfigKey}.",
-        logId,
-        recipientConfigKey);
-
-    return;
+    return recipientEmails
+        .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Where(email => !string.IsNullOrWhiteSpace(email))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
 }
