@@ -1,12 +1,13 @@
-catch (Exception ex)
+catch (InvalidOperationException ex) when (
+    ex.Message.Contains("D365 staging save failed after retry exhaustion"))
 {
-    await _diaExceptionNotificationService.NotifyFailureAsync(
+    await _diaExceptionNotificationService.NotifyRetryExhaustedAsync(
         payload.FileName,
-        "DecryptionFailure",
+        "D365DataverseSaveFailure",
         ex,
         cancellationToken);
 
     throw new InvalidOperationException(
-        $"DIA decryption failed for file {payload.FileName}.",
+        $"DIA Dataverse staging save failed after retry exhaustion. FileName: {payload.FileName}.",
         ex);
 }
