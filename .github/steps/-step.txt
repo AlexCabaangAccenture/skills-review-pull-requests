@@ -1,85 +1,18 @@
-[Fact]
-public async Task NotifyAsync_WhenRecipientConfigHasOnlyEmptyValues_ShouldSkipEmailCreation()
-{
-    // Arrange
-    var loggerMock = new Mock<ILogger<DiaExceptionNotificationService>>();
-    var dataverseRepoMock = new Mock<IDataverseRepository>();
+Progress update:
 
-    var logId = Guid.NewGuid();
+Completed the SPESTG-480 SonarQube cleanup for the DIA exception-handling PR.
 
-    dataverseRepoMock
-        .Setup(repo => repo.CreateAsync(
-            It.Is<Entity>(entity => entity.LogicalName == "tpc_logs"),
-            It.IsAny<CancellationToken>()))
-        .ReturnsAsync(logId);
+Initial SonarQube code smell findings were addressed, including naming convention fixes, logging cleanup, single-character Contains usage, and exception-handling updates in the DIA ingestion flow. Related unit tests were updated to align with the contextual exception handling changes.
 
-    var configResults = new EntityCollection(new List<Entity>
-    {
-        new Entity("tpc_configurationkeies")
-        {
-            ["tpc_name"] = "SenderConfig",
-            ["tpc_value_singlelinetext"] = "DIA Error Queue"
-        },
-        new Entity("tpc_configurationkeies")
-        {
-            ["tpc_name"] = "RecipientConfig",
-            ["tpc_value_singlelinetext"] = "; ; ;"
-        }
-    });
+Also resolved the SonarQube quality gate coverage issue by updating the PR SonarQube pipeline to generate/import unit test coverage correctly. The test project target framework was aligned with the .NET 8 pipeline, NuGet version was pinned, and the SonarQube analysis now includes the unit test coverage output.
 
-    dataverseRepoMock
-        .Setup(repo => repo.RetrieveMultipleAsync(
-            It.Is<QueryExpression>(query => query.EntityName == "tpc_configurationkeies"),
-            It.IsAny<CancellationToken>()))
-        .ReturnsAsync(configResults);
+Validation completed:
+- Local build passed
+- Local unit tests passed: 15/15
+- PR SonarQube pipeline passed
+- PR overview now shows all required checks succeeded
+- No merge conflicts reported
 
-    var service = new DiaExceptionNotificationService(
-        loggerMock.Object,
-        dataverseRepoMock.Object);
-
-    // Act
-    await service.NotifyAsync(
-        sendErrorEmail: true,
-        logError: true,
-        logErrorTitle: "Test title",
-        logErrorProcessName: "DIA",
-        errorEmailBody: "Test body",
-        errorEmailSubject: "Test subject",
-        senderConfigKey: "SenderConfig",
-        recipientConfigKey: "RecipientConfig",
-        logErrorFormattedError: "Formatted error",
-        logType: "428910002");
-
-    // Assert
-    dataverseRepoMock.Verify(
-        repo => repo.CreateAsync(
-            It.Is<Entity>(entity => entity.LogicalName == "tpc_logs"),
-            It.IsAny<CancellationToken>()),
-        Times.Once);
-
-    dataverseRepoMock.Verify(
-        repo => repo.RetrieveMultipleAsync(
-            It.Is<QueryExpression>(query => query.EntityName == "tpc_configurationkeies"),
-            It.IsAny<CancellationToken>()),
-        Times.Once);
-
-    dataverseRepoMock.Verify(
-        repo => repo.RetrieveMultipleAsync(
-            It.Is<QueryExpression>(query => query.EntityName == "queue"),
-            It.IsAny<CancellationToken>()),
-        Times.Never);
-
-    dataverseRepoMock.Verify(
-        repo => repo.CreateAsync(
-            It.Is<Entity>(entity => entity.LogicalName == "email"),
-            It.IsAny<CancellationToken>()),
-        Times.Never);
-
-    dataverseRepoMock.Verify(
-        repo => repo.ExecuteAsync(
-            It.IsAny<OrganizationRequest>(),
-            It.IsAny<CancellationToken>()),
-        Times.Never);
-}
-
-Add invalid recipient config test for DIA exception notification
+Remaining action:
+- PR approval is still pending from Vishal
+- I will do one final PR status check tomorrow morning before closing this subtask
