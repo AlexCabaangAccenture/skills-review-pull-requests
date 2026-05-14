@@ -1,3 +1,6 @@
-Assert.Contains("DIA Dataverse staging save failed after retry exhaustion", exception.Message);
+Assert.Contains("DIA processing failed unexpectedly during decrypt/stage flow", exception.Message);
 Assert.Contains(payload.FileName, exception.Message);
-Assert.Equal(stagingException, exception.InnerException);
+Assert.Contains("DIA decryption failed for file", exception.InnerException?.Message);
+Assert.Equal(decryptionException, exception.InnerException?.InnerException);
+
+Update DIA orchestrator test for contextual decryption exception
