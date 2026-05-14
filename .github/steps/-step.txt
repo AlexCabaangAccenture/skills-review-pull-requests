@@ -1,24 +1,20 @@
-if (!sendErrorEmail)
+if (!configurationValues.TryGetValue(senderConfigKey, out string senderQueueName) ||
+    string.IsNullOrWhiteSpace(senderQueueName))
 {
-    _logger.LogInformation(
-        "DIA notification email creation skipped because SendErrorEmail is false. LogId: {LogId}, Title: {LogErrorTitle}.",
+    _logger.LogWarning(
+        "DIA notification email creation skipped because sender queue configuration was not found. LogId: {LogId}, SenderConfigKey: {SenderConfigKey}.",
         logId,
-        logErrorTitle);
+        senderConfigKey);
 
     return;
 }
 
-var configurationValues = await GetConfigurationValuesAsync(
-    senderConfigKey,
-    recipientConfigKey,
-    cancellationToken);
-
-if (configurationValues.Count == 0)
+if (!configurationValues.TryGetValue(recipientConfigKey, out string recipientEmails) ||
+    string.IsNullOrWhiteSpace(recipientEmails))
 {
     _logger.LogWarning(
-        "DIA notification email creation skipped because no sender or recipient configuration values were found. LogId: {LogId}, SenderConfigKey: {SenderConfigKey}, RecipientConfigKey: {RecipientConfigKey}.",
+        "DIA notification email creation skipped because recipient email configuration was not found. LogId: {LogId}, RecipientConfigKey: {RecipientConfigKey}.",
         logId,
-        senderConfigKey,
         recipientConfigKey);
 
     return;
