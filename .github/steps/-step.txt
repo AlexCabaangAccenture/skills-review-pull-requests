@@ -1,34 +1,21 @@
-private async Task<Guid> CreateEmailAsync(
-    Entity senderParty,
-    List<Entity> recipientParties,
-    string errorEmailSubject,
-    string errorEmailBody,
-    Guid logId,
+private async Task SendEmailAsync(
+    Guid emailId,
     CancellationToken cancellationToken)
 {
-    var email = new Entity("email");
+    var request = new OrganizationRequest("SendEmail");
 
-    email["subject"] = errorEmailSubject;
-    email["description"] = errorEmailBody;
-    email["from"] = new EntityCollection(new List<Entity> { senderParty });
-    email["to"] = new EntityCollection(recipientParties);
-    email["regardingobjectid"] = new EntityReference("tpc_logs", logId);
+    request["EmailId"] = emailId;
+    request["IssueSend"] = true;
 
-    return await _dataverseRepo.CreateAsync(email, cancellationToken);
+    await _dataverseRepo.ExecuteAsync(request, cancellationToken);
 }
------------------
-Guid emailId = await CreateEmailAsync(
-    senderParty,
-    recipientParties,
-    errorEmailSubject,
-    errorEmailBody,
-    logId,
-    cancellationToken);
+
+await SendEmailAsync(emailId, cancellationToken);
 
 _logger.LogInformation(
-    "DIA notification email record created. EmailId: {EmailId}, LogId: {LogId}, Title: {LogErrorTitle}.",
+    "DIA notification email sent. EmailId: {EmailId}, LogId: {LogId}, Title: {LogErrorTitle}.",
     emailId,
     logId,
     logErrorTitle);
 
-Create Dataverse email record for DIA exception notification
+Send DIA exception notification email through Dataverse
