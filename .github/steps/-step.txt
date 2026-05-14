@@ -1,11 +1,48 @@
-var recipients = SplitRecipientEmails(recipientEmails);
+private async Task<Guid?> GetQueueIdByNameAsync(
+    string queueName,
+    CancellationToken cancellationToken)
+{
+    if (string.IsNullOrWhiteSpace(queueName))
+    {
+        return null;
+    }
 
-if (recipients.Count == 0)
+    var query = new QueryExpression("queue")
+    {
+        ColumnSet = new ColumnSet("queueid", "name")
+    };
+
+    query.Criteria.AddCondition(
+        "name",
+        ConditionOperator.Equal,
+        queueName);
+
+    var result = await _dataverseRepo.RetrieveMultipleAsync(
+        query,
+        cancellationToken);
+
+    var queue = result.Entities.FirstOrDefault();
+
+    if (queue == null)
+    {
+        return null;
+    }
+
+    return queue.Id;
+}
+----------------------
+Guid? senderQueueId = await GetQueueIdByNameAsync(
+    senderQueueName,
+    cancellationToken);
+
+if (!senderQueueId.HasValue)
 {
     _logger.LogWarning(
-        "DIA notification email creation skipped because no valid recipient emails were found. LogId: {LogId}, RecipientConfigKey: {RecipientConfigKey}.",
+        "DIA notification email creation skipped because sender queue was not found. LogId: {LogId}, SenderQueueName: {SenderQueueName}.",
         logId,
-        recipientConfigKey);
+        senderQueueName);
 
     return;
 }
+
+Add sender queue resolution for DIA exception notification
