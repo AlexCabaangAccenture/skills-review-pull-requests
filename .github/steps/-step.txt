@@ -1,13 +1,11 @@
-private static List<string> SplitRecipientEmails(string recipientEmails)
-{
-    if (string.IsNullOrWhiteSpace(recipientEmails))
-    {
-        return new List<string>();
-    }
+var recipients = SplitRecipientEmails(recipientEmails);
 
-    return recipientEmails
-        .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-        .Where(email => !string.IsNullOrWhiteSpace(email))
-        .Distinct(StringComparer.OrdinalIgnoreCase)
-        .ToList();
+if (recipients.Count == 0)
+{
+    _logger.LogWarning(
+        "DIA notification email creation skipped because no valid recipient emails were found. LogId: {LogId}, RecipientConfigKey: {RecipientConfigKey}.",
+        logId,
+        recipientConfigKey);
+
+    return;
 }
