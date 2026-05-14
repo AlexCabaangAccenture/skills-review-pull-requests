@@ -1,10 +1,28 @@
-  - task: DotNetCoreCLI@2
-    displayName: 'Run unit tests with coverage'
-    inputs:
-      command: 'test'
-      projects: '$(testProjects)'
-      arguments: '--configuration $(buildConfiguration) --logger trx --results-directory "$(testResultsDir)" /p:CollectCoverage=true /p:CoverletOutput="$(Agent.TempDirectory)/coverage.opencover.xml" /p:CoverletOutputFormat=opencover'
-      publishTestResults: false
+Hi Steven, good afternoon.
 
+Need your help to check the official SonarQube PR validation process for the INT Services repo.
 
-Add unit test coverage generation for SonarQube analysis
+This is not related to my local SonarQube setup or local installation. This is about the actual Westpac project PR flow where the PR triggers the SonarQube inspection/check in Azure DevOps. I understand this pipeline/process was originally set up by you, so I wanted to refer back to you for the correct pattern.
+
+The original Sonar code smells for SPESTG-480 were already fixed and pushed. The latest Sonar dashboard now shows 0 new issues, but the quality gate still fails because coverage on new code is 0%.
+
+From the pipeline log, Sonar is looking for coverage files but none are generated/imported:
+
+No test results files found
+Did not find any coverage files in the expected location
+Could not find any coverage report file matching coverage.opencover.xml or TestResults/coverage.xml
+
+I tried adding a DotNetCoreCLI test step with coverlet/opencover output before Publish Test Results, since the existing SonarQubePrepare already has these properties:
+
+sonar.cs.vscoveragexml.reportsPaths=$(coverageXml)
+sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/coverage.opencover.xml
+
+But after rerun, the pipeline failed earlier at this existing NuGet install step:
+
+Install Microsoft.PowerPlatform.Dataverse.Client to agent temp
+
+Error shown:
+Info_NuGetSupportedAfter3_5
+Can't find loc string for key Info_NuGetSupportedAfter3_5
+
+Can you help confirm the correct official pipeline pattern for generating/importing .NET coverage into SonarQube for this repo’s PR validation? I want to align with the existing Westpac project process instead of applying local or ad hoc changes.
