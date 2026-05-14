@@ -1,21 +1,57 @@
-private async Task SendEmailAsync(
-    Guid emailId,
-    CancellationToken cancellationToken)
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
+
+[Fact]
+public async Task NotifyAsync_WhenSendErrorEmailIsFalse_ShouldCreateLogOnly()
 {
-    var request = new OrganizationRequest("SendEmail");
+    // Arrange
+    var loggerMock = new Mock<ILogger<DiaExceptionNotificationService>>();
+    var dataverseRepoMock = new Mock<IDataverseRepository>();
 
-    request["EmailId"] = emailId;
-    request["IssueSend"] = true;
+    var logId = Guid.NewGuid();
 
-    await _dataverseRepo.ExecuteAsync(request, cancellationToken);
+    dataverseRepoMock
+        .Setup(repo => repo.CreateAsync(
+            It.Is<Entity>(entity => entity.LogicalName == "tpc_logs"),
+            It.IsAny<CancellationToken>()))
+        .ReturnsAsync(logId);
+
+    var service = new DiaExceptionNotificationService(
+        loggerMock.Object,
+        dataverseRepoMock.Object);
+
+    // Act
+    await service.NotifyAsync(
+        sendErrorEmail: false,
+        logError: true,
+        logErrorTitle: "Test title",
+        logErrorProcessName: "DIA",
+        errorEmailBody: "Test body",
+        errorEmailSubject: "Test subject",
+        senderConfigKey: "SenderConfig",
+        recipientConfigKey: "RecipientConfig",
+        logErrorFormattedError: "Formatted error",
+        logType: "428910002");
+
+    // Assert
+    dataverseRepoMock.Verify(
+        repo => repo.CreateAsync(
+            It.Is<Entity>(entity =>
+                entity.LogicalName == "tpc_logs" &&
+                entity.GetAttributeValue<string>("tpc_name") == "Test title" &&
+                entity.GetAttributeValue<bool>("tpc_emailcreated") == false),
+            It.IsAny<CancellationToken>()),
+        Times.Once);
+
+    dataverseRepoMock.Verify(
+        repo => repo.RetrieveMultipleAsync(
+            It.IsAny<QueryExpression>(),
+            It.IsAny<CancellationToken>()),
+        Times.Never);
+
+    dataverseRepoMock.Verify(
+        repo => repo.ExecuteAsync(
+            It.IsAny<OrganizationRequest>(),
+            It.IsAny<CancellationToken>()),
+        Times.Never);
 }
-
-await SendEmailAsync(emailId, cancellationToken);
-
-_logger.LogInformation(
-    "DIA notification email sent. EmailId: {EmailId}, LogId: {LogId}, Title: {LogErrorTitle}.",
-    emailId,
-    logId,
-    logErrorTitle);
-
-Send DIA exception notification email through Dataverse
