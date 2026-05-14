@@ -1,8 +1,5 @@
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Query;
-
 [Fact]
-public async Task NotifyAsync_WhenSendErrorEmailIsFalse_ShouldCreateLogOnly()
+public async Task NotifyAsync_WhenConfigurationValuesAreMissing_ShouldSkipEmailCreation()
 {
     // Arrange
     var loggerMock = new Mock<ILogger<DiaExceptionNotificationService>>();
@@ -16,13 +13,19 @@ public async Task NotifyAsync_WhenSendErrorEmailIsFalse_ShouldCreateLogOnly()
             It.IsAny<CancellationToken>()))
         .ReturnsAsync(logId);
 
+    dataverseRepoMock
+        .Setup(repo => repo.RetrieveMultipleAsync(
+            It.Is<QueryExpression>(query => query.EntityName == "tpc_configurationkeies"),
+            It.IsAny<CancellationToken>()))
+        .ReturnsAsync(new EntityCollection());
+
     var service = new DiaExceptionNotificationService(
         loggerMock.Object,
         dataverseRepoMock.Object);
 
     // Act
     await service.NotifyAsync(
-        sendErrorEmail: false,
+        sendErrorEmail: true,
         logError: true,
         logErrorTitle: "Test title",
         logErrorProcessName: "DIA",
@@ -36,16 +39,19 @@ public async Task NotifyAsync_WhenSendErrorEmailIsFalse_ShouldCreateLogOnly()
     // Assert
     dataverseRepoMock.Verify(
         repo => repo.CreateAsync(
-            It.Is<Entity>(entity =>
-                entity.LogicalName == "tpc_logs" &&
-                entity.GetAttributeValue<string>("tpc_name") == "Test title" &&
-                entity.GetAttributeValue<bool>("tpc_emailcreated") == false),
+            It.Is<Entity>(entity => entity.LogicalName == "tpc_logs"),
             It.IsAny<CancellationToken>()),
         Times.Once);
 
     dataverseRepoMock.Verify(
         repo => repo.RetrieveMultipleAsync(
-            It.IsAny<QueryExpression>(),
+            It.Is<QueryExpression>(query => query.EntityName == "tpc_configurationkeies"),
+            It.IsAny<CancellationToken>()),
+        Times.Once);
+
+    dataverseRepoMock.Verify(
+        repo => repo.CreateAsync(
+            It.Is<Entity>(entity => entity.LogicalName == "email"),
             It.IsAny<CancellationToken>()),
         Times.Never);
 
@@ -55,3 +61,5 @@ public async Task NotifyAsync_WhenSendErrorEmailIsFalse_ShouldCreateLogOnly()
             It.IsAny<CancellationToken>()),
         Times.Never);
 }
+
+Add missing config test for DIA exception notification
