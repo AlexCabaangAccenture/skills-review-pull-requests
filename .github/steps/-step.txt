@@ -1,5 +1,10 @@
-- task: NuGetToolInstaller@1
-  displayName: "Install NuGet 6.x"
+# Run unit tests and generate coverage for SonarQube
+- task: DotNetCoreCLI@2
+  displayName: 'Run unit tests with coverage'
   inputs:
-    versionSpec: '6.x'
-    checkLatest: false
+    command: 'test'
+    projects: '$(testProjects)'
+    arguments: '--configuration $(buildConfiguration) --no-build --logger trx --results-directory "$(testResultsDir)" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover'
+    publishTestResults: false
+
+Generate unit test coverage for SonarQube PR analysis
