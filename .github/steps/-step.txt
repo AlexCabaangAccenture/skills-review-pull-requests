@@ -1,26 +1,34 @@
-private static Entity CreateSenderParty(Guid senderQueueId)
+private async Task<Guid> CreateEmailAsync(
+    Entity senderParty,
+    List<Entity> recipientParties,
+    string errorEmailSubject,
+    string errorEmailBody,
+    Guid logId,
+    CancellationToken cancellationToken)
 {
-    var senderParty = new Entity("activityparty");
+    var email = new Entity("email");
 
-    senderParty["participationtypemask"] = new OptionSetValue(1);
-    senderParty["partyid"] = new EntityReference("queue", senderQueueId);
+    email["subject"] = errorEmailSubject;
+    email["description"] = errorEmailBody;
+    email["from"] = new EntityCollection(new List<Entity> { senderParty });
+    email["to"] = new EntityCollection(recipientParties);
+    email["regardingobjectid"] = new EntityReference("tpc_logs", logId);
 
-    return senderParty;
+    return await _dataverseRepo.CreateAsync(email, cancellationToken);
 }
+-----------------
+Guid emailId = await CreateEmailAsync(
+    senderParty,
+    recipientParties,
+    errorEmailSubject,
+    errorEmailBody,
+    logId,
+    cancellationToken);
 
-private static Entity CreateRecipientParty(string recipientEmail)
-{
-    var recipientParty = new Entity("activityparty");
+_logger.LogInformation(
+    "DIA notification email record created. EmailId: {EmailId}, LogId: {LogId}, Title: {LogErrorTitle}.",
+    emailId,
+    logId,
+    logErrorTitle);
 
-    recipientParty["participationtypemask"] = new OptionSetValue(2);
-    recipientParty["addressused"] = recipientEmail;
-
-    return recipientParty;
-}
-
-var senderParty = CreateSenderParty(senderQueueId.Value);
-var recipientParties = recipients
-    .Select(CreateRecipientParty)
-    .ToList();
-
-Add activity party builders for DIA exception notification
+Create Dataverse email record for DIA exception notification
