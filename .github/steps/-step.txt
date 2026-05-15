@@ -1,19 +1,20 @@
 
-var exception = new Exception("Test exception");
+private const string LogsEntityName = "tpc_logs";
+private const string LogNameField = "tpc_name";
+private const string EmailCreatedField = "tpc_emailcreated";
+private const string FormattedMessageField = "tpc_formattedmessage";
+private const string ProcessNameField = "tpc_processname";
+private const string LogTypeField = "tpc_logtype";
 
-await service.NotifyAsync(
-    new DiaExceptionNotificationRequest
-    {
-        SendErrorEmail = true,
-        LogError = true,
-        LogErrorTitle = "Test title",
-        LogErrorProcessName = "DIA",
-        ErrorEmailBody = "Test body",
-        ErrorEmailSubject = "Test subject",
-        SenderConfigKey = "SenderConfig",
-        RecipientConfigKey = "RecipientConfig",
-        LogErrorFormattedError = "Formatted error",
-        LogType = "428910002"
-    },
-    exception,
-    CancellationToken.None);
+
+var logEntity = new Microsoft.Xrm.Sdk.Entity(LogsEntityName);
+
+logEntity[LogNameField] = request.LogErrorTitle;
+logEntity[EmailCreatedField] = request.SendErrorEmail;
+logEntity[FormattedMessageField] = request.LogErrorFormattedError;
+logEntity[ProcessNameField] = request.LogErrorProcessName;
+
+if (!string.IsNullOrWhiteSpace(request.LogType) && int.TryParse(request.LogType, out int parsedLogType))
+{
+    logEntity[LogTypeField] = new Microsoft.Xrm.Sdk.OptionSetValue(parsedLogType);
+}
