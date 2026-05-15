@@ -1,57 +1,18 @@
-namespace WNZL.ICOW.DeceasedEstates.IntServices.Contracts;
+await service.NotifyAsync(
+    new DiaExceptionNotificationRequest
+    {
+        SendErrorEmail = true,
+        LogError = true,
+        LogErrorTitle = "Test title",
+        LogErrorProcessName = "DIA",
+        ErrorEmailBody = "Test body",
+        ErrorEmailSubject = "Test subject",
+        SenderConfigKey = "SenderConfig",
+        RecipientConfigKey = "RecipientConfig",
+        LogErrorFormattedError = "Formatted error",
+        LogType = "428910002"
+    },
+    exception,
+    CancellationToken.None);
 
-public sealed class DiaExceptionNotificationRequest
-{
-    public bool SendErrorEmail { get; init; }
-
-    public bool LogError { get; init; }
-
-    public string LogErrorTitle { get; init; } = string.Empty;
-
-    public string LogErrorProcessName { get; init; } = string.Empty;
-
-    public string ErrorEmailBody { get; init; } = string.Empty;
-
-    public string ErrorEmailSubject { get; init; } = string.Empty;
-
-    public string SenderConfigKey { get; init; } = string.Empty;
-
-    public string RecipientConfigKey { get; init; } = string.Empty;
-
-    public string LogErrorFormattedError { get; init; } = string.Empty;
-
-    public string LogType { get; init; } = string.Empty;
-}
-
-DiaExceptionNotificationRequest.cs
-
----------------------------------
-
-Task NotifyAsync(
-    DiaExceptionNotificationRequest request,
-    Exception exception,
-    CancellationToken ct = default);
-
-public async Task NotifyAsync(
-    DiaExceptionNotificationRequest request,
-    Exception exception,
-    CancellationToken ct = default)
-
------------------------------------
-
-request.SendErrorEmail
-request.LogError
-request.LogErrorTitle
-request.LogErrorProcessName
-request.ErrorEmailBody
-request.ErrorEmailSubject
-request.SenderConfigKey
-request.RecipientConfigKey
-request.LogErrorFormattedError
-request.LogType
-
---------------------------------------
-
-new Entity(LogsEntityName)
-logEntity[LogNameField]
-
+using WNZL.ICOW.DeceasedEstates.IntServices.Models;
