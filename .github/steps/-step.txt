@@ -1,33 +1,16 @@
-private const string DefaultSenderConfigKey = "DIAErrorEmailSender";
-private const string DefaultRecipientConfigKey = "DIAErrorEmailRecipients";
-private const string ErrorLogType = "428910002";
-private const string ProcessName = "DIA Ingestion";
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 
-_logger.LogError(
-    exception,
-    "DIA exception notification required. FailureType: {FailureType}, FileName: {FileName}.",
-    failureType,
-    fileName);
+var logId = Guid.NewGuid();
 
-var request = new DiaExceptionNotificationRequest
-{
-    SendErrorEmail = true,
-    LogError = true,
-    LogErrorTitle = $"DIA exception notification required - {failureType}",
-    LogErrorProcessName = ProcessName,
-    ErrorEmailSubject = $"DIA exception notification required - {failureType}",
-    ErrorEmailBody =
-        $"A DIA exception occurred.{Environment.NewLine}" +
-        $"FileName: {fileName}{Environment.NewLine}" +
-        $"FailureType: {failureType}{Environment.NewLine}" +
-        $"Error: {exception.Message}",
-    SenderConfigKey = DefaultSenderConfigKey,
-    RecipientConfigKey = DefaultRecipientConfigKey,
-    LogErrorFormattedError = exception.ToString(),
-    LogType = ErrorLogType
-};
+dataverseRepoMock
+    .Setup(repo => repo.CreateAsync(
+        It.Is<Entity>(entity => entity.LogicalName == "tpc_logs"),
+        It.IsAny<CancellationToken>()))
+    .ReturnsAsync(logId);
 
-return NotifyAsync(
-    request,
-    exception,
-    cancellationToken);
+dataverseRepoMock
+    .Setup(repo => repo.RetrieveMultipleAsync(
+        It.Is<QueryExpression>(query => query.EntityName == "tpc_configurationkeies"),
+        It.IsAny<CancellationToken>()))
+    .ReturnsAsync(new EntityCollection());
