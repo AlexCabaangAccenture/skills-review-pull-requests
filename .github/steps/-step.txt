@@ -1,18 +1,57 @@
-SPESTG-480 - Refine DIA exception notification mechanism
+namespace WNZL.ICOW.DeceasedEstates.IntServices.Contracts;
 
-Implemented and validated the DIA exception notification mechanism refinement.
+public sealed class DiaExceptionNotificationRequest
+{
+    public bool SendErrorEmail { get; init; }
 
-Changes included:
-- Reused the existing Dataverse repository path for notification handling.
-- Added Dataverse configuration lookup for sender and recipient notification settings.
-- Added sender queue resolution.
-- Added recipient parsing from semicolon-separated configuration values.
-- Added activity party creation for sender and recipients.
-- Added Dataverse email record creation.
-- Added SendEmail execution through Dataverse.
-- Added unit test coverage for log-only, missing configuration, missing sender queue, invalid recipient configuration, and happy path email send scenarios.
+    public bool LogError { get; init; }
 
-Validation:
-- Build succeeded.
-- Unit tests passed: 20/20.
-- Latest SPESTG-480 baseline branch has been merged into this branch.
+    public string LogErrorTitle { get; init; } = string.Empty;
+
+    public string LogErrorProcessName { get; init; } = string.Empty;
+
+    public string ErrorEmailBody { get; init; } = string.Empty;
+
+    public string ErrorEmailSubject { get; init; } = string.Empty;
+
+    public string SenderConfigKey { get; init; } = string.Empty;
+
+    public string RecipientConfigKey { get; init; } = string.Empty;
+
+    public string LogErrorFormattedError { get; init; } = string.Empty;
+
+    public string LogType { get; init; } = string.Empty;
+}
+
+DiaExceptionNotificationRequest.cs
+
+---------------------------------
+
+Task NotifyAsync(
+    DiaExceptionNotificationRequest request,
+    Exception exception,
+    CancellationToken ct = default);
+
+public async Task NotifyAsync(
+    DiaExceptionNotificationRequest request,
+    Exception exception,
+    CancellationToken ct = default)
+
+-----------------------------------
+
+request.SendErrorEmail
+request.LogError
+request.LogErrorTitle
+request.LogErrorProcessName
+request.ErrorEmailBody
+request.ErrorEmailSubject
+request.SenderConfigKey
+request.RecipientConfigKey
+request.LogErrorFormattedError
+request.LogType
+
+--------------------------------------
+
+new Entity(LogsEntityName)
+logEntity[LogNameField]
+
