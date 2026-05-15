@@ -1,18 +1,4 @@
-using Microsoft.Extensions.Options;
-using WNZL.ICOW.DeceasedEstates.Services.Models;
+builder.Services.AddOptions<DiaExceptionNotificationOptions>()
+    .Bind(builder.Configuration.GetSection("DiaExceptionNotification"));
 
-private static IOptions<DiaExceptionNotificationOptions> CreateNotificationOptions()
-{
-    return Options.Create(new DiaExceptionNotificationOptions
-    {
-        SenderConfigKey = "DIAErrorEmailSender",
-        RecipientConfigKey = "DIAErrorEmailRecipients",
-        ErrorLogType = "428910002",
-        ProcessName = "DIA Ingestion"
-    });
-}
-
-var service = new DiaExceptionNotificationService(
-    loggerMock.Object,
-    dataverseRepoMock.Object,
-    CreateNotificationOptions());
+Register DIA exception notification options
