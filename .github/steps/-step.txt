@@ -1,16 +1,33 @@
-Hi Ravind, good afternoon.
+private const string DefaultSenderConfigKey = "DIAErrorEmailSender";
+private const string DefaultRecipientConfigKey = "DIAErrorEmailRecipients";
+private const string ErrorLogType = "428910002";
+private const string ProcessName = "DIA Ingestion";
 
-I have two IIQ access requests currently pending for WNZLTEST:
+_logger.LogError(
+    exception,
+    "DIA exception notification required. FailureType: {FailureType}, FileName: {FileName}.",
+    failureType,
+    fileName);
 
-Request ID 443649
-IT-Access-DYNAMIC365 DataRep Developers on Active Directory - WNZLTEST
+var request = new DiaExceptionNotificationRequest
+{
+    SendErrorEmail = true,
+    LogError = true,
+    LogErrorTitle = $"DIA exception notification required - {failureType}",
+    LogErrorProcessName = ProcessName,
+    ErrorEmailSubject = $"DIA exception notification required - {failureType}",
+    ErrorEmailBody =
+        $"A DIA exception occurred.{Environment.NewLine}" +
+        $"FileName: {fileName}{Environment.NewLine}" +
+        $"FailureType: {failureType}{Environment.NewLine}" +
+        $"Error: {exception.Message}",
+    SenderConfigKey = DefaultSenderConfigKey,
+    RecipientConfigKey = DefaultRecipientConfigKey,
+    LogErrorFormattedError = exception.ToString(),
+    LogType = ErrorLogType
+};
 
-Request ID 443648
-CorpTestNZ-Application-D365-Customer-Engagement-Plan on Active Directory - WNZLTEST
-
-This is needed for my current SPESTG-480 work, specifically to access the TEST environment/SonarQube dashboard and validate PR findings directly. At the moment, I have to coordinate with others to check the dashboard, which slows down the turnaround for fixing and validating SonarQube issues.
-
-Could you please help review/approve when you have time?
-
-Thanks,
-Alex
+return NotifyAsync(
+    request,
+    exception,
+    cancellationToken);
