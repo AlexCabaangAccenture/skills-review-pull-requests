@@ -1,25 +1,12 @@
-Implemented and validated the DIA exception notification mechanism refinement.
+Hi Vishal, Yuxin,
 
-This PR includes:
-- Reused the existing Dataverse repository path for notification handling.
-- Added Dataverse configuration lookup for sender and recipient notification settings.
-- Added sender queue resolution.
-- Added recipient parsing from semicolon-separated configuration values.
-- Added activity party creation for sender and recipients.
-- Added Dataverse email record creation.
-- Added SendEmail execution through Dataverse.
-- Wired the DIA failure notification flow into the actual notification mechanism.
-- Added options-based configuration for DIA exception notification settings.
-- Added unit test coverage for log-only, missing configuration, missing sender queue, invalid recipient configuration, wrapper flow, and happy path email send scenarios.
-- Addressed SonarQube cleanup findings for the notification refinement changes.
+The updated PR for SPESTG-480 notification refinement is ready for review.
+I created this as a separate PR because the notification implementation was refined to use the Dataverse/D365 email mechanism instead of the earlier direct email approach.
+Build, unit tests, SonarQube Quality Gate, and required PR checks are all passing. No merge conflicts.
 
-Validation:
-- Build succeeded.
-- Unit tests passed: 21/21.
-- SonarQube Quality Gate passed.
-- All required PR checks succeeded.
-- No merge conflicts.
+PR: 
 
-Notes:
-- This PR is separate from the existing green SPESTG-480 baseline PR.
-- The existing baseline branch was kept untouched.
+I will continue with end-to-end/runtime validation separately, but this PR is ready for code review.
+
+
+
