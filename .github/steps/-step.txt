@@ -1,22 +1,18 @@
 using Microsoft.Extensions.Options;
 using WNZL.ICOW.DeceasedEstates.Services.Models;
 
-private readonly DiaExceptionNotificationOptions _options;
-
-public DiaExceptionNotificationService(
-    ILogger<DiaExceptionNotificationService> logger,
-    IDataverseRepository dataverseRepository,
-    IOptions<DiaExceptionNotificationOptions> options)
+private static IOptions<DiaExceptionNotificationOptions> CreateNotificationOptions()
 {
-    _logger = logger;
-    _dataverseRepo = dataverseRepository;
-    _options = options.Value;
+    return Options.Create(new DiaExceptionNotificationOptions
+    {
+        SenderConfigKey = "DIAErrorEmailSender",
+        RecipientConfigKey = "DIAErrorEmailRecipients",
+        ErrorLogType = "428910002",
+        ProcessName = "DIA Ingestion"
+    });
 }
 
-
-LogErrorProcessName = _options.ProcessName,
-SenderConfigKey = _options.SenderConfigKey,
-RecipientConfigKey = _options.RecipientConfigKey,
-LogType = _options.ErrorLogType
-
-
+var service = new DiaExceptionNotificationService(
+    loggerMock.Object,
+    dataverseRepoMock.Object,
+    CreateNotificationOptions());
