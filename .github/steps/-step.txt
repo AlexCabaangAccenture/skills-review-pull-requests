@@ -1,15 +1,22 @@
-DiaExceptionNotificationOptions
+using Microsoft.Extensions.Options;
+using WNZL.ICOW.DeceasedEstates.Services.Models;
 
-namespace WNZL.ICOW.DeceasedEstates.Services.Models;
+private readonly DiaExceptionNotificationOptions _options;
 
-public sealed class DiaExceptionNotificationOptions
+public DiaExceptionNotificationService(
+    ILogger<DiaExceptionNotificationService> logger,
+    IDataverseRepository dataverseRepository,
+    IOptions<DiaExceptionNotificationOptions> options)
 {
-    public string SenderConfigKey { get; set; } = string.Empty;
-
-    public string RecipientConfigKey { get; set; } = string.Empty;
-
-    public string ErrorLogType { get; set; } = string.Empty;
-
-    public string ProcessName { get; set; } = string.Empty;
+    _logger = logger;
+    _dataverseRepo = dataverseRepository;
+    _options = options.Value;
 }
+
+
+LogErrorProcessName = _options.ProcessName,
+SenderConfigKey = _options.SenderConfigKey,
+RecipientConfigKey = _options.RecipientConfigKey,
+LogType = _options.ErrorLogType
+
 
