@@ -1,20 +1,16 @@
+Hi Ravind, good afternoon.
 
-private const string LogsEntityName = "tpc_logs";
-private const string LogNameField = "tpc_name";
-private const string EmailCreatedField = "tpc_emailcreated";
-private const string FormattedMessageField = "tpc_formattedmessage";
-private const string ProcessNameField = "tpc_processname";
-private const string LogTypeField = "tpc_logtype";
+I have two IIQ access requests currently pending for WNZLTEST:
 
+Request ID 443649
+IT-Access-DYNAMIC365 DataRep Developers on Active Directory - WNZLTEST
 
-var logEntity = new Microsoft.Xrm.Sdk.Entity(LogsEntityName);
+Request ID 443648
+CorpTestNZ-Application-D365-Customer-Engagement-Plan on Active Directory - WNZLTEST
 
-logEntity[LogNameField] = request.LogErrorTitle;
-logEntity[EmailCreatedField] = request.SendErrorEmail;
-logEntity[FormattedMessageField] = request.LogErrorFormattedError;
-logEntity[ProcessNameField] = request.LogErrorProcessName;
+This is needed for my current SPESTG-480 work, specifically to access the TEST environment/SonarQube dashboard and validate PR findings directly. At the moment, I have to coordinate with others to check the dashboard, which slows down the turnaround for fixing and validating SonarQube issues.
 
-if (!string.IsNullOrWhiteSpace(request.LogType) && int.TryParse(request.LogType, out int parsedLogType))
-{
-    logEntity[LogTypeField] = new Microsoft.Xrm.Sdk.OptionSetValue(parsedLogType);
-}
+Could you please help review/approve when you have time?
+
+Thanks,
+Alex
