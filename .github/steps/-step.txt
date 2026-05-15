@@ -1,108 +1,15 @@
-[Fact]
-public async Task NotifyFailureAsync_WhenConfigurationAndQueueAreValid_ShouldCreateEmailAndSend()
+DiaExceptionNotificationOptions
+
+namespace WNZL.ICOW.DeceasedEstates.Services.Models;
+
+public sealed class DiaExceptionNotificationOptions
 {
-    // Arrange
-    var loggerMock = new Mock<ILogger<DiaExceptionNotificationService>>();
-    var dataverseRepoMock = new Mock<IDataverseRepository>();
+    public string SenderConfigKey { get; set; } = string.Empty;
 
-    var logId = Guid.NewGuid();
-    var queueId = Guid.NewGuid();
-    var emailId = Guid.NewGuid();
+    public string RecipientConfigKey { get; set; } = string.Empty;
 
-    dataverseRepoMock
-        .Setup(repo => repo.CreateAsync(
-            It.Is<Entity>(entity => entity.LogicalName == "tpc_logs"),
-            It.IsAny<CancellationToken>()))
-        .ReturnsAsync(logId);
+    public string ErrorLogType { get; set; } = string.Empty;
 
-    var configResults = new EntityCollection(new List<Entity>
-    {
-        new Entity("tpc_configurationkeies")
-        {
-            ["tpc_name"] = "DIAErrorEmailSender",
-            ["tpc_value_singlelinetext"] = "DIA Error Queue"
-        },
-        new Entity("tpc_configurationkeies")
-        {
-            ["tpc_name"] = "DIAErrorEmailRecipients",
-            ["tpc_value_singlelinetext"] = "test1@example.com;test2@example.com"
-        }
-    });
-
-    dataverseRepoMock
-        .Setup(repo => repo.RetrieveMultipleAsync(
-            It.Is<QueryExpression>(query => query.EntityName == "tpc_configurationkeies"),
-            It.IsAny<CancellationToken>()))
-        .ReturnsAsync(configResults);
-
-    var queue = new Entity("queue")
-    {
-        Id = queueId
-    };
-
-    var queueResults = new EntityCollection(new List<Entity> { queue });
-
-    dataverseRepoMock
-        .Setup(repo => repo.RetrieveMultipleAsync(
-            It.Is<QueryExpression>(query => query.EntityName == "queue"),
-            It.IsAny<CancellationToken>()))
-        .ReturnsAsync(queueResults);
-
-    dataverseRepoMock
-        .Setup(repo => repo.CreateAsync(
-            It.Is<Entity>(entity => entity.LogicalName == "email"),
-            It.IsAny<CancellationToken>()))
-        .ReturnsAsync(emailId);
-
-    var service = new DiaExceptionNotificationService(
-        loggerMock.Object,
-        dataverseRepoMock.Object);
-
-    var exception = new InvalidOperationException("Test failure");
-
-    // Act
-    await service.NotifyFailureAsync(
-        "test-file.txt",
-        "DecryptionFailure",
-        exception);
-
-    // Assert
-    dataverseRepoMock.Verify(
-        repo => repo.CreateAsync(
-            It.Is<Entity>(entity => entity.LogicalName == "tpc_logs"),
-            It.IsAny<CancellationToken>()),
-        Times.Once);
-
-    dataverseRepoMock.Verify(
-        repo => repo.RetrieveMultipleAsync(
-            It.Is<QueryExpression>(query => query.EntityName == "tpc_configurationkeies"),
-            It.IsAny<CancellationToken>()),
-        Times.Once);
-
-    dataverseRepoMock.Verify(
-        repo => repo.RetrieveMultipleAsync(
-            It.Is<QueryExpression>(query => query.EntityName == "queue"),
-            It.IsAny<CancellationToken>()),
-        Times.Once);
-
-    dataverseRepoMock.Verify(
-        repo => repo.CreateAsync(
-            It.Is<Entity>(entity =>
-                entity.LogicalName == "email" &&
-                entity.GetAttributeValue<string>("subject") == "DIA exception notification required - DecryptionFailure" &&
-                entity.GetAttributeValue<string>("description").Contains("test-file.txt") &&
-                entity.GetAttributeValue<string>("description").Contains("DecryptionFailure")),
-            It.IsAny<CancellationToken>()),
-        Times.Once);
-
-    dataverseRepoMock.Verify(
-        repo => repo.ExecuteAsync(
-            It.Is<OrganizationRequest>(request =>
-                request.RequestName == "SendEmail" &&
-                request.Parameters.Contains("EmailId") &&
-                request.Parameters.Contains("IssueSend") &&
-                (Guid)request["EmailId"] == emailId &&
-                (bool)request["IssueSend"] == true),
-            It.IsAny<CancellationToken>()),
-        Times.Once);
+    public string ProcessName { get; set; } = string.Empty;
 }
+
