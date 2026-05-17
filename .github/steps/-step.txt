@@ -1,12 +1,4 @@
-Hi Vishal, Yuxin,
-
-The updated PR for SPESTG-480 notification refinement is ready for review.
-I created this as a separate PR because the notification implementation was refined to use the Dataverse/D365 email mechanism instead of the earlier direct email approach.
-Build, unit tests, SonarQube Quality Gate, and required PR checks are all passing. No merge conflicts.
-
-PR: 
-
-I will continue with end-to-end/runtime validation separately, but this PR is ready for code review.
-
-
-
+DiaExceptionNotification__SenderConfigKey = System Error Notification Email Sender
+DiaExceptionNotification__RecipientConfigKey = DE Estate Tech Team Notification Email
+DiaExceptionNotification__ErrorLogType = 428910002
+DiaExceptionNotification__ProcessName = DIA Ingestion
