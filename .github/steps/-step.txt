@@ -1,5 +1,5 @@
-Yes, that might be possible as a temporary validation approach if the TEST Function App can be allowed to access the DEV blob storage/container.
+Got it, Vishal.
 
-From my side, the issue is that TEST does not currently have the same blob upload/source setup I used for DEV validation. If TEST can temporarily point to or access the DEV blob source, then I can deploy the same Function App changes to TEST and validate the DIA flow there.
+I’ll check first whether the TEST Function App can access the DEV blob source, including the required app setting, RBAC, and network access.
 
-I just need to confirm the app setting/storage endpoint to use and whether TEST has the required network/RBAC access to that DEV storage account.
+For UAT/Prod, I’ll raise a separate PR from the feature branch to uncomment UAT and Prod only, with Preprod remaining commented out, for both the terraform infra and base-environment-pipeline.
