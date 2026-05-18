@@ -1,12 +1,32 @@
-Enable UAT and Prod pipeline stages
+traces
+| where operation_Id == "f67a8f49-000c-4703-bcd1-a8ae3e6a6932"
+| project timestamp, severityLevel, message, operation_Name, operation_Id
+| order by timestamp asc
 
-Summary:
-- Enabled UAT and Prod stages in terraform-bootstrap-pipeline.yaml.
-- Enabled UAT and Prod stages in base-environment-pipeline.yaml.
-- Removed Preprod environment references as instructed.
-- Left Dev and Test stages unchanged.
 
-Note:
-This PR is for enabling UAT and Prod pipeline stages only.
+traces
+| where operation_Id == "f67a8f49-000c-4703-bcd1-a8ae3e6a6932"
+| where message contains "notification"
+   or message contains "email"
+   or message contains "configuration"
+   or message contains "sender"
+   or message contains "recipient"
+   or message contains "queue"
+   or message contains "Dataverse"
+   or message contains "LogId"
+| project timestamp, severityLevel, message, operation_Name, operation_Id
+| order by timestamp asc
 
-Hi Vishal, I raised the PR for enabling UAT and Prod and removed Preprod references as discussed. Please review when you’re available.
+
+traces
+| where timestamp > ago(1h)
+| where message contains "DIA notification"
+   or message contains "sender"
+   or message contains "recipient"
+   or message contains "configuration"
+   or message contains "queue"
+   or message contains "email"
+| project timestamp, severityLevel, message, operation_Name, operation_Id
+| order by timestamp desc
+
+
