@@ -1,5 +1,30 @@
-exceptions
-| where timestamp > ago(30m)
-| where operation_Name contains "DiaIngestionFunction" or cloud_RoleName contains "deceasedestate"
-| order by timestamp desc
-| project timestamp, operation_Name, type, outerMessage, innermostMessage, problemId
+Hi Vishal,
+
+As discussed, I checked whether the TEST Function App can temporarily use the same DEV blob source for DIA validation.
+
+Current DEV validation status:
+
+DEV is already reaching the expected missing file scenario.
+The DEV DIA temporary blob source is using:
+Blob service URL: https://sad365cndevwu6mv.blob.core.windows.net
+Container: dia-input
+
+I also checked the TEST Function App configuration. TEST currently points to its own TEST storage account:
+
+Blob service URL: https://sad365cntest2zqkw.blob.core.windows.net
+Container: dia-input
+
+The TEST storage account does not currently have the same dia-input container/source setup, so the function initially returned that the dia-input container does not exist.
+
+As a temporary check, I pointed the TEST Function App blob source setting to the DEV blob service URL while keeping the TEST runtime storage settings unchanged. After this change, the behavior changed from “container does not exist” to the function timing out/failing while checking the dia-input container. This suggests that TEST cannot directly access the DEV blob source at the moment, likely due to cross-environment networking/private endpoint/firewall access or managed identity/RBAC restrictions.
+
+Because of this, TEST validation may be blocked unless one of the following is confirmed/provided:
+
+Allow temporary TEST Function App access to the DEV storage/container, including required RBAC and network path.
+Create the equivalent dia-input container/source setup in TEST storage.
+Confirm another agreed temporary source setup for TEST/UAT validation.
+
+For now, I will avoid changing any UAT or production settings until the preferred approach is confirmed.
+
+Thanks,
+Alex
