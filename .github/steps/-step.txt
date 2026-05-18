@@ -1,11 +1,10 @@
 traces
-| where timestamp between (datetime(2026-05-18 05:47:30) .. datetime(2026-05-18 05:49:00))
+| where timestamp > ago(4h)
 | where message contains "notification"
    or message contains "email"
    or message contains "configuration"
    or message contains "queue"
    or message contains "recipient"
-   or message contains "tpc"
    or message contains "Dataverse"
 | project timestamp, severityLevel, message, operation_Name, operation_Id
-| order by timestamp asc
+| order by timestamp desc
