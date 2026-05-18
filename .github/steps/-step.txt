@@ -1,4 +1,4 @@
-DiaExceptionNotification__SenderConfigKey = System Error Notification Email Sender
-DiaExceptionNotification__RecipientConfigKey = DE Estate Tech Team Notification Email
-DiaExceptionNotification__ErrorLogType = 428910002
-DiaExceptionNotification__ProcessName = DIA Ingestion
+traces
+| where timestamp > ago(2h)
+| where message contains "DIA"
+| order by timestamp desc
