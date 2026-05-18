@@ -1,5 +1,5 @@
-Got it, Vishal.
-
-I’ll check first whether the TEST Function App can access the DEV blob source, including the required app setting, RBAC, and network access.
-
-For UAT/Prod, I’ll raise a separate PR from the feature branch to uncomment UAT and Prod only, with Preprod remaining commented out, for both the terraform infra and base-environment-pipeline.
+exceptions
+| where timestamp > ago(30m)
+| where operation_Name contains "DiaIngestionFunction" or cloud_RoleName contains "deceasedestate"
+| order by timestamp desc
+| project timestamp, operation_Name, type, outerMessage, innermostMessage, problemId
