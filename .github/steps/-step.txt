@@ -1,10 +1,5 @@
-traces
-| where timestamp > ago(4h)
-| where message contains "notification"
-   or message contains "email"
-   or message contains "configuration"
-   or message contains "queue"
-   or message contains "recipient"
-   or message contains "Dataverse"
-| project timestamp, severityLevel, message, operation_Name, operation_Id
-| order by timestamp desc
+Yes, that might be possible as a temporary validation approach if the TEST Function App can be allowed to access the DEV blob storage/container.
+
+From my side, the issue is that TEST does not currently have the same blob upload/source setup I used for DEV validation. If TEST can temporarily point to or access the DEV blob source, then I can deploy the same Function App changes to TEST and validate the DIA flow there.
+
+I just need to confirm the app setting/storage endpoint to use and whether TEST has the required network/RBAC access to that DEV storage account.
