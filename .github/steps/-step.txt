@@ -1,32 +1,5 @@
-traces
-| where operation_Id == "f67a8f49-000c-4703-bcd1-a8ae3e6a6932"
-| project timestamp, severityLevel, message, operation_Name, operation_Id
-| order by timestamp asc
+PR review completed and implementation refinements are now done.
 
+The SPESTG-480 PR was approved and merged by Vishal with no major review comments requiring further changes. Final refinements were completed after DEV validation, including the Dataverse logical name fixes needed for the DIA exception notification flow.
 
-traces
-| where operation_Id == "f67a8f49-000c-4703-bcd1-a8ae3e6a6932"
-| where message contains "notification"
-   or message contains "email"
-   or message contains "configuration"
-   or message contains "sender"
-   or message contains "recipient"
-   or message contains "queue"
-   or message contains "Dataverse"
-   or message contains "LogId"
-| project timestamp, severityLevel, message, operation_Name, operation_Id
-| order by timestamp asc
-
-
-traces
-| where timestamp > ago(1h)
-| where message contains "DIA notification"
-   or message contains "sender"
-   or message contains "recipient"
-   or message contains "configuration"
-   or message contains "queue"
-   or message contains "email"
-| project timestamp, severityLevel, message, operation_Name, operation_Id
-| order by timestamp desc
-
-
+DEV validation confirmed that the missing DIA file scenario successfully creates the TPC Log record and sends the notification email from CRM Outgoing Email Queue.
