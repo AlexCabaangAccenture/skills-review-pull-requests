@@ -1,15 +1,11 @@
-_logger.LogInformation(
-    "DIA Dataverse staging save attempt {Attempt} of {MaxAttempts} started for file {FileName}.",
-    attempt,
-    maxAttempts,
-    filename);
+Completed QA clarification and test alignment for the SPESTG-480 DIA exception notification flow.
 
-var forceStagingFailure =
-    Environment.GetEnvironmentVariable("ForceDiaStagingFailure") == "true";
+Aligned with QA on the DEV-validated scenarios and expected results for demo readiness:
+- Missing DIA file after 7 AM NZT
+- Valid DIA file happy path
+- Valid filename but plain-text / non-encrypted content
+- Dataverse staging save failure after retry exhaustion
 
-if (forceStagingFailure)
-{
-    throw new Exception("Temporary DEV validation: forced DIA staging save failure.");
-}
+Also prepared supporting test data and confirmed which runtime evidence can be used for validation, including Function App logs, TPC Log creation, D365 email notification records, and Dataverse staging success/failure behavior.
 
-var deStagingRecord = new icow_deceasedestatestaging();
+Remaining validation/demo activities will continue under the validation / retest subtask.
