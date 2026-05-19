@@ -1,5 +1,15 @@
-PR review completed and implementation refinements are now done.
+string asciiPreview = Encoding.ASCII.GetString(fileBytes.Take(Math.Min(fileBytes.Length, 200)).ToArray());
 
-The SPESTG-480 PR was approved and merged by Vishal with no major review comments requiring further changes. Final refinements were completed after DEV validation, including the Dataverse logical name fixes needed for the DIA exception notification flow.
+bool looksArmoredPgp = asciiPreview.Contains("BEGIN PGP MESSAGE");
 
-DEV validation confirmed that the missing DIA file scenario successfully creates the TPC Log record and sends the notification email from CRM Outgoing Email Queue.
+int printableCount = asciiPreview.Count(c =>
+    !char.IsControl(c) || c == '\r' || c == '\n' || c == '\t');
+
+bool looksMostlyPrintableText = asciiPreview.Length > 0 &&
+                                printableCount >= asciiPreview.Length * 0.90;
+
+bool looksDelimitedDiaText = asciiPreview.Contains('|');
+
+if (!looksArmoredPgp && looksMostlyPrintableText && looksDelimitedDiaText)
+
+Refine DIA encrypted file pre-validation to avoid rejecting binary PGP files
