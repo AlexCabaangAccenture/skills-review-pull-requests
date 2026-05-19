@@ -1,11 +1,15 @@
-Completed QA clarification and test alignment for the SPESTG-480 DIA exception notification flow.
+$folderPath = "$env:USERPROFILE\Downloads\Temp\EncryptedIssue"
 
-Aligned with QA on the DEV-validated scenarios and expected results for demo readiness:
-- Missing DIA file after 7 AM NZT
-- Valid DIA file happy path
-- Valid filename but plain-text / non-encrypted content
-- Dataverse staging save failure after retry exhaustion
+if (!(Test-Path $folderPath)) {
+    New-Item -ItemType Directory -Path $folderPath | Out-Null
+}
 
-Also prepared supporting test data and confirmed which runtime evidence can be used for validation, including Function App logs, TPC Log creation, D365 email notification records, and Dataverse staging success/failure behavior.
+$filePath = Join-Path $folderPath "BDM_Westpac_ISA_Deaths_2026-05-20_2026-05-20.txt.pgp"
 
-Remaining validation/demo activities will continue under the validation / retest subtask.
+$bytes = New-Object byte[] 400
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+
+[System.IO.File]::WriteAllBytes($filePath, $bytes)
+
+Write-Host "Created test file:"
+Write-Host $filePath
