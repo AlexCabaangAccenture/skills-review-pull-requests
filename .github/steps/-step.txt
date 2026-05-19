@@ -1,15 +1,15 @@
-string asciiPreview = Encoding.ASCII.GetString(fileBytes.Take(Math.Min(fileBytes.Length, 200)).ToArray());
+_logger.LogInformation(
+    "DIA Dataverse staging save attempt {Attempt} of {MaxAttempts} started for file {FileName}.",
+    attempt,
+    maxAttempts,
+    filename);
 
-bool looksArmoredPgp = asciiPreview.Contains("BEGIN PGP MESSAGE");
+var forceStagingFailure =
+    Environment.GetEnvironmentVariable("ForceDiaStagingFailure") == "true";
 
-int printableCount = asciiPreview.Count(c =>
-    !char.IsControl(c) || c == '\r' || c == '\n' || c == '\t');
+if (forceStagingFailure)
+{
+    throw new Exception("Temporary DEV validation: forced DIA staging save failure.");
+}
 
-bool looksMostlyPrintableText = asciiPreview.Length > 0 &&
-                                printableCount >= asciiPreview.Length * 0.90;
-
-bool looksDelimitedDiaText = asciiPreview.Contains('|');
-
-if (!looksArmoredPgp && looksMostlyPrintableText && looksDelimitedDiaText)
-
-Refine DIA encrypted file pre-validation to avoid rejecting binary PGP files
+var deStagingRecord = new icow_deceasedestatestaging();
