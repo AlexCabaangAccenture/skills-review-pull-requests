@@ -1,8 +1,8 @@
-Added technical handover documentation for SPESTG-480 DIA exception notification flow.
 
-The Confluence page documents the implemented DIA exception notification behavior, including the high-level process flow, covered exception scenarios, D365 email notification behavior, TPC Log traceability, Dataverse logical names, DEV validation summary, and unit test result summary.
+TEMP - SPESTG-480 runtime validation final scan
 
-This documentation is intended to support QA/demo alignment, sprint close, and future technical handover after the team transition.
+Temporary PR to run build and SonarQube checks against the latest SPESTG-480 runtime validation branch.
 
-Confluence link:
-<paste Confluence page link here>
+This branch includes the final DEV validation updates for the DIA exception notification flow, including Dataverse logical name fixes, encrypted file pre-validation refinement, staging failure validation support, and unit test updates.
+
+This PR is currently for validation/scanning only and is not intended for immediate merge until the final demo/review is completed.
