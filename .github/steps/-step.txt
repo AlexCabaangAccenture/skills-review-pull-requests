@@ -1,7 +1,24 @@
-var forceStagingFailure =
-    Environment.GetEnvironmentVariable("ForceDiaStagingFailure") == "true";
+Temporary PR created to run build and SonarQube checks against the latest SPESTG-480 runtime validation branch.
 
-if (forceStagingFailure)
-{
-    throw new InvalidOperationException("Temporary DEV validation: forced DIA staging save failure.");
-}
+This branch includes the final DEV validation updates for the DIA exception notification flow, including:
+- Dataverse logical name fixes for TPC Log and TPC Configuration Key
+- Encrypted file pre-validation refinement to avoid rejecting valid binary PGP files
+- Decryption / invalid encrypted content scenario coverage
+- Temporary DEV-only staging failure validation support
+- Unit test updates after the runtime validation fixes
+
+Validation status:
+- Unit tests passing: 21/21
+- SonarQube Quality Gate passing
+- New issues: 0
+- Coverage on new code: 83.3%
+- Duplications: 0.0%
+- Security hotspots: 0
+- No merge conflicts against DEDIAAutomationDevelop
+
+This PR is currently for validation/scanning only and is not intended for immediate merge until the final demo/review is completed and Vishal confirms the preferred merge approach.
+
+----------------------
+
+SPESTG-480 Final DIA exception notification validation updates
+This PR contains the final validated updates for SPESTG-480 and is ready for review/merge.
