@@ -1,8 +1,7 @@
+var forceStagingFailure =
+    Environment.GetEnvironmentVariable("ForceDiaStagingFailure") == "true";
 
-TEMP - SPESTG-480 runtime validation final scan
-
-Temporary PR to run build and SonarQube checks against the latest SPESTG-480 runtime validation branch.
-
-This branch includes the final DEV validation updates for the DIA exception notification flow, including Dataverse logical name fixes, encrypted file pre-validation refinement, staging failure validation support, and unit test updates.
-
-This PR is currently for validation/scanning only and is not intended for immediate merge until the final demo/review is completed.
+if (forceStagingFailure)
+{
+    throw new InvalidOperationException("Temporary DEV validation: forced DIA staging save failure.");
+}
