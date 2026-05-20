@@ -1,153 +1,19 @@
-SPESTG-480 DIA Exception Notification Flow
+Completed the technical handover documentation for SPESTG-480 DIA exception notification flow.
 
-Purpose
-
-This document summarizes the DIA exception notification changes implemented under SPESTG-480. The purpose of the change is to ensure that exception scenarios in the DIA ingestion flow are logged and notified through D365 / Dataverse, so support and QA teams can trace failures through standard application records.
-
-Scope
-
-The implementation covers exception notification handling for DIA file ingestion, decryption, and Dataverse staging failures.
-
-The flow creates:
-- A TPC Log record for traceability.
-- A D365 email notification from CRM Outgoing Email Queue.
-- A Regarding link between the email and the related TPC Log record.
-
-High-level Process Flow
-
-1. Function App checks the dia-input blob container.
-2. The process selects the valid DIA file for the current processing date.
-3. The selected .txt.pgp file is handed off for processing.
-4. The file is validated and decrypted.
-5. If successful, the decrypted file is saved to the Dataverse staging table.
-6. If an exception occurs, the notification flow creates a TPC Log and email notification.
-
-Exception Scenarios Covered
-
-1. Missing DIA file after 7 AM NZT
-
-Expected behavior:
-If no valid DIA file is found after the configured cutoff, the process creates an exception notification.
-
-FailureType:
-MissingDiaFileAfter7AmNzt
-
-Validated result:
-TPC Log record and D365 email notification were created successfully.
-
-2. Invalid encrypted file content
-
-Expected behavior:
-If the file has a valid filename pattern but the content is plain text / not encrypted, the process creates an exception notification before decryption.
-
-FailureType:
-InvalidEncryptedFileFormat
-
-Validated result:
-TPC Log record and D365 email notification were created successfully.
-
-3. Decryption failure
-
-Expected behavior:
-If the file is selected for processing but the decryption step fails, the process creates an exception notification and does not continue to Dataverse staging.
-
-FailureType:
-DecryptionFailure
-
-QA note:
-This is covered by the implementation and unit test flow. A runtime test can be performed using a valid filename with invalid binary content that cannot be decrypted.
-
-4. Dataverse staging save failure
-
-Expected behavior:
-If Dataverse staging save fails, the process retries the save operation. After retry exhaustion, the process creates an exception notification.
-
-FailureType:
-D365DataverseSaveFailure
-
-Validated result:
-Retry logic was triggered. After retry exhaustion, TPC Log and D365 email notification were created successfully.
-
-5. Happy path
-
-Expected behavior:
-If the file is valid, the process decrypts the file and creates the Dataverse staging record. No exception notification should be created.
-
-Validated result:
-Valid file was selected, decrypted, staged successfully in Dataverse, and no exception notification was triggered.
-
-D365 / Dataverse Notification Design
-
-The notification flow creates two related records:
-
-1. Email record
-
-The D365 email record provides the readable notification summary.
-
-It includes:
-- Subject
-- From: CRM Outgoing Email Queue
-- To: configured recipients
-- Failure type
-- File name
-- Error summary
-
-2. TPC Log record
-
-The TPC Log record stores the technical traceability details.
-
-It includes:
-- Name
-- Process Name
-- Log Type
-- Formatted Message
-- Related Email record
-
-The email Regarding field links back to the related TPC Log record.
-
-Configuration Used
-
-The notification flow uses Dataverse configuration records to determine the sender queue and recipient list.
-
-Important Dataverse logical names confirmed during validation:
-
-TPC Log table:
-tpc_log
-
-TPC Configuration Key table:
-tpc_configurationkey
-
-TPC Configuration Key value column:
-tpc_value_singlelinetext
-
-Runtime Validation Summary
-
-DEV validation was completed for the main scenarios:
+The Confluence page documents the implemented DIA exception notification behavior, including:
+- High-level DIA ingestion and exception notification flow
+- Covered exception scenarios
 - Missing DIA file after 7 AM NZT
-- Valid DIA file happy path
-- Valid filename with plain-text / non-encrypted content
+- Invalid encrypted file content
+- Decryption failure coverage
 - Dataverse staging save failure after retry exhaustion
+- Valid DIA file happy path
+- D365 email notification behavior
+- TPC Log traceability and Regarding link
+- Confirmed Dataverse logical names used by the implementation
+- DEV validation and unit test summary
 
-The temporary DEV-only ForceDiaStagingFailure setting was used only to simulate Dataverse staging save failure without breaking D365 credentials. It was set back to false after validation, and normal processing was revalidated.
+This documentation was created to support QA/demo alignment, sprint close, and technical handover for future support after the team transition.
 
-Unit Test Summary
-
-Unit tests were updated after the Dataverse logical name fixes and validation changes.
-
-Final result:
-21/21 tests passed.
-
-Known Notes / Demo Notes
-
-For the Dataverse save failure scenario, the email body shows the original uploaded .txt.pgp file name. The error message may also show the internal decrypted/staging .txt filename generated after decryption. This is expected because the failure occurs during Dataverse staging after decryption.
-
-References
-
-Jira:
-SPESTG-480
-
-Branch:
-users/alex/SPESTG-480-dev-runtime-validation
-
-Merged PR:
-SPESTG-480 refinement PR approved and merged by Vishal
+Confluence link:
+<paste Confluence page link here>
