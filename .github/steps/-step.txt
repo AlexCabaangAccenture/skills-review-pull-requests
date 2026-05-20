@@ -1,19 +1,8 @@
-Completed the technical handover documentation for SPESTG-480 DIA exception notification flow.
+Added technical handover documentation for SPESTG-480 DIA exception notification flow.
 
-The Confluence page documents the implemented DIA exception notification behavior, including:
-- High-level DIA ingestion and exception notification flow
-- Covered exception scenarios
-- Missing DIA file after 7 AM NZT
-- Invalid encrypted file content
-- Decryption failure coverage
-- Dataverse staging save failure after retry exhaustion
-- Valid DIA file happy path
-- D365 email notification behavior
-- TPC Log traceability and Regarding link
-- Confirmed Dataverse logical names used by the implementation
-- DEV validation and unit test summary
+The Confluence page documents the implemented DIA exception notification behavior, including the high-level process flow, covered exception scenarios, D365 email notification behavior, TPC Log traceability, Dataverse logical names, DEV validation summary, and unit test result summary.
 
-This documentation was created to support QA/demo alignment, sprint close, and technical handover for future support after the team transition.
+This documentation is intended to support QA/demo alignment, sprint close, and future technical handover after the team transition.
 
 Confluence link:
 <paste Confluence page link here>
