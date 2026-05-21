@@ -1,9 +1,11 @@
-      noProxy: '.westpac.co.nz,.westpactrust.co.nz,deterraformstateuat.blob.core.windows.net'
-      clientId: $(DE_D365_client_id)
-      clientSecret: $(DE_D365_client_secret)
-      dediaSftpPrivateKey: $(DEDIASFTPPrivateKey)
+Updated the UAT and Prod pipeline sections to align with the Dev/Test parameter pattern.
 
-      noProxy: '.westpac.co.nz,.westpactrust.co.nz,deterraformstateprod.blob.core.windows.net'
-      clientId: $(DE_D365_client_id)
-      clientSecret: $(DE_D365_client_secret)
-      dediaSftpPrivateKey: $(DEDIASFTPPrivateKey)
+Added the required backend parameters for UAT and Prod:
+- noProxy
+- clientId
+- clientSecret
+- dediaSftpPrivateKey
+
+Also created the Terraform ELZ UAT Backend variable group and aligned it with the cleaned Dev/Test backend variable group pattern.
+
+Note: For UAT/Prod noProxy, I included the known Terraform backend storage host first. Runtime storage host values can be updated later once confirmed during validation.
