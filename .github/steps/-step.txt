@@ -1,6 +1,5 @@
-Review PR comments for UAT/prod pipeline enablement
-Configure UAT pipeline stage and backend settings
-Configure prod pipeline stage placeholders/settings
-Review and clean up Azure DevOps variable library usage
-Validate UAT deployment pipeline readiness
-Document Azure deployment configuration and known constraints
+Thanks Vishal and Swapna. I checked the updated AC.
+
+I’ll focus on SPESTG-1054 in this sprint. Based on the scope, my estimate is around 3 working days to complete the UAT pipeline/backend setup, prod configuration placeholders, library cleanup, validation, and documentation.
+
+I’ll continue with the PR comments first and update the Jira subtasks as I progress.
