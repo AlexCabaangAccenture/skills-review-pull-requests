@@ -1,5 +1,5 @@
 Thanks Vishal and Swapna. I checked the updated AC.
 
-I’ll focus on SPESTG-1054 in this sprint. Based on the scope, my estimate is around 3 working days to complete the UAT pipeline/backend setup, prod configuration placeholders, library cleanup, validation, and documentation.
+I’ll focus on SPESTG-1054 in this sprint. Based on the current scope, my estimate is around 4 to 5 working days, covering UAT pipeline/backend setup, prod configuration, library group creation/cleanup, validation, and documentation.
 
-I’ll continue with the PR comments first and update the Jira subtasks as I progress.
+I’ll continue addressing the PR comments first and update the Jira subtasks as I progress.
