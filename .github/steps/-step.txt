@@ -1,11 +1,18 @@
-Updated the UAT and Prod pipeline sections to align with the Dev/Test parameter pattern.
+Reviewed and cleaned up the Dev/Test backend variable groups.
 
-Added the required backend parameters for UAT and Prod:
+Removed duplicate/unused variables:
+- client_id
+- client_secret
+- DEDIASFTPPublicKey
+
+Created the backend variable groups for:
+- Terraform ELZ UAT Backend
+- Terraform ELZ Prod Backend
+
+Updated the UAT/Prod pipeline sections to include the required parameters:
 - noProxy
 - clientId
 - clientSecret
 - dediaSftpPrivateKey
 
-Also created the Terraform ELZ UAT Backend variable group and aligned it with the cleaned Dev/Test backend variable group pattern.
-
-Note: For UAT/Prod noProxy, I included the known Terraform backend storage host first. Runtime storage host values can be updated later once confirmed during validation.
+For UAT/Prod noProxy, I included the known Terraform backend storage host first. Runtime storage host values can be updated later once confirmed during validation.
