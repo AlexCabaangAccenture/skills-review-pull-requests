@@ -1,19 +1,9 @@
-  uat = {
-    subscription_id        = "72242ab6-bd88-4b5e-a233-56d5ab3157d9" # from SKYC UAT reference
-    location               = "australiaeast"
-    email_domain_name      = "westpac.co.nz"
-    app_short_name         = "d365cn"
-    subnet_name            = "uat_private"
-    virtual_network        = "syd-customer-uat-d365cn-vnet"
-    network_resource_group = "t2-syd-d365cn-uat-nrg"
-  }
+      noProxy: '.westpac.co.nz,.westpactrust.co.nz,deterraformstateuat.blob.core.windows.net'
+      clientId: $(DE_D365_client_id)
+      clientSecret: $(DE_D365_client_secret)
+      dediaSftpPrivateKey: $(DEDIASFTPPrivateKey)
 
-  prod = {
-    subscription_id        = "995b8de5-5c5e-49ab-b22e-adcf444ab513" # from SKYC Prod reference
-    location               = "australiaeast"
-    email_domain_name      = "westpac.co.nz"
-    app_short_name         = "d365cn"
-    subnet_name            = "prod_private"
-    virtual_network        = "syd-customer-prod-d365cn-vnet"
-    network_resource_group = "t2-syd-d365cn-prod-nrg"
-  }
+      noProxy: '.westpac.co.nz,.westpactrust.co.nz,deterraformstateprod.blob.core.windows.net'
+      clientId: $(DE_D365_client_id)
+      clientSecret: $(DE_D365_client_secret)
+      dediaSftpPrivateKey: $(DEDIASFTPPrivateKey)
