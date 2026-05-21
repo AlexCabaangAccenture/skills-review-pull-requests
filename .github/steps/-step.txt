@@ -1,18 +1,14 @@
-Reviewed and cleaned up the Dev/Test backend variable groups.
+Hi Vishal and Swapna, quick update on SPESTG-1054.
 
-Removed duplicate/unused variables:
-- client_id
-- client_secret
-- DEDIASFTPPublicKey
+I have addressed and resolved the PR comments for the UAT/Prod pipeline enablement PR.
 
-Created the backend variable groups for:
-- Terraform ELZ UAT Backend
-- Terraform ELZ Prod Backend
+Completed so far:
+- Added UAT and Prod configuration in global_variables/main.tf using the SKYC reference values.
+- Cleaned up duplicate/unused variables from the Dev/Test backend variable groups.
+- Created Terraform ELZ UAT Backend and Terraform ELZ Prod Backend variable groups.
+- Updated the UAT/Prod pipeline sections with the required backend parameters.
 
-Updated the UAT/Prod pipeline sections to include the required parameters:
-- noProxy
-- clientId
-- clientSecret
-- dediaSftpPrivateKey
+PR link:
+<paste PR link here>
 
-For UAT/Prod noProxy, I included the known Terraform backend storage host first. Runtime storage host values can be updated later once confirmed during validation.
+One item to confirm next is the UAT/Prod service connection access. I can currently see only Azure ELZ DE Dev and Azure ELZ DE Test from my side.
