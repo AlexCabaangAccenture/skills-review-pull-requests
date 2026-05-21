@@ -1,5 +1,19 @@
-Thanks Vishal and Swapna. I checked the updated AC.
+  uat = {
+    subscription_id        = "72242ab6-bd88-4b5e-a233-56d5ab3157d9" # from SKYC UAT reference
+    location               = "australiaeast"
+    email_domain_name      = "westpac.co.nz"
+    app_short_name         = "d365cn"
+    subnet_name            = "uat_private"
+    virtual_network        = "syd-customer-uat-d365cn-vnet"
+    network_resource_group = "t2-syd-d365cn-uat-nrg"
+  }
 
-I’ll focus on SPESTG-1054 in this sprint. Based on the current scope, my estimate is around 4 to 5 working days, covering UAT pipeline/backend setup, prod configuration, library group creation/cleanup, validation, and documentation.
-
-I’ll continue addressing the PR comments first and update the Jira subtasks as I progress.
+  prod = {
+    subscription_id        = "995b8de5-5c5e-49ab-b22e-adcf444ab513" # from SKYC Prod reference
+    location               = "australiaeast"
+    email_domain_name      = "westpac.co.nz"
+    app_short_name         = "d365cn"
+    subnet_name            = "prod_private"
+    virtual_network        = "syd-customer-prod-d365cn-vnet"
+    network_resource_group = "t2-syd-d365cn-prod-nrg"
+  }
