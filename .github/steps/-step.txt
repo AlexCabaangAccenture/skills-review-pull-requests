@@ -1,5 +1,11 @@
-tried creating the Azure DevOps environment as uat, matching the SimpleKYC naming pattern, but I’m getting an access denied message.
+Fix Test bootstrap environment value
 
-It says I need Create permissions to create the environment.
+Updated the Test stage environment value in terraform-bootstrap-pipeline.yaml from ICECowboysTestD365 to test so the shared backend bootstrap template can parse the pipeline correctly.
 
-Can you please create the uat environment or grant me the required permission to create it?
+This is required before rerunning the backend/storage pipeline from Develop through the proper Test → UAT flow.
+
+--------------------
+
+I cancelled the run and created a small follow-up PR to fix the existing Test environment value in the bootstrap pipeline so it can parse correctly from Develop.
+
+After this is merged, I’ll rerun the backend/storage pipeline through the proper Test → UAT flow.
