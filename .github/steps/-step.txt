@@ -1,59 +1,58 @@
-echo ===== Branch / current location =====
-git branch --show-current
-cd
+CreateEmailAsync
 
-echo.
-echo ===== RecipientConfigKey references =====
-findstr /S /N /I /C:"RecipientConfigKey" *.cs
+ActivityParty
 
-echo.
-echo ===== SenderConfigKey references =====
-findstr /S /N /I /C:"SenderConfigKey" *.cs
+RecipientConfigKey
 
-echo.
-echo ===== DIAErrorEmailRecipients references =====
-findstr /S /N /I /C:"DIAErrorEmailRecipients" *.cs
+SenderConfigKey
 
-echo.
-echo ===== DIAErrorEmailSender references =====
-findstr /S /N /I /C:"DIAErrorEmailSender" *.cs
+DIAErrorEmailRecipients
 
-echo.
-echo ===== CreateEmailAsync references =====
-findstr /S /N /I /C:"CreateEmailAsync" *.cs
+DIAErrorEmailSender
 
-echo.
-echo ===== ActivityParty references =====
-findstr /S /N /I /C:"ActivityParty" *.cs
+collections
 
-echo.
-echo ===== CC references =====
-findstr /S /N /I /C:"cc" *.cs
+collections_leaders
 
-echo.
-echo ===== BCC references =====
-findstr /S /N /I /C:"bcc" *.cs
+tech
 
-echo.
-echo ===== collections_leaders references =====
-findstr /S /N /I /C:"collections_leaders" *.cs
+cc
 
-echo.
-echo ===== collections references =====
-findstr /S /N /I /C:"collections" *.cs
+bcc
 
-echo.
-echo ===== tech references =====
-findstr /S /N /I /C:"tech" *.cs
+to
 
-echo.
-echo ===== notification email references =====
-findstr /S /N /I /C:"notification email" *.cs
+from
 
-echo.
-echo ===== DIAError references =====
-findstr /S /N /I /C:"DIAError" *.cs
+regardingobjectid
 
-echo.
-echo ===== Dataverse TPC references =====
-findstr /S /N /I /C:"tpc_configurationkey" /C:"tpc_configurationkeies" /C:"tpc_value_singlelinetext" /C:"tpc_Value_SingleLineText" /C:"tpc_log" /C:"tpc_logs" *.cs
+email_activity_parties
+
+SendEmailAsync
+
+CreateRecipientParty
+
+CreateSenderParty
+
+DIA notification email
+
+notification email
+
+ErrorEmailSubject
+
+ErrorEmailBody
+
+ErrorEmailRecipients
+
+ErrorEmailSender
+
+===================================================
+
+CreateEmailAsync
+ActivityParty
+cc
+bcc
+RecipientConfigKey
+SenderConfigKey
+DIAErrorEmailRecipients
+DIAErrorEmailSender
