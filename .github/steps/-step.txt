@@ -1,10 +1,117 @@
-Hi Vishal, noted. The YAML changes are already pushed in the existing PR.
 
-I checked the PR using All Changes view, and it includes the latest updates for:
-- base-environment-pipeline.yaml
-- terraform-bootstrap-pipeline.yaml
-- global_variables/main.tf
+echo "===== Branch / current location ====="
+git branch --show-current
+pwd
 
-I also aligned the UAT/Prod bootstrap subnetName values to private based on the SKYC reference.
+echo ""
+echo "===== RecipientConfigKey references ====="
+grep -RIn --include="*.cs" "RecipientConfigKey" .
 
-Please review when available.
+echo ""
+echo "===== SenderConfigKey references ====="
+grep -RIn --include="*.cs" "SenderConfigKey" .
+
+echo ""
+echo "===== DIAErrorEmailRecipients references ====="
+grep -RIn --include="*.cs" "DIAErrorEmailRecipients" .
+
+echo ""
+echo "===== DIAErrorEmailSender references ====="
+grep -RIn --include="*.cs" "DIAErrorEmailSender" .
+
+echo ""
+echo "===== CreateEmailAsync references ====="
+grep -RIn --include="*.cs" "CreateEmailAsync" .
+
+echo ""
+echo "===== ActivityParty references ====="
+grep -RIn --include="*.cs" "ActivityParty" .
+
+echo ""
+echo "===== CC references ====="
+grep -RIn --include="*.cs" -i "cc" .
+
+echo ""
+echo "===== BCC references ====="
+grep -RIn --include="*.cs" -i "bcc" .
+
+echo ""
+echo "===== collections_leaders references ====="
+grep -RIn --include="*.cs" -i "collections_leaders" .
+
+echo ""
+echo "===== collections references ====="
+grep -RIn --include="*.cs" -i "collections" .
+
+echo ""
+echo "===== tech team references ====="
+grep -RIn --include="*.cs" -i "tech" .
+
+echo ""
+echo "===== notification email references ====="
+grep -RIn --include="*.cs" -i "notification email" .
+
+echo ""
+echo "===== DIAError references ====="
+grep -RIn --include="*.cs" -i "DIAError" .
+
+echo ""
+echo "===== Email field references ====="
+grep -RIn --include="*.cs" -E "\"to\"|\"cc\"|\"bcc\"|\"from\"|\"subject\"|\"description\"|\"regardingobjectid\"" .
+
+echo ""
+echo "===== TPC Configuration Key references ====="
+grep -RIn --include="*.cs" -E "tpc_configurationkey|tpc_configurationkeies|tpc_value_singlelinetext|tpc_Value_SingleLineText|tpc_name" .
+
+echo ""
+echo "===== TPC Log references ====="
+grep -RIn --include="*.cs" -E "tpc_log|tpc_logs|tpc_name|tpc_emailcreated|tpc_formattedmessage|tpc_processname|tpc_logtype" .
+
+=======================================
+
+{
+echo "===== Branch / current location ====="
+git branch --show-current
+pwd
+
+echo ""
+echo "===== RecipientConfigKey references ====="
+grep -RIn --include="*.cs" "RecipientConfigKey" .
+
+echo ""
+echo "===== SenderConfigKey references ====="
+grep -RIn --include="*.cs" "SenderConfigKey" .
+
+echo ""
+echo "===== DIAErrorEmailRecipients references ====="
+grep -RIn --include="*.cs" "DIAErrorEmailRecipients" .
+
+echo ""
+echo "===== DIAErrorEmailSender references ====="
+grep -RIn --include="*.cs" "DIAErrorEmailSender" .
+
+echo ""
+echo "===== CreateEmailAsync references ====="
+grep -RIn --include="*.cs" "CreateEmailAsync" .
+
+echo ""
+echo "===== ActivityParty references ====="
+grep -RIn --include="*.cs" "ActivityParty" .
+
+echo ""
+echo "===== CC/BCC references ====="
+grep -RIn --include="*.cs" -i -E "cc|bcc" .
+
+echo ""
+echo "===== collections / tech / DIAError references ====="
+grep -RIn --include="*.cs" -i -E "collections_leaders|collections|tech|DIAError|notification email" .
+
+echo ""
+echo "===== Email field references ====="
+grep -RIn --include="*.cs" -E "\"to\"|\"cc\"|\"bcc\"|\"from\"|\"subject\"|\"description\"|\"regardingobjectid\"" .
+
+echo ""
+echo "===== Dataverse TPC references ====="
+grep -RIn --include="*.cs" -E "tpc_configurationkey|tpc_configurationkeies|tpc_value_singlelinetext|tpc_Value_SingleLineText|tpc_log|tpc_logs" .
+} | tee spestg480-recipient-verification-search.txt
+
