@@ -1,58 +1,9 @@
-CreateEmailAsync
+Hi Vishal, noted.
 
-ActivityParty
+I’ll prepare/share the 3 UAT pipeline releases separately:
 
-RecipientConfigKey
+1. Terraform backend/storage
+2. Terraform infra/resources
+3. Function App deployment
 
-SenderConfigKey
-
-DIAErrorEmailRecipients
-
-DIAErrorEmailSender
-
-collections
-
-collections_leaders
-
-tech
-
-cc
-
-bcc
-
-to
-
-from
-
-regardingobjectid
-
-email_activity_parties
-
-SendEmailAsync
-
-CreateRecipientParty
-
-CreateSenderParty
-
-DIA notification email
-
-notification email
-
-ErrorEmailSubject
-
-ErrorEmailBody
-
-ErrorEmailRecipients
-
-ErrorEmailSender
-
-===================================================
-
-CreateEmailAsync
-ActivityParty
-cc
-bcc
-RecipientConfigKey
-SenderConfigKey
-DIAErrorEmailRecipients
-DIAErrorEmailSender
+Just to confirm, for “seek approval for UAT”, should I request the approval through the Azure DevOps UAT environment approval flow once the pipelines are queued, or is there a specific approver/group I should coordinate with first?
