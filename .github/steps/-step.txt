@@ -1,9 +1,5 @@
-Hi Vishal, noted.
+Hi Vishal, I checked Pipelines > Environments and I don’t see a UAT environment currently.
 
-I’ll prepare/share the 3 UAT pipeline releases separately:
+I can see dev, test, Preprod, and Prod, but not UAT.
 
-1. Terraform backend/storage
-2. Terraform infra/resources
-3. Function App deployment
-
-Just to confirm, for “seek approval for UAT”, should I request the approval through the Azure DevOps UAT environment approval flow once the pipelines are queued, or is there a specific approver/group I should coordinate with first?
+Can you confirm the exact Azure DevOps environment name to use for UAT, or should I create a new one as UAT?
