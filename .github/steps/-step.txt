@@ -1,5 +1,5 @@
-Hi Vishal, I checked Pipelines > Environments and I don’t see a UAT environment currently.
+tried creating the Azure DevOps environment as uat, matching the SimpleKYC naming pattern, but I’m getting an access denied message.
 
-I can see dev, test, Preprod, and Prod, but not UAT.
+It says I need Create permissions to create the environment.
 
-Can you confirm the exact Azure DevOps environment name to use for UAT, or should I create a new one as UAT?
+Can you please create the uat environment or grant me the required permission to create it?
