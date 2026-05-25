@@ -1,5 +1,6 @@
-Fix Test bootstrap environment value
+Hi Vishal, I created a small follow-up PR for the bootstrap pipeline parse issue we hit earlier.
 
-Updated the Test stage environment value in terraform-bootstrap-pipeline.yaml from ICECowboysTestD365 to test.
+The existing Test stage had environment set to ICECowboysTestD365, which the shared backend bootstrap template does not accept. I updated it to test so the pipeline can load properly from Develop and follow the Test → UAT flow.
 
-This fixes the YAML parse issue from the shared backend bootstrap template and allows the backend/storage pipeline to run from Develop through the proper Test → UAT flow.
+PR is ready for review. If okay, please approve/merge or override as needed so I can rerun the backend/storage pipeline from Develop.
+
