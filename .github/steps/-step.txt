@@ -1,6 +1,5 @@
-
 Tribe/Squad/Team: Estate Management / ICE Cowboys
 
 Role being undertaken: Developer supporting SPESTG-1054 UAT deployment validation.
 
-Reason for access: Reader access is required to view the t3_d365connect_uat Azure subscription and validate UAT resources created by the deployment pipelines. This access is needed to confirm resource creation, deployment status, and support troubleshooting during UAT pipeline execution. Read-only access only; no deployment or delete permission required.
+Reason for access: Operator access is required to support SPESTG-1054 UAT deployment validation and pipeline troubleshooting for the t3_d365connect_uat Azure subscription. This access is needed to validate UAT resources, check deployment-related configuration, and support environment-level verification after pipeline execution. No delete permission is required.
