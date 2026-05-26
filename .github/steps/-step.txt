@@ -1,5 +1,4 @@
-Tribe/Squad/Team: Estate Management / ICE Cowboys
-
-Role being undertaken: Developer supporting SPESTG-1054 UAT deployment validation.
-
-Reason for access: Operator access is required to support SPESTG-1054 UAT deployment validation and pipeline troubleshooting for the t3_d365connect_uat Azure subscription. This access is needed to validate UAT resources, check deployment-related configuration, and support environment-level verification after pipeline execution. No delete permission is required.
+    noProxy: '<copy exact full Dev noProxy value here>'
+    clientId: $(DE_D365_client_id)
+    clientSecret: $(DE_D365_client_secret)
+    dediaSftpPrivateKey: $(DEDIASFTPPrivateKey)
