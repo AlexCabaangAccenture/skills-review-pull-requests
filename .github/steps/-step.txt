@@ -1,3 +1,5 @@
-  clientId: ${{ parameters.clientId }}
-    clientSecret: ${{ parameters.clientSecret }}
-    dediaSftpPrivateKey: ${{ parameters.dediaSftpPrivateKey }}
+ Hi Vishal, I found the YAML template parameter issue in the base environment pipeline and pushed a fix branch.
+
+The Run screen now parses correctly. To avoid another back-and-forth after PR merge, I’m thinking to run the fix branch only up to the plan/manual validation step, without approving apply, just to confirm the pipeline reaches plan successfully.
+
+If you prefer, I can skip the temporary validation and proceed directly with PR approval/merge first, then run from Develop.
