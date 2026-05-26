@@ -1,4 +1,3 @@
-    noProxy: '<copy exact full Dev noProxy value here>'
-    clientId: $(DE_D365_client_id)
-    clientSecret: $(DE_D365_client_secret)
-    dediaSftpPrivateKey: $(DEDIASFTPPrivateKey)
+  clientId: ${{ parameters.clientId }}
+    clientSecret: ${{ parameters.clientSecret }}
+    dediaSftpPrivateKey: ${{ parameters.dediaSftpPrivateKey }}
