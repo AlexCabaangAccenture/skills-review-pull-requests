@@ -1,24 +1,33 @@
+steps:
+- task: PowerShell@2
+  displayName: Validate proxy parameters
+  inputs:
+    targetType: 'inline'
+    script: |
+      $pipelineNoProxy = "$env:PIPELINE_NO_PROXY"
+      $functionNoProxy = "$env:FUNCTION_NO_PROXY"
 
-SPESTG-1054 Fix Terraform backend key handling for UAT deployment
+      if ([string]::IsNullOrWhiteSpace($pipelineNoProxy)) {
+        throw "Pipeline noProxy parameter is empty. Check PipelineNoProxy variable in the selected backend variable group."
+      }
 
-Summary:
-Updated the Terraform pipeline templates to pass BackendKey explicitly through the pipeline/template chain instead of relying on the hardcoded backend key from main.tf.
+      if ($pipelineNoProxy -like '$(*') {
+        throw "Pipeline noProxy parameter was not resolved. Check that PipelineNoProxy exists in the selected backend variable group."
+      }
 
-Changes:
-- Added backendKey parameter passing from base-environment-pipeline.yaml to the Terraform stage/build templates.
-- Updated terraform-build.yml and terraform-apply.yml to use the passed backendKey value for terraform init.
-- Removed the legacy backend key override behavior that was causing the pipeline to fall back to the Dev backend key.
-- Added UAT environment configuration file for base_environment/env/uat.yaml.
-- Validated Build + UAT plan path successfully.
+      if ([string]::IsNullOrWhiteSpace($functionNoProxy)) {
+        throw "FunctionNoProxy parameter is empty. Check FunctionNoProxy variable in the selected backend variable group."
+      }
 
-Validation:
-- Confirmed UAT terraform init now uses:
-  backend-config-key=intinfra_de_uat
-- Confirmed UAT backend storage account points to the UAT backend storage.
-- Confirmed UAT plan reaches approval successfully with expected new-resource plan:
-  35 to add, 0 to change, 0 to destroy
-- Dev/Test backend key routing was also checked separately to confirm environment-specific backend key usage.
+      if ($functionNoProxy -like '$(*') {
+        throw "FunctionNoProxy parameter was not resolved. Check that FunctionNoProxy exists in the selected backend variable group."
+      }
 
-Notes:
-- This PR is focused on fixing backend state/key handling for UAT pipeline readiness.
-- Dataverse app settings and any further noProxy parameter cleanup can be handled separately after the UAT infra deployment path is stable.
+      Write-Host "Proxy parameters provided."
+  env:
+    PIPELINE_NO_PROXY: ${{ parameters.noProxy }}
+    FUNCTION_NO_PROXY: ${{ parameters.functionNoProxy }}
+
+- template: ../proxy-configure.yml
+  parameters:
+    noProxy: ${{ parameters.noProxy }}
