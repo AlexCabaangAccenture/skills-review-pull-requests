@@ -1,5 +1,19 @@
- Hi Vishal, I found the YAML template parameter issue in the base environment pipeline and pushed a fix branch.
+$backendKeyFromVariableGroup = "$(BackendKey)"
 
-The Run screen now parses correctly. To avoid another back-and-forth after PR merge, I’m thinking to run the fix branch only up to the plan/manual validation step, without approving apply, just to confirm the pipeline reaches plan successfully.
+if (![string]::IsNullOrWhiteSpace($backendKeyFromVariableGroup) -and $backendKeyFromVariableGroup -ne '$(BackendKey)') {
+    $value = $backendKeyFromVariableGroup
+    Write-Host "Using BackendKey from variable group: '${value}'"
+} else {
+    Write-Host "BackendKey variable not provided. Searching $((Get-Location).Path)\main.tf for backend configuration"
+    [string]$line = Select-String -Path "main.tf" -Pattern '^\s*key.*=.*$' -List
 
-If you prefer, I can skip the temporary validation and proceed directly with PR approval/merge first, then run from Develop.
+    if ($line) {
+        $var = $line.Split('=', 2).Trim()
+        $value = $var[1]
+        $value = $value.Replace('"', '')
+    }
+
+    Write-Host "Using BackendKey from main.tf fallback: '${value}'"
+}
+
+Write-Host ("##vso[task.setvariable variable=BackendKey]${value}")
