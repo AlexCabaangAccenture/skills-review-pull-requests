@@ -1,8 +1,37 @@
-blobServiceUrl: $(BlobServiceUrl)
-dataverseTenantId: $(DataverseTenantId)
-dataverseUrl: $(DataverseUrl)
-functionNoProxy: $(FunctionNoProxy)
-noProxy: $(PipelineNoProxy)
-clientId: $(DE_D365_client_id)
-clientSecret: $(DE_D365_client_secret)
-dediaSftpPrivateKey: $(DEDIASFTPPrivateKey)
+Configured the UAT pipeline stage and backend settings.
+
+Updates completed:
+- Added UAT environment configuration.
+- Added UAT backend variable group usage.
+- Fixed backend key handling so the pipeline uses the Library BackendKey instead of falling back to the hardcoded main.tf backend key.
+- Confirmed UAT backend/state routing through Terraform init.
+
+Validated up to Terraform plan using the UAT backend/state. Ready to close this subtask.
+
+
+Configured the Prod pipeline stage placeholders/settings.
+
+Updates completed:
+- Added Prod stage configuration placeholder using the same pipeline/template pattern as the other environments.
+- Confirmed the Prod block is structurally aligned with the UAT/Test/Dev stage configuration.
+- Prod execution is not part of the current UAT deployment run and will remain controlled separately.
+
+Ready to close this subtask.
+
+
+
+Validated UAT deployment pipeline readiness.
+
+Updates completed:
+- Tested updated pipeline path across Dev/Test up to Terraform plan.
+- Repointed final configuration back to UAT.
+- Confirmed UAT build and Terraform plan pass using the correct UAT backend/state.
+- Added Library-based Dataverse/blob/proxy variable wiring.
+- Added proxy validation so the pipeline fails early if required proxy values are missing or unresolved.
+
+Actual UAT deployment execution will continue under the separate execution subtask.
+
+
+Starting UAT deployment execution.
+
+The base environment pipeline readiness validation is complete and the PR has been updated for review. Once approved and merged, I will execute the UAT deployment from the standard DEDIAAutomationDevelop path and validate the deployment result.
