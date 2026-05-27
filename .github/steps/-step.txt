@@ -1,33 +1,8 @@
-steps:
-- task: PowerShell@2
-  displayName: Validate proxy parameters
-  inputs:
-    targetType: 'inline'
-    script: |
-      $pipelineNoProxy = "$env:PIPELINE_NO_PROXY"
-      $functionNoProxy = "$env:FUNCTION_NO_PROXY"
-
-      if ([string]::IsNullOrWhiteSpace($pipelineNoProxy)) {
-        throw "Pipeline noProxy parameter is empty. Check PipelineNoProxy variable in the selected backend variable group."
-      }
-
-      if ($pipelineNoProxy -like '$(*') {
-        throw "Pipeline noProxy parameter was not resolved. Check that PipelineNoProxy exists in the selected backend variable group."
-      }
-
-      if ([string]::IsNullOrWhiteSpace($functionNoProxy)) {
-        throw "FunctionNoProxy parameter is empty. Check FunctionNoProxy variable in the selected backend variable group."
-      }
-
-      if ($functionNoProxy -like '$(*') {
-        throw "FunctionNoProxy parameter was not resolved. Check that FunctionNoProxy exists in the selected backend variable group."
-      }
-
-      Write-Host "Proxy parameters provided."
-  env:
-    PIPELINE_NO_PROXY: ${{ parameters.noProxy }}
-    FUNCTION_NO_PROXY: ${{ parameters.functionNoProxy }}
-
-- template: ../proxy-configure.yml
-  parameters:
-    noProxy: ${{ parameters.noProxy }}
+blobServiceUrl: $(BlobServiceUrl)
+dataverseTenantId: $(DataverseTenantId)
+dataverseUrl: $(DataverseUrl)
+functionNoProxy: $(FunctionNoProxy)
+noProxy: $(PipelineNoProxy)
+clientId: $(DE_D365_client_id)
+clientSecret: $(DE_D365_client_secret)
+dediaSftpPrivateKey: $(DEDIASFTPPrivateKey)
