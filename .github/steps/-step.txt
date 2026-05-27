@@ -1,7 +1,24 @@
-$backendKeyFromVariableGroup = "$(BackendKey)"
 
-if ([string]::IsNullOrWhiteSpace($backendKeyFromVariableGroup) -or $backendKeyFromVariableGroup -eq '$(BackendKey)') {
-    $backendKeyFromVariableGroup = $env:BACKENDKEY
-}
+SPESTG-1054 Fix Terraform backend key handling for UAT deployment
 
-Using BackendKey from variable group: 'intinfra_de_uat'
+Summary:
+Updated the Terraform pipeline templates to pass BackendKey explicitly through the pipeline/template chain instead of relying on the hardcoded backend key from main.tf.
+
+Changes:
+- Added backendKey parameter passing from base-environment-pipeline.yaml to the Terraform stage/build templates.
+- Updated terraform-build.yml and terraform-apply.yml to use the passed backendKey value for terraform init.
+- Removed the legacy backend key override behavior that was causing the pipeline to fall back to the Dev backend key.
+- Added UAT environment configuration file for base_environment/env/uat.yaml.
+- Validated Build + UAT plan path successfully.
+
+Validation:
+- Confirmed UAT terraform init now uses:
+  backend-config-key=intinfra_de_uat
+- Confirmed UAT backend storage account points to the UAT backend storage.
+- Confirmed UAT plan reaches approval successfully with expected new-resource plan:
+  35 to add, 0 to change, 0 to destroy
+- Dev/Test backend key routing was also checked separately to confirm environment-specific backend key usage.
+
+Notes:
+- This PR is focused on fixing backend state/key handling for UAT pipeline readiness.
+- Dataverse app settings and any further noProxy parameter cleanup can be handled separately after the UAT infra deployment path is stable.
