@@ -1,22 +1,7 @@
 $backendKeyFromVariableGroup = "$(BackendKey)"
 
-if (![string]::IsNullOrWhiteSpace($backendKeyFromVariableGroup) -and $backendKeyFromVariableGroup -ne '$(BackendKey)') {
-    $value = $backendKeyFromVariableGroup
-    Write-Host "Using BackendKey from variable group: '${value}'"
-} else {
-    Write-Host "BackendKey variable not provided. Searching $((Get-Location).Path)\main.tf for backend configuration"
-    [string]$line = Select-String -Path "main.tf" -Pattern '^\s*key.*=.*$' -List
-
-    if ($line) {
-        $var = $line.Split('=', 2).Trim()
-        $value = $var[1]
-        $value = $value.Replace('"', '')
-    }
-
-    Write-Host "Using BackendKey from main.tf fallback: '${value}'"
+if ([string]::IsNullOrWhiteSpace($backendKeyFromVariableGroup) -or $backendKeyFromVariableGroup -eq '$(BackendKey)') {
+    $backendKeyFromVariableGroup = $env:BACKENDKEY
 }
 
-Write-Host ("##vso[task.setvariable variable=BackendKey]${value}")
-
-
-Use variable group BackendKey in apply template
+Using BackendKey from variable group: 'intinfra_de_uat'
