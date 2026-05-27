@@ -17,3 +17,6 @@ if (![string]::IsNullOrWhiteSpace($backendKeyFromVariableGroup) -and $backendKey
 }
 
 Write-Host ("##vso[task.setvariable variable=BackendKey]${value}")
+
+
+Use variable group BackendKey in apply template
