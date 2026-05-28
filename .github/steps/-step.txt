@@ -1,1 +1,11 @@
-.westpac.co.nz,.westpactrust.co.nz,deterraformstateuat.blob.core.windows.net,wfwcoterraformstateuat.blob.core.windows.net,sad365cnuatz2817.blob.core.windows.net,sad365cnuatz2817.file.core.windows.net,sad365cnuatz2817.queue.core.windows.net,sad365cnuatz2817.table.core.windows.net,kv-deceasedestate-uat.vault.azure.net,kv-deceasedestate-uat.privatelink.vaultcore.azure.net
+SPESTG-1054 Parameterize function content file share name
+
+This PR fixes the UAT Terraform apply failure caused by the Function App content file share name being hardcoded to the Dev value.
+
+Changes:
+- Replaced hardcoded d365cn-dev-shr in main.tf with local.env.function_content_share_name
+- Added function_content_share_name to dev/test/uat/prod environment YAML files
+- Preserved existing Dev value and added environment-specific values for Test, UAT, and Prod
+
+Reason:
+The UAT apply was failing when checking/creating the storage file share because Terraform was still using the Dev share name d365cn-dev-shr.
