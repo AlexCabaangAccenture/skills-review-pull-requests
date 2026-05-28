@@ -1,7 +1,16 @@
-Terraform infra
-UAT release Status: Completed
-Comment: UAT Terraform infra pipeline completed successfully. Backend/state handling was validated and UAT stage passed.
+SPESTG-480 Deploy DIA Function App exception handling updates
 
-Azure resources
-UAT release Status: Completed
-Comment: UAT Azure resources were deployed successfully after resolving PipelineNoProxy configuration and environment-specific file share name issue.
+
+This PR contains the DIA Function App updates validated in Dev for SPESTG-480.
+
+Changes include:
+- DIA exception handling and notification flow updates
+- TPC Log / Dataverse notification fixes validated during Dev runtime testing
+- DIA file validation handling updates
+- Unit coverage for DIA exception email subject mapping
+- Removed temporary DEV-only forced staging failure validation code before PR
+
+Validation:
+- Test Explorer run completed successfully
+- Temporary ForceDiaStagingFailure logic removed
+- Dev Function App runtime validation confirmed after required app settings were corrected
