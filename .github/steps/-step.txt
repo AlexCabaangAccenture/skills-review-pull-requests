@@ -1,26 +1,43 @@
-module "function_app_sites_private_endpoint" {
-  source  = "terraform.westpac.co.nz/WNZL/module-network-privateendpoint/azurerm"
-  version = "~> 1"
+SPESTG-1054 Add Function App private endpoint and runtime settings
 
-  name                = "${local.env.function_app_name}-pe"
-  resource_group_name = local.env.resource_group_name
-  location            = module.global_variables.azure.location
-  resource_id         = azurerm_windows_function_app.function_app.id
-  subnet_id           = data.azurerm_subnet.private_endpoint.id
-  subresource_names   = ["sites"]
-  tags                = local.tags
-}
+Summary:
+- Added Function App sites private endpoint pattern based on the SQYC reference.
+- Added DNS wait for Function App privatelink.azurewebsites.net.
+- Added required Function App runtime blob settings:
+  - BLOB_CONTAINER_NAME
+  - BLOB_SERVICE_URL
+- Kept NO_PROXY and removed unnecessary HTTP/HTTPS proxy app settings if present.
 
-module "wait_for_function_app_dns_sites_reg" {
-  depends_on        = [module.function_app_sites_private_endpoint]
-  source            = "terraform.westpac.co.nz/WNZL/module-network-privateendpoint/azurerm//wait_for_dns_registration"
-  version           = "~> 1"
-  fqdn              = "${local.env.function_app_name}.privatelink.azurewebsites.net"
-  shell_interpreter = "powershell"
-}
+Validation:
+- Validated infra deployment from branch.
+- Test Function App private endpoint and DNS records were created successfully.
+- Function App deployment to Dev and Test now works after the infra fix.
 
+---------------------
 
-SPESTG-1054 Add Function App sites private endpoint
-git add base_environment/main.tf
-git commit -m "SPESTG-1054 Add Function App sites private endpoint"
-git push -u origin users/alex/SPESTG-1054-add-functionapp-sites-pe
+users/alex/SPESTG-480-dev-runtime-validation
+
+Summary:
+- Added staged Function App deployment pipeline flow.
+- Build runs once, then deployment proceeds sequentially:
+  - Dev
+  - Test
+  - UAT
+- Added dependsOn support in the Function App deploy template.
+- Removed temporary DEV-only forced staging failure validation code.
+
+Validation:
+- Function App pipeline tested from branch.
+- Build passed.
+- Dev deployment passed.
+- Test deployment passed after infra private endpoint fix.
+
+--------------------------  
+
+Vishal Kumar, both branch validations are now passing for Dev and Test.
+
+I’ll create two separate PRs now:
+1. Infra PR for the Function App sites private endpoint and runtime app settings.
+2. Function App PR for the staged deployment pipeline and code updates.
+
+After approval and merge, I’ll rerun both from DEDIAAutomationDevelop and validate through UAT.
