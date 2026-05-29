@@ -1,16 +1,21 @@
-SPESTG-480 Deploy DIA Function App exception handling updates
+SPESTG-1054 Run infra deployment stages sequentially
+
+This PR updates the base environment deployment pipeline so infra stages run sequentially instead of in parallel.
+
+Change:
+- Dev depends on Build
+- Test depends on Dev
+- UAT depends on Test
+- Prod depends on UAT
+
+Purpose:
+Ensure each environment completes before the next environment starts, based on the requested deployment flow.
 
 
-This PR contains the DIA Function App updates validated in Dev for SPESTG-480.
+Vishal Kumar, I created the follow-up PR for the infra pipeline sequencing.
 
-Changes include:
-- DIA exception handling and notification flow updates
-- TPC Log / Dataverse notification fixes validated during Dev runtime testing
-- DIA file validation handling updates
-- Unit coverage for DIA exception email subject mapping
-- Removed temporary DEV-only forced staging failure validation code before PR
+This updates the base environment deployment pipeline so the stages run sequentially instead of in parallel:
 
-Validation:
-- Test Explorer run completed successfully
-- Temporary ForceDiaStagingFailure logic removed
-- Dev Function App runtime validation confirmed after required app settings were corrected
+Build to Dev to Test to UAT to Prod
+
+This is separate from the Function App code deployment PR.
