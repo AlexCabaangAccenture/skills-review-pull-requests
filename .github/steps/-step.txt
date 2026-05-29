@@ -1,15 +1,4 @@
-Vishal Kumar, I created the two PRs for review.
 
-1. Infra PR
+UAT Azure resources deployment completed successfully. Latest infra updates included the Function App sites private endpoint/DNS setup and required runtime app settings for blob configuration. Dev and Test validation passed, and UAT resources were provisioned successfully.
 
-   <infra PR link>
-
-This includes the fix for the Function App deployment issue we encountered in Test. The deployment was timing out at the SCM/Kudu endpoint, so I added the Function App sites private endpoint pattern based on the SQYC reference, including the required DNS handling. I also included the runtime blob app settings cleanup needed by the Function App.
-
-2. Function App PR
-
-   <function app PR link>
-
-This includes the Function App deployment pipeline staging fix. The pipeline now follows the staged flow and supports the dependency sequence properly so deployment can proceed Dev to Test to UAT.
-
-I already validated both branches up to Dev and Test, and both are now working. Once these are approved and merged, I’ll rerun from DEDIAAutomationDevelop and validate up to UAT.
+Function App code deployment pipeline completed successfully through Dev, Test, and UAT using the staged deployment flow. Deployment blocker was resolved after adding the Function App SCM/Kudu private endpoint and DNS configuration in infra.
