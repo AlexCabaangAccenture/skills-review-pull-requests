@@ -1,21 +1,45 @@
-SPESTG-1054 Run infra deployment stages sequentially
+trigger: none
 
-This PR updates the base environment deployment pipeline so infra stages run sequentially instead of in parallel.
+pool:
+  name: Default
+  demands:
+  - msbuild
+  - visualstudio
 
-Change:
-- Dev depends on Build
-- Test depends on Dev
-- UAT depends on Test
-- Prod depends on UAT
+stages:
+- template: azure-function-build.yml
+  parameters:
+    azureServiceConnection: 'Azure ELZ DE Dev'
+    backendVariableGroup: 'Terraform ELZ Dev Backend'
+    buildSolution: 'src/WNZL.ICOW.DeceasedEstates.IntServices/*.sln'
+    publishProjects: 'src/WNZL.ICOW.DeceasedEstates.IntServices/WNZL.ICOW.DeceasedEstates.AzureFunctions/*.csproj'
 
-Purpose:
-Ensure each environment completes before the next environment starts, based on the requested deployment flow.
+- template: azure-function-deploy.yml
+  parameters:
+    workspace: 'dev'
+    dependsOn: [Build]
+    azureServiceConnection: 'Azure ELZ DE Dev'
+    backendVariableGroup: 'Terraform ELZ Dev Backend'
+    functionAppName: 'fn-deceasedestate-dev'
+    functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
+    resourceGroup: 't3-syd-d365cn-DeceasedEstate-dev-arg'
 
+- template: azure-function-deploy.yml
+  parameters:
+    workspace: 'test'
+    dependsOn: [dev]
+    azureServiceConnection: 'Azure ELZ DE Test'
+    backendVariableGroup: 'Terraform ELZ Test Backend'
+    functionAppName: 'fn-deceasedestate-test'
+    functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
+    resourceGroup: 't3-syd-d365cn-DeceasedEstate-test-arg'
 
-Vishal Kumar, I created the follow-up PR for the infra pipeline sequencing.
-
-This updates the base environment deployment pipeline so the stages run sequentially instead of in parallel:
-
-Build to Dev to Test to UAT to Prod
-
-This is separate from the Function App code deployment PR.
+- template: azure-function-deploy.yml
+  parameters:
+    workspace: 'uat'
+    dependsOn: [test]
+    azureServiceConnection: 'Azure ELZ DE Uat'
+    backendVariableGroup: 'Terraform ELZ Uat Backend'
+    functionAppName: 'fn-deceasedestate-uat'
+    functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
+    resourceGroup: 't3-syd-d365cn-DeceasedEstate-uat-arg'
