@@ -1,43 +1,15 @@
-SPESTG-1054 Add Function App private endpoint and runtime settings
+Vishal Kumar, I created the two PRs for review.
 
-Summary:
-- Added Function App sites private endpoint pattern based on the SQYC reference.
-- Added DNS wait for Function App privatelink.azurewebsites.net.
-- Added required Function App runtime blob settings:
-  - BLOB_CONTAINER_NAME
-  - BLOB_SERVICE_URL
-- Kept NO_PROXY and removed unnecessary HTTP/HTTPS proxy app settings if present.
+1. Infra PR
 
-Validation:
-- Validated infra deployment from branch.
-- Test Function App private endpoint and DNS records were created successfully.
-- Function App deployment to Dev and Test now works after the infra fix.
+   <infra PR link>
 
----------------------
+This includes the fix for the Function App deployment issue we encountered in Test. The deployment was timing out at the SCM/Kudu endpoint, so I added the Function App sites private endpoint pattern based on the SQYC reference, including the required DNS handling. I also included the runtime blob app settings cleanup needed by the Function App.
 
-users/alex/SPESTG-480-dev-runtime-validation
+2. Function App PR
 
-Summary:
-- Added staged Function App deployment pipeline flow.
-- Build runs once, then deployment proceeds sequentially:
-  - Dev
-  - Test
-  - UAT
-- Added dependsOn support in the Function App deploy template.
-- Removed temporary DEV-only forced staging failure validation code.
+   <function app PR link>
 
-Validation:
-- Function App pipeline tested from branch.
-- Build passed.
-- Dev deployment passed.
-- Test deployment passed after infra private endpoint fix.
+This includes the Function App deployment pipeline staging fix. The pipeline now follows the staged flow and supports the dependency sequence properly so deployment can proceed Dev to Test to UAT.
 
---------------------------  
-
-Vishal Kumar, both branch validations are now passing for Dev and Test.
-
-I’ll create two separate PRs now:
-1. Infra PR for the Function App sites private endpoint and runtime app settings.
-2. Function App PR for the staged deployment pipeline and code updates.
-
-After approval and merge, I’ll rerun both from DEDIAAutomationDevelop and validate through UAT.
+I already validated both branches up to Dev and Test, and both are now working. Once these are approved and merged, I’ll rerun from DEDIAAutomationDevelop and validate up to UAT.
