@@ -1,4 +1,25 @@
-trigger: none
+parameters:
+- name: workspace
+  type: string
+
+- name: dependsOn
+  type: object
+  default: []
+
+- name: azureServiceConnection
+  type: string
+
+- name: backendVariableGroup
+  type: string
+
+- name: functionAppName
+  type: string
+
+- name: functionPackage
+  type: string
+
+- name: resourceGroup
+  type: string
 
 pool:
   name: Default
@@ -7,39 +28,5 @@ pool:
   - visualstudio
 
 stages:
-- template: azure-function-build.yml
-  parameters:
-    azureServiceConnection: 'Azure ELZ DE Dev'
-    backendVariableGroup: 'Terraform ELZ Dev Backend'
-    buildSolution: 'src/WNZL.ICOW.DeceasedEstates.IntServices/*.sln'
-    publishProjects: 'src/WNZL.ICOW.DeceasedEstates.IntServices/WNZL.ICOW.DeceasedEstates.AzureFunctions/*.csproj'
-
-- template: azure-function-deploy.yml
-  parameters:
-    workspace: 'dev'
-    dependsOn: [Build]
-    azureServiceConnection: 'Azure ELZ DE Dev'
-    backendVariableGroup: 'Terraform ELZ Dev Backend'
-    functionAppName: 'fn-deceasedestate-dev'
-    functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
-    resourceGroup: 't3-syd-d365cn-DeceasedEstate-dev-arg'
-
-- template: azure-function-deploy.yml
-  parameters:
-    workspace: 'test'
-    dependsOn: [dev]
-    azureServiceConnection: 'Azure ELZ DE Test'
-    backendVariableGroup: 'Terraform ELZ Test Backend'
-    functionAppName: 'fn-deceasedestate-test'
-    functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
-    resourceGroup: 't3-syd-d365cn-DeceasedEstate-test-arg'
-
-- template: azure-function-deploy.yml
-  parameters:
-    workspace: 'uat'
-    dependsOn: [test]
-    azureServiceConnection: 'Azure ELZ DE Uat'
-    backendVariableGroup: 'Terraform ELZ Uat Backend'
-    functionAppName: 'fn-deceasedestate-uat'
-    functionPackage: '$(Pipeline.Workspace)/drop/s.zip'
-    resourceGroup: 't3-syd-d365cn-DeceasedEstate-uat-arg'
+- stage: ${{ parameters.workspace }}
+  dependsOn: ${{ parameters.dependsOn }}
