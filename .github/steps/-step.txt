@@ -1,32 +1,26 @@
-parameters:
-- name: workspace
-  type: string
+module "function_app_sites_private_endpoint" {
+  source  = "terraform.westpac.co.nz/WNZL/module-network-privateendpoint/azurerm"
+  version = "~> 1"
 
-- name: dependsOn
-  type: object
-  default: []
+  name                = "${local.env.function_app_name}-pe"
+  resource_group_name = local.env.resource_group_name
+  location            = module.global_variables.azure.location
+  resource_id         = azurerm_windows_function_app.function_app.id
+  subnet_id           = data.azurerm_subnet.private_endpoint.id
+  subresource_names   = ["sites"]
+  tags                = local.tags
+}
 
-- name: azureServiceConnection
-  type: string
+module "wait_for_function_app_dns_sites_reg" {
+  depends_on        = [module.function_app_sites_private_endpoint]
+  source            = "terraform.westpac.co.nz/WNZL/module-network-privateendpoint/azurerm//wait_for_dns_registration"
+  version           = "~> 1"
+  fqdn              = "${local.env.function_app_name}.privatelink.azurewebsites.net"
+  shell_interpreter = "powershell"
+}
 
-- name: backendVariableGroup
-  type: string
 
-- name: functionAppName
-  type: string
-
-- name: functionPackage
-  type: string
-
-- name: resourceGroup
-  type: string
-
-pool:
-  name: Default
-  demands:
-  - msbuild
-  - visualstudio
-
-stages:
-- stage: ${{ parameters.workspace }}
-  dependsOn: ${{ parameters.dependsOn }}
+SPESTG-1054 Add Function App sites private endpoint
+git add base_environment/main.tf
+git commit -m "SPESTG-1054 Add Function App sites private endpoint"
+git push -u origin users/alex/SPESTG-1054-add-functionapp-sites-pe
