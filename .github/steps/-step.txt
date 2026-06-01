@@ -1,4 +1,10 @@
+resource "azurerm_role_assignment" "function_app_key_vault_secrets_user" {
+  scope                = module.vault_full_private.resource_id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
 
-UAT Azure resources deployment completed successfully. Latest infra updates included the Function App sites private endpoint/DNS setup and required runtime app settings for blob configuration. Dev and Test validation passed, and UAT resources were provisioned successfully.
-
-Function App code deployment pipeline completed successfully through Dev, Test, and UAT using the staged deployment flow. Deployment blocker was resolved after adding the Function App SCM/Kudu private endpoint and DNS configuration in infra.
+  depends_on = [
+    azurerm_windows_function_app.function_app,
+    module.vault_full_private
+  ]
+}
