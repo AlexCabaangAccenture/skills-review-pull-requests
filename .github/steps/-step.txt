@@ -1,1 +1,12 @@
-powershell -Command "$line = (Get-Content 'base_environment/main.tf' | Select-String 'Key Vault Secrets User').Line; $line.ToCharArray() | ForEach-Object { '{0} {1}' -f $_, [int][char]$_ }"
+resource "azurerm_role_assignment" "function_app_key_vault_secrets_user" {
+  count = local.env.azure_tenant == "dev" ? 0 : 1
+
+  scope                = module.vault_full_private.resource_id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_windows_function_app.function_app.identity[0].principal_id
+
+  depends_on = [
+    azurerm_windows_function_app.function_app,
+    module.vault_full_private
+  ]
+}
