@@ -1,29 +1,8 @@
-Added Key Vault Secrets User role assignment for Function App managed identity so Key Vault references can resolve in higher environments.
+Vishal Kumar, I validated the Key Vault reference issue and created the PR for the fix.
 
+Dev was already resolving correctly. For Test/UAT, the Function App managed identity was missing the equivalent Key Vault Secrets User access on the environment Key Vault.
 
-SPESTG-1054 Add Key Vault secret access for Function App identity
+I added the Terraform role assignment and validated it against Test. After rerun and Function App restart, the Key Vault references resolved correctly and Dev remained unaffected.
 
-Summary:
-- Added Key Vault Secrets User role assignment for the Function App managed identity.
-- This allows the Function App to resolve Key Vault references for Dataverse client ID and client secret.
-
-Reason:
-- Dev already resolves Key Vault references correctly.
-- Test/UAT Function App managed identities were missing the equivalent Key Vault secret read access.
-- This caused Dataverse:ClientId and Dataverse:ClientSecret Key Vault references to remain unresolved in Test/UAT.
-
-Validation:
-- Ran infra pipeline from branch.
-- Test role assignment was created successfully.
-- Re-ran pipeline to confirm no repeat conflict.
-- Restarted Test Function App and confirmed Key Vault references still resolve.
-- Verified Dev remains unaffected.
-
-
-Vishal Kumar, I validated the Key Vault reference issue.
-
-Dev was resolving correctly, but Test/UAT were missing the equivalent Key Vault Secrets User access for the Function App managed identity on the environment Key Vault.
-
-I added the Terraform role assignment and validated it against Test. After rerun and Function App restart, the Key Vault references still resolve correctly. Dev remains unaffected.
-
-I’ll raise the PR now for this fix.
+PR:
+<paste PR link>
