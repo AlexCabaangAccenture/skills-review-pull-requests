@@ -1,8 +1,13 @@
-Vishal Kumar, I validated the Key Vault reference issue and created the PR for the fix.
+SPESTG-1054 Add Function App Key Vault access and DIA runtime settings
 
-Dev was already resolving correctly. For Test/UAT, the Function App managed identity was missing the equivalent Key Vault Secrets User access on the environment Key Vault.
+Summary:
+- Added Key Vault Secrets User role assignment for the Function App managed identity so Key Vault references can resolve in Test/UAT.
+- Added DIA exception notification app settings required by the Function App runtime:
+  - DiaExceptionNotification__SenderConfigKey
+  - DiaExceptionNotification__RecipientConfigKey
 
-I added the Terraform role assignment and validated it against Test. After rerun and Function App restart, the Key Vault references resolved correctly and Dev remained unaffected.
-
-PR:
-<paste PR link>
+Validation:
+- Validated Test pipeline rerun with the Key Vault role assignment.
+- Confirmed Test Key Vault references still resolve after Function App restart.
+- Dev remains unaffected.
+- Dev/Test validation will be rerun after the DIA notification app settings update.
