@@ -1,13 +1,6 @@
-SPESTG-1054 Add Function App Key Vault access and DIA runtime settings
+Hi Vishal Kumar, I updated the PR with the infra fixes for the Key Vault reference access and DIA notification config app settings.
 
-Summary:
-- Added Key Vault Secrets User role assignment for the Function App managed identity so Key Vault references can resolve in Test/UAT.
-- Added DIA exception notification app settings required by the Function App runtime:
-  - DiaExceptionNotification__SenderConfigKey
-  - DiaExceptionNotification__RecipientConfigKey
+I validated the changes against Dev/Test, and the Key Vault references are resolving now after the pipeline run and Function App restart.
 
-Validation:
-- Validated Test pipeline rerun with the Key Vault role assignment.
-- Confirmed Test Key Vault references still resolve after Function App restart.
-- Dev remains unaffected.
-- Dev/Test validation will be rerun after the DIA notification app settings update.
+Details are in the PR description. Once approved and merged, I can rerun from DEDIAAutomationDevelop and update the deployment documentation/pipeline links accordingly.
+
