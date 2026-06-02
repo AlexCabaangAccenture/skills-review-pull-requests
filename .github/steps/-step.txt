@@ -1,10 +1,6 @@
-As of the latest validation:
 
-* UAT backend/storage pipeline has been completed successfully.
-* Base environment pipeline backend key handling has been fixed.
-* The pipeline now uses the BackendKey from Azure DevOps Library instead of falling back to the hardcoded backend key in main.tf.
-* UAT build and Terraform plan have been validated using the correct UAT backend/state.
-* Latest infra changes have been approved, merged, and deployed from the standard branch path.
-* The merged-branch deployment completed successfully across Dev, Test, and UAT.
-* Latest infra updates included Function App managed identity Key Vault access and DIA exception notification app settings.
 
+DiaExceptionNotification__SenderConfigKey
+DiaExceptionNotification__RecipientConfigKey
+
+The pipeline now uses the BackendKey from Azure DevOps Library instead of falling back to the hardcoded backend key in main.tf.
