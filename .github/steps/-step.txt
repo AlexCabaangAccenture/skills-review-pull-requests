@@ -21,3 +21,23 @@ Execution order summary:
 
 Terraform Infra → Base Env Infra → Azure Services / Function App Pipeline
 
+====================================================================================================
+
+3. Azure
+
+Azure Pipeline Links and Execution Order
+[paste new section here]
+
+A) Terraform Infra
+
+Refer to the Azure Pipeline Links and Execution Order section above.
+
+B) Base Env Infra
+
+Refer to the Azure Pipeline Links and Execution Order section above.
+
+C) Azure Services (Function App) Pipeline
+
+Test Deployment and Configuration Validation
+[existing content remains]
+
