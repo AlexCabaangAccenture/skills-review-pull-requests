@@ -1,12 +1,6 @@
-Deployment Validation Evidence
 
-The latest merged-branch deployment completed successfully across Dev, Test, and UAT.
+Hi Vishal and team, I have completed the documentation cleanup based on the latest successful merged-branch deployment across Dev, Test, and UAT.
 
-Validation confirmed the following:
+I updated the deployment status, latest pipeline run link, and notes for the recent fixes, including the Key Vault access update and DIA notification configuration app settings.
 
-* UAT backend/state configuration was used correctly during Terraform execution.
-* Function App managed identity Key Vault access was applied for the required environments.
-* Test Key Vault references resolved after the Terraform deployment and Function App restart.
-* DIA exception notification app settings were loaded correctly by the Function App.
-* Dev runtime validation confirmed TPC Log creation and D365 email notification record creation.
-* Final D365 email send status is handled by D365/server-side email processing.
+I’ll keep monitoring for any specific feedback or items that still need adjustment.
