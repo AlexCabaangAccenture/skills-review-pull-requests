@@ -1,35 +1,16 @@
+Known Constraints / Notes
+
+* Pipeline execution may require manual approval depending on the configured Azure DevOps environment gates.
+* Azure resource visibility depends on the required SailPoint/entitlement access being granted.
+* Proxy/noProxy values must be correct per environment to avoid access issues during Terraform execution or Function App runtime access.
+* Full DIA runtime file-processing validation in Test/UAT may require Cloud team support because DIA input blob/container access and test file upload setup are restricted.
+* Dev runtime validation was previously possible using Blob Storage because SMTP/source integration was not yet available.
+* Even with Owner/PIM access, blob upload or container creation may still be blocked by storage, network, or security policies.
+* Any future apply-stage issue should be fixed through a user branch, validated up to plan where possible, then merged back through the standard process.
 
 
-Proxy Configuration Notes
+Current Follow-up / Turnover Notes
 
-There are two separate proxy-related values:
-
-* PipelineNoProxy: used by the pipeline agent/proxy configuration.
-* FunctionNoProxy: used by the deployed Function App NO_PROXY app setting.
-
-A validation step has been added so the pipeline fails early if the proxy values are missing or unresolved.
-
-
------------------------------------------
-
-
-Function App App Settings
-
-The Function App app settings use the Dataverse runtime keys:
-
-* dataverse:ClientId
-* dataverse:ClientSecret
-* dataverse:TenantId
-* dataverse:Url
-
-Dataverse:ClientId and Dataverse:ClientSecret are backed by the existing D365 Key Vault secret references.
-
-DataverseTenantId and DataverseUrl are passed from Azure DevOps Library variables into Terraform.
-
-The DIA exception notification app settings are also configured for runtime notification handling:
-
-* DiaExceptionNotification__SenderConfigKey
-* DiaExceptionNotification__RecipientConfigKey
-
-These values are Dataverse TPC Configuration Key names used by the Function App to retrieve the configured sender and recipient values. They are not the actual email addresses.
-
+* Keep this page updated with final deployment evidence and validation notes.
+* Record any remaining Test/UAT runtime validation constraints separately from deployment completion.
+* No further infrastructure deployment blocker is currently identified from the latest merged-branch run.
