@@ -1,7 +1,10 @@
+As of the latest validation:
 
-Current Follow-up / Turnover Notes
+* UAT backend/storage pipeline has been completed successfully.
+* Base environment pipeline backend key handling has been fixed.
+* The pipeline now uses the BackendKey from Azure DevOps Library instead of falling back to the hardcoded backend key in main.tf.
+* UAT build and Terraform plan have been validated using the correct UAT backend/state.
+* Latest infra changes have been approved, merged, and deployed from the standard branch path.
+* The merged-branch deployment completed successfully across Dev, Test, and UAT.
+* Latest infra updates included Function App managed identity Key Vault access and DIA exception notification app settings.
 
-* Keep this page updated with final deployment evidence and validation notes.
-* Record any remaining Test/UAT runtime validation constraints separately from deployment completion.
-* Full DIA runtime file-processing validation in Test/UAT may require Cloud team support for blob/container access and test file setup.
-* No further infrastructure deployment blocker is currently identified from the latest merged-branch run.
