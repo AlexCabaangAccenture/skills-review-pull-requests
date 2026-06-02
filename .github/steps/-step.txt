@@ -1,3 +1,4 @@
 
 
-The DIA exception notification values are Dataverse TPC Configuration Key names used by the Function App at runtime. They are not the actual email addresses.
+The backend key is explicitly passed through the pipeline/template chain and used during Terraform init. This has been validated through the latest merged-branch deployment run.
+
