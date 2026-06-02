@@ -1,6 +1,3 @@
 
 
-DiaExceptionNotification__SenderConfigKey
-DiaExceptionNotification__RecipientConfigKey
-
-The pipeline now uses the BackendKey from Azure DevOps Library instead of falling back to the hardcoded backend key in main.tf.
+The DIA exception notification values are Dataverse TPC Configuration Key names used by the Function App at runtime. They are not the actual email addresses.
