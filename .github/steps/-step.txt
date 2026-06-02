@@ -1,22 +1,23 @@
-Azure Pipeline Execution Order
+Azure Pipeline Links and Execution Order
 
-The Azure deployment pipelines should be executed in the following order:
+The Azure pipelines should be executed in the following order:
 
-1. Terraform Infra pipeline
+1. Terraform Infra
 
-   * Purpose: provisions or updates the Terraform backend and base infrastructure dependencies required for the environment.
-   * Execute first when backend/storage or shared infrastructure setup is required.
+   * Pipeline link: <insert Terraform Infra pipeline link>
+   * Purpose: prepares or updates the Terraform backend and shared infrastructure dependencies required for environment deployment.
 
-2. Base Env Infra pipeline
+2. Base Env Infra
 
-   * Purpose: provisions or updates the environment-specific Azure resources, Terraform state usage, Function App infrastructure settings, Key Vault references, role assignments, and app settings.
-   * Execute after Terraform Infra is available and the required Azure DevOps Library values are configured.
+   * Pipeline link: <insert Base Env Infra pipeline link>
+   * Purpose: deploys or updates the environment-specific Azure infrastructure, including Terraform state usage, Azure resources, Function App infrastructure configuration, Key Vault references, role assignments, and app settings.
 
-3. Azure Services / Function App pipeline
+3. Azure Services / Function App Pipeline
 
-   * Purpose: builds and deploys the Function App code package to the target Azure Function App.
-   * Execute after the environment infrastructure and Function App app settings are available.
+   * Pipeline link: <insert Azure Services / Function App pipeline link>
+   * Purpose: builds and deploys the Azure Function App code package to the target Function App.
 
-Execution summary:
+Execution order summary:
 
-Terraform Infra → Base Env Infra → Azure Services / Function App
+Terraform Infra → Base Env Infra → Azure Services / Function App Pipeline
+
