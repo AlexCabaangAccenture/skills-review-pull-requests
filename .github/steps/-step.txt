@@ -1,6 +1,7 @@
-Hi Vishal Kumar, I updated the PR with the infra fixes for the Key Vault reference access and DIA notification config app settings.
 
-I validated the changes against Dev/Test, and the Key Vault references are resolving now after the pipeline run and Function App restart.
+Current Follow-up / Turnover Notes
 
-Details are in the PR description. Once approved and merged, I can rerun from DEDIAAutomationDevelop and update the deployment documentation/pipeline links accordingly.
-
+* Keep this page updated with final deployment evidence and validation notes.
+* Record any remaining Test/UAT runtime validation constraints separately from deployment completion.
+* Full DIA runtime file-processing validation in Test/UAT may require Cloud team support for blob/container access and test file setup.
+* No further infrastructure deployment blocker is currently identified from the latest merged-branch run.
