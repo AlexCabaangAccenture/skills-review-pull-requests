@@ -1,13 +1,14 @@
-A) Terraform Infra
+Completed the Azure deployment documentation updates for SPESTG-1054.
 
-Refer to the Azure Pipeline Links and Execution Order section above for the Terraform Infra pipeline link, purpose, and execution order.
+Updated the documentation with:
 
-B) Base Env Infra
+* Latest merged-branch deployment pipeline run links and status
+* Dev/Test/UAT deployment result summary
+* Pipeline execution order
+* Key Vault access fix for the Function App managed identity
+* DIA notification configuration app settings
+* Validation notes and known constraints
+* PR/reference details
 
-Refer to the Azure Pipeline Links and Execution Order section above for the Base Env Infra pipeline link, purpose, and execution order.
+Also updated the 2.4 Pipelines page with the Azure pipeline links and execution order as requested.
 
-C) Azure Services (Function App) Pipeline
-
-Refer to the Azure Pipeline Links and Execution Order section above for the Azure Services / Function App pipeline link and execution order.
-
-Test Deployment and Configuration Validation
