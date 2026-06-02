@@ -1,4 +1,35 @@
 
 
-The backend key is explicitly passed through the pipeline/template chain and used during Terraform init. This has been validated through the latest merged-branch deployment run.
+Proxy Configuration Notes
+
+There are two separate proxy-related values:
+
+* PipelineNoProxy: used by the pipeline agent/proxy configuration.
+* FunctionNoProxy: used by the deployed Function App NO_PROXY app setting.
+
+A validation step has been added so the pipeline fails early if the proxy values are missing or unresolved.
+
+
+-----------------------------------------
+
+
+Function App App Settings
+
+The Function App app settings use the Dataverse runtime keys:
+
+* dataverse:ClientId
+* dataverse:ClientSecret
+* dataverse:TenantId
+* dataverse:Url
+
+Dataverse:ClientId and Dataverse:ClientSecret are backed by the existing D365 Key Vault secret references.
+
+DataverseTenantId and DataverseUrl are passed from Azure DevOps Library variables into Terraform.
+
+The DIA exception notification app settings are also configured for runtime notification handling:
+
+* DiaExceptionNotification__SenderConfigKey
+* DiaExceptionNotification__RecipientConfigKey
+
+These values are Dataverse TPC Configuration Key names used by the Function App to retrieve the configured sender and recipient values. They are not the actual email addresses.
 
