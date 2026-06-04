@@ -1,88 +1,111 @@
-Hi Vishal,
+# SPESTG-1054 Evidence Summary
 
-I completed the initial comparison of the current Deceased Estates Terraform/file/function structure against the SQYC reference pattern.
+Story: SPESTG-1054
+Title: Deploy Integration infra and Resource to UAT
 
-Summary of findings:
+## Summary
 
-1. Infra/Terraform repo
+The deployment and documentation work for SPESTG-1054 has been completed from my side.
 
-Current Deceased Estates infra repo:
-WNZL.ICOW.DE.ELZIntInfra
+The evidence below maps to the story acceptance criteria:
 
-Reference infra repo:
-WNZL.WF.AzureELZ.Infrastructure
+1. Terraform pipeline is able to deploy infra and resources to UAT environment
+2. Terraform code is configured to deploy infra and resources to Prod environment as well
+3. Library variables cleaned and no duplicate
+4. Library group created/configured for all environments
+5. Pipelines, infra, and function app documented
 
-Both repos follow the same high-level Terraform structure:
+## Evidence by acceptance criteria
 
-* base_environment
-* global_variables
-* elz_local
-* root-level Terraform pipeline YAML files
+### 1. Terraform pipeline is able to deploy infra and resources to UAT environment
 
-The root pipeline also follows the same pattern of using elz_local templates and passing base_environment as the Terraform configuration directory.
+Evidence:
 
-Based on this initial check, I do not see a major Terraform folder structure gap against the reference infra repo.
+* UAT deployment pipeline was executed successfully.
+* Latest deployment run from the merged branch completed successfully across Dev, Test, and UAT.
+* UAT resource deployment was validated after pipeline execution.
 
-2. Function services repo
+Attach/link:
 
-Current Deceased Estates function repo:
-WNZL.ICOW.DE.ELZIntServices
+* UAT deployment pipeline run
+* Latest Dev/Test/UAT deployment run
+* UAT validation screenshot or Azure resource validation evidence
 
-Current structure:
-repo root
-src
-WNZL.ICOW.DeceasedEstates.IntServices
-Pipeline
-WNZL.ICOW.DeceasedEstates.AzureFunctions
-WNZL.ICOW.DeceasedEstates.Services
-WNZL.ICOW.DeceasedEstates.Services.Tests
+Status:
+Completed
 
-Reference SQYC services repo:
-WNZL.WF.AzureELZ.Services
+### 2. Terraform code is configured to deploy infra and resources to Prod environment as well
 
-Reference structure:
-repo root
-Pipelines
-WNZL.SKYC.Dataverse.Func
+Evidence:
 
-This is the main structure difference found. SQYC keeps the pipeline folder and function project directly under the repo root, while Deceased Estates has an additional src/WNZL.ICOW.DeceasedEstates.IntServices nesting layer.
+* Terraform pipeline includes Prod deployment stage/configuration.
+* Prod backend/configuration placeholders are included in the pipeline setup.
+* Prod deployment is configured but should only be executed through the normal approval/release process.
 
-3. Impact if we align the function repo structure
+Attach/link:
 
-The Deceased Estates function build/deploy/Sonar pipeline files currently have path references tied to the existing nested structure, including:
+* Pipeline YAML/configuration evidence showing Prod stage/configuration
+* Pipeline documentation page covering environment execution order
 
-* solution path
-* function project csproj path
-* publish project path
-* package/artifact path
-* SonarQube source/project path
+Status:
+Completed from configuration/documentation perspective
 
-Because of this, restructuring the function repo would not be only a folder move. It would require coordinated updates to pipeline YAML paths and validation of build, deploy, and SonarQube execution.
+### 3. Library variables cleaned and no duplicate
 
-4. Risk
+Evidence:
 
-The current Dev/Test/UAT deployment baseline has already been validated from the merged branch. Changing the structure now could affect:
+* Library variable usage was reviewed and cleaned as part of the deployment readiness work.
+* Environment-specific variable groups/backend settings were aligned for the deployment flow.
 
-* build solution discovery
-* function app publish output
-* deployment package generation
-* deployment stages
-* SonarQube analysis path
-* documentation references
+Attach/link:
 
-5. Recommendation
+* Variable group/library configuration screenshot if available
+* Documentation note showing variable group usage
 
-My recommendation is to treat this as a separate cleanup/alignment item rather than a quick change under the already validated deployment work.
+Status:
+Completed
 
-Suggested approach:
+### 4. Library group created/configured for all environments
 
-* Confirm the target structure to align with the SQYC services repo pattern.
-* Create a separate branch/PR for the structure alignment.
-* Move the function pipeline and project folders in a controlled way.
-* Update the build, deploy, and SonarQube YAML path references.
-* Validate build and SonarQube first.
-* Then validate deployment in Dev before considering Test/UAT promotion.
+Evidence:
 
-This keeps the completed Dev/Test/UAT deployment baseline protected while still allowing the structure alignment to be planned properly.
+* Backend/environment variable groups were configured for the deployment flow.
+* Deployment pipeline references the required backend variable groups per environment.
 
-I can walk through the comparison and proposed alignment if needed.
+Attach/link:
+
+* Dev/Test/UAT/Prod variable group evidence if available
+* Pipeline configuration showing backend variable group references
+
+Status:
+Completed
+
+### 5. Document the pipelines, infra, and function app
+
+Evidence:
+
+* Azure deployment documentation was updated.
+* Pipeline links and execution order were documented.
+* Validation notes, known constraints, and PR/reference details were added.
+* The 2.4 Pipelines Confluence page was updated with Azure pipeline links and execution order.
+
+Attach/link:
+
+* Azure deployment documentation page
+* 2.4 Pipelines Confluence page
+* PR/reference links
+
+Status:
+Completed
+
+## Additional notes
+
+The latest deployment baseline has been validated across Dev, Test, and UAT.
+
+A separate structure comparison summary was also prepared and sent for review. That structure review is a follow-up analysis item and is not considered a blocker for SPESTG-1054 closure.
+
+## Closure statement
+
+The deployment and documentation items under SPESTG-1054 have been completed from my side. Evidence has been attached/linked to support story closure.
+
+
